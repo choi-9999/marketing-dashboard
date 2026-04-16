@@ -50,7 +50,13 @@ async function readRawTabs() {
 
   if (storageMode === "shared-kv") {
     const payload = await kv.get(sharedStateKey);
-    return payload || null;
+    if (!payload) return null;
+
+    if (typeof payload === "string") {
+      return JSON.parse(payload);
+    }
+
+    return payload;
   }
 
   if (storageMode === "local-file") {
@@ -64,7 +70,7 @@ async function persistRawTabs(payload) {
   const storageMode = getStorageMode();
 
   if (storageMode === "shared-kv") {
-    await kv.set(sharedStateKey, payload);
+    await kv.set(sharedStateKey, JSON.stringify(payload));
     return;
   }
 
