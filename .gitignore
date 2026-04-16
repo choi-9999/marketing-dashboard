@@ -1,0 +1,5 @@
+node_modules
+.next
+tmp_sns_xlsx
+dashboard-preview.pdf
+dashboard-preview.png

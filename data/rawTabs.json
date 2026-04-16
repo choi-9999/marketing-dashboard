@@ -1,0 +1,156 @@
+{
+  "page": "dashboard",
+  "rawTabs": [
+    {
+      "id": "tab-social-1",
+      "name": "SNS",
+      "kind": "special-social",
+      "events": [],
+      "rows": [],
+      "socialRows": [
+        {
+          "id": "social-row-1776313840680-5i3qvq",
+          "branch": "강남",
+          "blogUrl": "dddd",
+          "instagramUrl": "dddd",
+          "blogRecentPosts": "30",
+          "blogLastPosted": "2026-04-16",
+          "blogVisitScore": "5",
+          "instagramRecentPosts": "30",
+          "instagramLastPosted": "2026-04-17",
+          "instagramDesignScore": "5",
+          "instagramReactionScore": "4",
+          "profileSetupScore": "0",
+          "featureUsageScore": "0",
+          "ctaScore": "0",
+          "linkHealthScore": "0",
+          "brandInfoScore": "0",
+          "memo": ""
+        },
+        {
+          "id": "social-row-1776313840680-4clu49",
+          "branch": "분당정자",
+          "blogUrl": "",
+          "instagramUrl": "",
+          "blogRecentPosts": "0",
+          "blogLastPosted": "",
+          "blogVisitScore": "0",
+          "instagramRecentPosts": "0",
+          "instagramLastPosted": "",
+          "instagramDesignScore": "0",
+          "instagramReactionScore": "0",
+          "profileSetupScore": "0",
+          "featureUsageScore": "0",
+          "ctaScore": "0",
+          "linkHealthScore": "0",
+          "brandInfoScore": "0",
+          "memo": ""
+        },
+        {
+          "id": "social-row-1776313840680-lckzl1",
+          "branch": "부산대",
+          "blogUrl": "",
+          "instagramUrl": "",
+          "blogRecentPosts": "0",
+          "blogLastPosted": "",
+          "blogVisitScore": "0",
+          "instagramRecentPosts": "0",
+          "instagramLastPosted": "",
+          "instagramDesignScore": "0",
+          "instagramReactionScore": "0",
+          "profileSetupScore": "0",
+          "featureUsageScore": "0",
+          "ctaScore": "0",
+          "linkHealthScore": "0",
+          "brandInfoScore": "0",
+          "memo": ""
+        },
+        {
+          "id": "social-row-1776313840680-oqlbmg",
+          "branch": "목동",
+          "blogUrl": "",
+          "instagramUrl": "",
+          "blogRecentPosts": "0",
+          "blogLastPosted": "",
+          "blogVisitScore": "0",
+          "instagramRecentPosts": "0",
+          "instagramLastPosted": "",
+          "instagramDesignScore": "0",
+          "instagramReactionScore": "0",
+          "profileSetupScore": "0",
+          "featureUsageScore": "0",
+          "ctaScore": "0",
+          "linkHealthScore": "0",
+          "brandInfoScore": "0",
+          "memo": ""
+        },
+        {
+          "id": "social-row-1776313840680-reznyb",
+          "branch": "인천송도",
+          "blogUrl": "",
+          "instagramUrl": "",
+          "blogRecentPosts": "0",
+          "blogLastPosted": "",
+          "blogVisitScore": "0",
+          "instagramRecentPosts": "0",
+          "instagramLastPosted": "",
+          "instagramDesignScore": "0",
+          "instagramReactionScore": "0",
+          "profileSetupScore": "0",
+          "featureUsageScore": "0",
+          "ctaScore": "0",
+          "linkHealthScore": "0",
+          "brandInfoScore": "0",
+          "memo": ""
+        },
+        {
+          "id": "social-row-1776314102011-nhslxk",
+          "branch": "",
+          "blogUrl": "",
+          "instagramUrl": "",
+          "blogRecentPosts": "0",
+          "blogLastPosted": "",
+          "blogVisitScore": "0",
+          "instagramRecentPosts": "0",
+          "instagramLastPosted": "",
+          "instagramDesignScore": "0",
+          "instagramReactionScore": "0",
+          "profileSetupScore": "0",
+          "featureUsageScore": "0",
+          "ctaScore": "0",
+          "linkHealthScore": "0",
+          "brandInfoScore": "0",
+          "memo": ""
+        }
+      ]
+    },
+    {
+      "id": "tab-1776315850096",
+      "name": "새 활성화 방안 2",
+      "kind": "default",
+      "events": [],
+      "rows": [
+        {
+          "id": "row-1776315850096-ekp957",
+          "region": "서울",
+          "branch": "강남",
+          "eventValues": {}
+        },
+        {
+          "id": "row-1776315850096-k41z11",
+          "region": "경기",
+          "branch": "분당정자",
+          "eventValues": {}
+        },
+        {
+          "id": "row-1776315850096-dn7i1k",
+          "region": "부산",
+          "branch": "부산대",
+          "eventValues": {}
+        }
+      ]
+    }
+  ],
+  "activeTabId": "tab-1776315850096",
+  "dashboardTabId": "tab-1776315850096"
+}

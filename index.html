@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>지점 활성화 방안 대시보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="workbook">
+    <header class="sheet-topbar">
+      <div class="title-block">
+        <p class="sheet-kicker">BRANCH ACTIVATION REPORT</p>
+        <h1>지점 활성화 방안 대시보드</h1>
+      </div>
+      <div class="topbar-meta">
+        <div class="meta-cell">
+          <span>기준일</span>
+          <strong>2026.04.14</strong>
+        </div>
+        <div class="meta-cell">
+          <span>업데이트</span>
+          <strong>09:00</strong>
+        </div>
+        <div class="meta-cell highlight">
+          <span>데이터 원본</span>
+          <strong>XLSM 연동 반영</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="sheet-tabs" id="sheet-tabs">
+      <button class="sheet-tab active" data-program="all">대시보드</button>
+      <button class="sheet-tab" data-program="friends">247프렌즈</button>
+      <button class="sheet-tab" data-program="trial">247체험단</button>
+      <button class="sheet-tab" data-program="exam">입시교육</button>
+      <button class="sheet-tab" data-program="marketing">마케팅교육</button>
+      <button class="sheet-tab" data-program="press">언론보도</button>
+      <button class="sheet-tab" data-program="event">협업이벤트</button>
+    </section>
+
+    <main class="sheet-body">
+      <section class="sheet-panel utility-panel">
+        <div class="utility-row">
+          <div class="utility-badge navy">📂 RAWDATA</div>
+          <div class="utility-badge yellow">⚡ RESET</div>
+          <button id="reset-button" class="reset-button">필터 초기화</button>
+          <div class="utility-note">엑셀 원본의 상단 도구영역, 프로그램 버튼, 프로그램별 참여이력을 웹에서 조작 가능하게 옮겼습니다.</div>
+        </div>
+        <div class="program-chip-row" id="program-chips">
+          <button class="program-chip friends active" data-program="friends">🧑‍🤝‍🧑 247프렌즈</button>
+          <button class="program-chip trial" data-program="trial">📢 247체험단</button>
+          <button class="program-chip exam" data-program="exam">🎓 입시교육</button>
+          <button class="program-chip marketing" data-program="marketing">🌐 마케팅교육</button>
+          <button class="program-chip press" data-program="press">📰 언론보도</button>
+          <button class="program-chip event" data-program="event">🍫 협업이벤트</button>
+        </div>
+      </section>
+
+      <section class="sheet-panel filter-panel">
+        <div class="panel-title-row">
+          <h2>조회 조건</h2>
+          <span class="note-text">권역, 프로그램, 상태에 따라 KPI, 추이, 지점 매트릭스가 함께 변경됩니다.</span>
+        </div>
+        <div class="filter-grid controls-grid">
+          <label class="filter-cell control-cell">
+            <span class="filter-label">권역</span>
+            <select id="region-filter"></select>
+          </label>
+          <label class="filter-cell control-cell">
+            <span class="filter-label">프로그램</span>
+            <select id="program-filter"></select>
+          </label>
+          <label class="filter-cell control-cell">
+            <span class="filter-label">상태</span>
+            <select id="status-filter">
+              <option value="all">전체</option>
+              <option value="active">운영중</option>
+              <option value="inactive">미운영</option>
+            </select>
+          </label>
+          <div class="filter-cell accent summary-cell">
+            <span class="filter-label">현재 보기</span>
+            <strong id="current-view-label">247프렌즈 / 전체 권역</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="sheet-grid overview-grid">
+        <article class="sheet-panel score-panel">
+          <div class="panel-title-row">
+            <h2>핵심 요약</h2>
+            <span id="summary-badge" class="status-pill good">실데이터 기준</span>
+          </div>
+          <div class="score-layout">
+            <div class="score-box strong">
+              <span>운영 지점 수</span>
+              <strong id="active-branches">0</strong>
+              <p id="active-branches-sub">선택 조건 기준</p>
+            </div>
+            <div class="score-box">
+              <span>전체 지점 수</span>
+              <strong id="total-branches">0</strong>
+              <p>합계 행 제외</p>
+            </div>
+            <div class="score-box">
+              <span>운영 비율</span>
+              <strong id="active-rate">0%</strong>
+              <p id="active-rate-sub">선택 프로그램 기준</p>
+            </div>
+            <div class="score-box warn">
+              <span>미운영 지점 수</span>
+              <strong id="inactive-branches">0</strong>
+              <p>즉시 액션 후보</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="sheet-panel monthly-panel">
+          <div class="panel-title-row">
+            <h2>회차별 참여 요약</h2>
+            <span class="note-text">선택한 프로그램의 실제 시트 헤더를 기반으로 구성</span>
+          </div>
+          <div class="table-shell">
+            <table class="excel-table compact-table">
+              <thead>
+                <tr id="summary-head-row"></tr>
+              </thead>
+              <tbody>
+                <tr id="summary-count-row"></tr>
+                <tr id="summary-share-row"></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="sheet-panel trend-panel">
+        <div class="panel-title-row">
+          <h2>📊 참여추이</h2>
+          <span id="trend-note" class="note-text">프로그램별 실제 회차 참여 지점 수</span>
+        </div>
+        <div id="trend-cards" class="trend-grid"></div>
+      </section>
+
+      <section class="sheet-grid metrics-grid">
+        <article class="sheet-panel chart-panel">
+          <div class="panel-title-row">
+            <h2>프로그램별 운영 지점 수</h2>
+            <span class="note-text">현재 필터 기준 집계</span>
+          </div>
+          <div id="program-bars" class="program-bars"></div>
+        </article>
+
+        <article class="sheet-panel heat-panel">
+          <div class="panel-title-row">
+            <h2>권역별 활성화 수준</h2>
+            <span class="note-text">현재 프로그램 기준 운영 비율</span>
+          </div>
+          <div id="heat-cells" class="heat-grid"></div>
+        </article>
+
+        <article class="sheet-panel action-panel">
+          <div class="panel-title-row">
+            <h2>즉시 실행 과제</h2>
+            <span class="status-pill warn">금주 우선</span>
+          </div>
+          <ul id="action-list" class="action-list"></ul>
+        </article>
+      </section>
+
+      <section class="sheet-grid detail-grid">
+        <article class="sheet-panel">
+          <div class="panel-title-row">
+            <h2>전체 시트 기준 프로그램 운영 매트릭스</h2>
+            <span class="note-text">`O/X` 데이터와 필터가 연결된 표</span>
+          </div>
+          <div class="table-shell">
+            <table class="excel-table matrix-table">
+              <thead>
+                <tr>
+                  <th>지역</th>
+                  <th>지점</th>
+                  <th>프렌즈</th>
+                  <th>체험단</th>
+                  <th>입시교육</th>
+                  <th>마케팅교육</th>
+                  <th>언론보도</th>
+                  <th>협업이벤트</th>
+                </tr>
+              </thead>
+              <tbody id="branch-table"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="sheet-panel">
+          <div class="panel-title-row">
+            <h2>활성화 방안 실행표</h2>
+            <span class="note-text">현재 필터에 맞춘 우선 과제</span>
+          </div>
+          <div class="table-shell">
+            <table class="excel-table">
+              <thead>
+                <tr>
+                  <th>영역</th>
+                  <th>실행 항목</th>
+                  <th>담당</th>
+                  <th>완료 목표</th>
+                  <th>진행률</th>
+                </tr>
+              </thead>
+              <tbody id="plan-table"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
