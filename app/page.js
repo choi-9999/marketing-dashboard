@@ -649,9 +649,10 @@ export default function HomePage() {
 
     async function loadRawTabs() {
       try {
-        const cached = window.localStorage.getItem(BROWSER_SAVE_KEY);
-        if (cached) {
-          const parsed = JSON.parse(cached);
+        const response = await fetch("/api/rawtabs", { cache: "no-store" });
+        const parsed = await response.json().catch(() => null);
+
+        if (response.ok && parsed?.rawTabs) {
           const normalizedTabs = normalizeRawTabs(parsed.rawTabs);
 
           if (!ignore && normalizedTabs.length > 0) {
@@ -659,14 +660,25 @@ export default function HomePage() {
             setActiveTabId(parsed.activeTabId || normalizedTabs[0].id);
             setDashboardTabId(parsed.dashboardTabId || OVERVIEW_TAB_ID);
             setPage(parsed.page === "rawdata" ? "rawdata" : "dashboard");
-            setSaveState("브라우저 저장본 복원됨");
+            setSaveState(parsed.storageMode === "shared-kv" ? "공유 서버 데이터 복원됨" : "서버 데이터 복원됨");
+            window.localStorage.setItem(BROWSER_SAVE_KEY, JSON.stringify({
+              page: parsed.page,
+              rawTabs: parsed.rawTabs,
+              activeTabId: parsed.activeTabId,
+              dashboardTabId: parsed.dashboardTabId
+            }));
             return;
           }
         }
+      } catch {
+        // Fall through to browser cache restore.
+      }
 
-        const response = await fetch("/api/rawtabs", { cache: "no-store" });
-        if (!response.ok) throw new Error("failed to load");
-        const parsed = await response.json();
+      try {
+        const cached = window.localStorage.getItem(BROWSER_SAVE_KEY);
+        if (!cached) throw new Error("no cached state");
+
+        const parsed = JSON.parse(cached);
         const normalizedTabs = normalizeRawTabs(parsed.rawTabs);
 
         if (!ignore && normalizedTabs.length > 0) {
@@ -674,7 +686,8 @@ export default function HomePage() {
           setActiveTabId(parsed.activeTabId || normalizedTabs[0].id);
           setDashboardTabId(parsed.dashboardTabId || OVERVIEW_TAB_ID);
           setPage(parsed.page === "rawdata" ? "rawdata" : "dashboard");
-          setSaveState("서버 데이터 복원됨");
+          setSaveState("브라우저 저장본 복원됨");
+          return;
         }
       } catch {
         if (!ignore) setSaveState("저장된 데이터 없음");
@@ -716,8 +729,21 @@ export default function HomePage() {
           body: JSON.stringify(payload)
         });
 
-        if (!response.ok) throw new Error("failed to save");
-        setSaveState("서버에 자동 저장됨");
+        const result = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          if (result?.storageMode === "browser-fallback") {
+            setSaveState("공유 저장 미설정, 브라우저에 저장됨");
+            return;
+          }
+          throw new Error("failed to save");
+        }
+
+        if (result?.storageMode === "shared-kv") {
+          setSaveState("공유 서버에 저장됨");
+        } else {
+          setSaveState("서버에 자동 저장됨");
+        }
       } catch {
         setSaveState("브라우저에 저장됨");
       }
