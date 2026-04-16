@@ -2,9 +2,15 @@ import { promises as fs } from "fs";
 import path from "path";
 import { kv } from "@vercel/kv";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const dataPath = path.join(process.cwd(), "data", "rawTabs.json");
 const sharedStateKey = "branch-activation-dashboard-state";
 let writeQueue = Promise.resolve();
+const noStoreHeaders = {
+  "Cache-Control": "no-store, max-age=0, must-revalidate"
+};
 
 function getStorageMode() {
   if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
@@ -68,15 +74,19 @@ async function readRawTabs() {
 
 async function persistRawTabs(payload) {
   const storageMode = getStorageMode();
+  const nextPayload = {
+    ...payload,
+    updatedAt: new Date().toISOString()
+  };
 
   if (storageMode === "shared-kv") {
-    await kv.set(sharedStateKey, JSON.stringify(payload));
-    return;
+    await kv.set(sharedStateKey, JSON.stringify(nextPayload));
+    return nextPayload;
   }
 
   if (storageMode === "local-file") {
-    await persistLocalFile(payload);
-    return;
+    await persistLocalFile(nextPayload);
+    return nextPayload;
   }
 
   throw new Error("Shared storage is not configured.");
@@ -89,24 +99,24 @@ export async function GET() {
     const data = await readRawTabs();
 
     if (data) {
-      return Response.json({ ...data, storageMode });
+      return Response.json({ ...data, storageMode }, { headers: noStoreHeaders });
     }
 
     if (storageMode === "browser-fallback") {
       return Response.json(
         { error: "Shared storage is not configured.", storageMode },
-        { status: 503 }
+        { status: 503, headers: noStoreHeaders }
       );
     }
 
     return Response.json(
       { error: "Failed to read raw tabs data.", storageMode },
-      { status: 500 }
+      { status: 500, headers: noStoreHeaders }
     );
   } catch (error) {
     return Response.json(
       { error: "Failed to read raw tabs data.", storageMode },
-      { status: 500 }
+      { status: 500, headers: noStoreHeaders }
     );
   }
 }
@@ -120,13 +130,13 @@ export async function POST(request) {
       .catch(() => {})
       .then(() => persistRawTabs(payload));
 
-    await writeQueue;
-    return Response.json({ ok: true, storageMode });
+    const savedPayload = await writeQueue;
+    return Response.json({ ok: true, storageMode, updatedAt: savedPayload.updatedAt }, { headers: noStoreHeaders });
   } catch (error) {
     console.error("Failed to save raw tabs data.", error);
     return Response.json(
       { error: "Failed to save raw tabs data.", storageMode },
-      { status: storageMode === "browser-fallback" ? 503 : 500 }
+      { status: storageMode === "browser-fallback" ? 503 : 500, headers: noStoreHeaders }
     );
   }
 }

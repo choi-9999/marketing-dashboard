@@ -767,6 +767,17 @@ function ExternalScoreLink({ href, value }) {
   );
 }
 
+function formatStatusTimestamp(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+}
+
 export default function HomePage() {
   const [page, setPage] = useState("dashboard");
   const [rawTabs, setRawTabs] = useState(initialTabs);
@@ -801,13 +812,18 @@ export default function HomePage() {
 
         if (response.ok && parsed?.rawTabs) {
           const normalizedTabs = normalizeRawTabs(parsed.rawTabs);
+          const restoredAt = formatStatusTimestamp(parsed.updatedAt);
 
           if (!ignore && normalizedTabs.length > 0) {
             setRawTabs(normalizedTabs);
             setActiveTabId(parsed.activeTabId || normalizedTabs[0].id);
             setDashboardTabId(parsed.dashboardTabId || OVERVIEW_TAB_ID);
             setPage(parsed.page === "rawdata" ? "rawdata" : "dashboard");
-            setSaveState(parsed.storageMode === "shared-kv" ? "공유 서버 데이터 복원됨" : "서버 데이터 복원됨");
+            setSaveState(
+              parsed.storageMode === "shared-kv"
+                ? `공유 서버 데이터 복원됨${restoredAt ? ` · ${restoredAt}` : ""}`
+                : "서버 데이터 복원됨"
+            );
             window.localStorage.setItem(BROWSER_SAVE_KEY, JSON.stringify({
               page: parsed.page,
               rawTabs: parsed.rawTabs,
@@ -894,7 +910,8 @@ export default function HomePage() {
         }
 
         if (result?.storageMode === "shared-kv") {
-          setSaveState("공유 서버에 저장됨");
+          const savedAt = formatStatusTimestamp(result?.updatedAt);
+          setSaveState(`공유 서버에 저장됨${savedAt ? ` · ${savedAt}` : ""}`);
         } else {
           setSaveState("서버에 자동 저장됨");
         }
