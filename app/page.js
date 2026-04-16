@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import * as XLSX from "xlsx";
 
 const OVERVIEW_TAB_ID = "__overall__";
 const SPECIAL_SOCIAL_TAB_KIND = "special-social";
@@ -627,6 +628,127 @@ function summarizeSnsRow(row, baseDate = snsEvaluationBaseDate) {
   };
 }
 
+function formatImportDate(value) {
+  if (!value && value !== 0) return "";
+
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString().slice(0, 10);
+  }
+
+  if (typeof value === "number") {
+    const parsed = XLSX.SSF.parse_date_code(value);
+    if (parsed) {
+      const date = new Date(Date.UTC(parsed.y, parsed.m - 1, parsed.d));
+      return date.toISOString().slice(0, 10);
+    }
+  }
+
+  const date = new Date(value);
+  if (!Number.isNaN(date.getTime())) {
+    return date.toISOString().slice(0, 10);
+  }
+
+  return "";
+}
+
+function readImportedCell(sheet, column, rowIndex, options = {}) {
+  const cell = sheet[`${column}${rowIndex}`];
+  if (!cell) return "";
+
+  if (options.preferHyperlink && cell.l?.Target) {
+    return String(cell.l.Target).trim();
+  }
+
+  if (options.type === "date") {
+    return formatImportDate(cell.v ?? cell.w ?? "");
+  }
+
+  const value = cell.v ?? cell.w ?? "";
+  return value === null || value === undefined ? "" : String(value).trim();
+}
+
+function extractSnsRowsFromWorkbook(arrayBuffer) {
+  const workbook = XLSX.read(arrayBuffer, {
+    type: "array",
+    cellDates: true,
+    cellNF: false,
+    cellStyles: false
+  });
+
+  const sheetName = workbook.SheetNames.find((name) => name.includes("입력")) ?? workbook.SheetNames[1] ?? workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+
+  if (!sheet?.["!ref"]) {
+    return { sheetName, rows: [] };
+  }
+
+  const range = XLSX.utils.decode_range(sheet["!ref"]);
+  const rows = [];
+
+  for (let rowIndex = 2; rowIndex <= range.e.r + 1; rowIndex += 1) {
+    const branch = readImportedCell(sheet, "A", rowIndex);
+    const blogUrl = readImportedCell(sheet, "B", rowIndex, { preferHyperlink: true });
+    const instagramUrl = readImportedCell(sheet, "C", rowIndex, { preferHyperlink: true });
+    const blogRecentPosts = readImportedCell(sheet, "D", rowIndex);
+    const blogLastPosted = readImportedCell(sheet, "E", rowIndex, { type: "date" });
+    const blogVisitScore = readImportedCell(sheet, "F", rowIndex);
+    const instagramRecentPosts = readImportedCell(sheet, "G", rowIndex);
+    const instagramLastPosted = readImportedCell(sheet, "H", rowIndex, { type: "date" });
+    const instagramDesignScore = readImportedCell(sheet, "I", rowIndex);
+    const instagramReactionScore = readImportedCell(sheet, "J", rowIndex);
+    const profileSetupScore = readImportedCell(sheet, "K", rowIndex);
+    const featureUsageScore = readImportedCell(sheet, "L", rowIndex);
+    const ctaScore = readImportedCell(sheet, "M", rowIndex);
+    const linkHealthScore = readImportedCell(sheet, "N", rowIndex);
+    const brandInfoScore = readImportedCell(sheet, "O", rowIndex);
+    const memo = readImportedCell(sheet, "P", rowIndex);
+
+    const hasMeaningfulData = [
+      branch,
+      blogUrl,
+      instagramUrl,
+      blogRecentPosts,
+      blogLastPosted,
+      blogVisitScore,
+      instagramRecentPosts,
+      instagramLastPosted,
+      instagramDesignScore,
+      instagramReactionScore,
+      profileSetupScore,
+      featureUsageScore,
+      ctaScore,
+      linkHealthScore,
+      brandInfoScore,
+      memo
+    ].some(Boolean);
+
+    if (!hasMeaningfulData) continue;
+
+    rows.push(
+      createSpecialSocialRow({
+        branch,
+        blogUrl,
+        instagramUrl,
+        blogRecentPosts: blogRecentPosts || "0",
+        blogLastPosted,
+        blogVisitScore: blogVisitScore || "0",
+        instagramRecentPosts: instagramRecentPosts || "0",
+        instagramLastPosted,
+        instagramDesignScore: instagramDesignScore || "0",
+        instagramReactionScore: instagramReactionScore || "0",
+        profileSetupScore: profileSetupScore || "0",
+        featureUsageScore: featureUsageScore || "0",
+        ctaScore: ctaScore || "0",
+        linkHealthScore: linkHealthScore || "0",
+        brandInfoScore: brandInfoScore || "0",
+        memo
+      })
+    );
+  }
+
+  return { sheetName, rows };
+}
+
 function ExternalScoreLink({ href, value }) {
   if (!href) {
     return <strong>{value}</strong>;
@@ -661,6 +783,7 @@ export default function HomePage() {
   const [regionFilter, setRegionFilter] = useState("all");
   const [hoveredRegion, setHoveredRegion] = useState(null);
   const saveTimeoutRef = useRef(null);
+  const snsImportInputRef = useRef(null);
 
   useEffect(() => {
     let ignore = false;
@@ -1245,6 +1368,32 @@ export default function HomePage() {
     });
   }
 
+  async function importSnsWorkbook(file) {
+    if (!file || activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND) return;
+
+    const shouldReplace = window.confirm("현재 SNS 탭 데이터를 업로드한 엑셀의 입력 원본 시트 데이터로 교체할까요?");
+    if (!shouldReplace) return;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const { sheetName, rows } = extractSnsRowsFromWorkbook(arrayBuffer);
+
+      if (rows.length === 0) {
+        setSaveState("가져올 SNS 데이터 없음");
+        return;
+      }
+
+      updateActiveTab((tab) => ({
+        ...tab,
+        socialRows: rows
+      }));
+      setSaveState(`엑셀 '${sheetName}' 시트 불러옴`);
+    } catch (error) {
+      console.error("Failed to import SNS workbook.", error);
+      setSaveState("엑셀 불러오기 실패");
+    }
+  }
+
   function removeEvent(eventId) {
     if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND) return;
     updateActiveTab((tab) => ({
@@ -1663,6 +1812,24 @@ export default function HomePage() {
                 <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>현재 탭 삭제</button>
                 <button className="reset-button" onClick={addRow}>{activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : "+ 지점 행 추가"}</button>
                 {activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
+                {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? (
+                  <>
+                    <button className="reset-button" onClick={() => snsImportInputRef.current?.click()}>엑셀 불러오기</button>
+                    <input
+                      ref={snsImportInputRef}
+                      type="file"
+                      accept=".xlsx,.xlsm,.xls"
+                      style={{ display: "none" }}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          await importSnsWorkbook(file);
+                        }
+                        e.target.value = "";
+                      }}
+                    />
+                  </>
+                ) : null}
               </div>
               <div className="program-chip-row">
                 {rawTabs.map((tab) => <button key={tab.id} className={`program-chip raw-tab-chip ${activeTab?.id === tab.id ? "active" : ""}`} onClick={() => setActiveTabId(tab.id)}>{tab.name}</button>)}
