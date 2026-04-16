@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 const OVERVIEW_TAB_ID = "__overall__";
 const SPECIAL_SOCIAL_TAB_KIND = "special-social";
+const BROWSER_SAVE_KEY = "branch-activation-dashboard-state";
 
 const createId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -661,7 +662,23 @@ export default function HomePage() {
           setSaveState("서버 데이터 복원됨");
         }
       } catch {
-        if (!ignore) setSaveState("서버 데이터 복원 실패");
+        try {
+          const cached = window.localStorage.getItem(BROWSER_SAVE_KEY);
+          if (!cached) throw new Error("no cached state");
+
+          const parsed = JSON.parse(cached);
+          const normalizedTabs = normalizeRawTabs(parsed.rawTabs);
+
+          if (!ignore && normalizedTabs.length > 0) {
+            setRawTabs(normalizedTabs);
+            setActiveTabId(parsed.activeTabId || normalizedTabs[0].id);
+            setDashboardTabId(parsed.dashboardTabId || OVERVIEW_TAB_ID);
+            setPage(parsed.page === "rawdata" ? "rawdata" : "dashboard");
+            setSaveState("브라우저 저장본 복원됨");
+          }
+        } catch {
+          if (!ignore) setSaveState("저장된 데이터 없음");
+        }
       } finally {
         if (!ignore) setIsHydrated(true);
       }
@@ -682,25 +699,28 @@ export default function HomePage() {
     }
 
     saveTimeoutRef.current = setTimeout(async () => {
+      const payload = {
+        page,
+        rawTabs,
+        activeTabId,
+        dashboardTabId
+      };
+
       try {
+        window.localStorage.setItem(BROWSER_SAVE_KEY, JSON.stringify(payload));
         setSaveState("저장 중...");
         const response = await fetch("/api/rawtabs", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            page,
-            rawTabs,
-            activeTabId,
-            dashboardTabId
-          })
+          body: JSON.stringify(payload)
         });
 
         if (!response.ok) throw new Error("failed to save");
         setSaveState("서버에 자동 저장됨");
       } catch {
-        setSaveState("서버 저장 실패");
+        setSaveState("브라우저에 저장됨");
       }
     }, 400);
 
