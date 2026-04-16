@@ -819,6 +819,20 @@ input, select {
   font-size: .84rem;
 }
 
+.inline-score-link {
+  color: #2153a4;
+  font-size: .84rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(33, 83, 164, 0.35);
+  transition: color .18s ease, border-color .18s ease;
+}
+
+.inline-score-link:hover {
+  color: #14386f;
+  border-bottom-color: rgba(20, 56, 111, 0.75);
+}
+
 @keyframes overviewCardReveal {
   from {
     opacity: 0;

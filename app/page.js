@@ -627,6 +627,24 @@ function summarizeSnsRow(row, baseDate = snsEvaluationBaseDate) {
   };
 }
 
+function ExternalScoreLink({ href, value }) {
+  if (!href) {
+    return <strong>{value}</strong>;
+  }
+
+  return (
+    <a
+      className="inline-score-link"
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      title="새 탭에서 열기"
+    >
+      {value}
+    </a>
+  );
+}
+
 export default function HomePage() {
   const [page, setPage] = useState("dashboard");
   const [rawTabs, setRawTabs] = useState(initialTabs);
@@ -1444,8 +1462,8 @@ export default function HomePage() {
                           {snsGradeGroups[grade].length > 0 ? snsGradeGroups[grade].slice(0, 8).map((row) => (
                             <article className="grade-branch-card" key={`sns-grade-${grade}-${row.branch}`}>
                               <div className="grade-branch-head"><strong>{row.branch}</strong><span>{row.finalScore}점</span></div>
-                              <div className="grade-metric-row"><span>블로그 점수</span><strong>{row.blogScore}</strong></div>
-                              <div className="grade-metric-row"><span>인스타 점수</span><strong>{row.instagramScore}</strong></div>
+                              <div className="grade-metric-row"><span>블로그 점수</span><ExternalScoreLink href={row.hasBlog ? row.blogUrl : ""} value={row.blogScore} /></div>
+                              <div className="grade-metric-row"><span>인스타 점수</span><ExternalScoreLink href={row.hasInstagram ? row.instagramUrl : ""} value={row.instagramScore} /></div>
                             </article>
                           )) : <div className="grade-empty-card">해당 등급 지점이 없습니다.</div>}
                         </div>
