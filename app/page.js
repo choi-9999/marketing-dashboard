@@ -802,6 +802,47 @@ export default function HomePage() {
     setSaveState("변경 감지됨");
   }
 
+  async function forceServerSave() {
+    const payload = {
+      page,
+      rawTabs,
+      activeTabId,
+      dashboardTabId
+    };
+
+    try {
+      window.localStorage.setItem(BROWSER_SAVE_KEY, JSON.stringify(payload));
+      setSaveState("강제 서버 저장 중...");
+
+      const saveResponse = await fetch("/api/rawtabs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload),
+        cache: "no-store"
+      });
+      const saveResult = await saveResponse.json().catch(() => null);
+
+      if (!saveResponse.ok) {
+        throw new Error(saveResult?.error || "force save failed");
+      }
+
+      const verifyResponse = await fetch("/api/rawtabs", { cache: "no-store" });
+      const verifyResult = await verifyResponse.json().catch(() => null);
+
+      if (!verifyResponse.ok || !verifyResult?.rawTabs) {
+        throw new Error("verify failed");
+      }
+
+      const savedAt = formatStatusTimestamp(verifyResult.updatedAt || saveResult?.updatedAt);
+      setSaveState(`강제 저장 완료${savedAt ? ` · ${savedAt}` : ""}`);
+    } catch (error) {
+      console.error("Failed to force save server state.", error);
+      setSaveState("강제 서버 저장 실패");
+    }
+  }
+
   useEffect(() => {
     let ignore = false;
 
@@ -1845,6 +1886,7 @@ export default function HomePage() {
                 <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>현재 탭 삭제</button>
                 <button className="reset-button" onClick={addRow}>{activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : "+ 지점 행 추가"}</button>
                 {activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
+                <button className="reset-button" onClick={forceServerSave}>강제 서버 저장</button>
                 {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? (
                   <>
                     <button className="reset-button" onClick={() => snsImportInputRef.current?.click()}>엑셀 불러오기</button>
