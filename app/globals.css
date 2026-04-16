@@ -1616,6 +1616,10 @@ select:focus {
   align-items: stretch;
 }
 
+.compact-score-panel {
+  overflow: visible;
+}
+
 .compact-score-panel .score-box {
   display: flex;
   flex-direction: column;
