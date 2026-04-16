@@ -783,6 +783,7 @@ export default function HomePage() {
   const [regionFilter, setRegionFilter] = useState("all");
   const [hoveredRegion, setHoveredRegion] = useState(null);
   const saveTimeoutRef = useRef(null);
+  const hasInitializedSaveRef = useRef(false);
   const snsImportInputRef = useRef(null);
 
   useEffect(() => {
@@ -847,9 +848,16 @@ export default function HomePage() {
   useEffect(() => {
     if (!isHydrated) return;
 
+    if (!hasInitializedSaveRef.current) {
+      hasInitializedSaveRef.current = true;
+      return;
+    }
+
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
+
+    setSaveState("변경 감지됨");
 
     saveTimeoutRef.current = setTimeout(async () => {
       const payload = {
