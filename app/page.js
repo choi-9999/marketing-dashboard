@@ -749,6 +749,52 @@ function extractSnsRowsFromWorkbook(arrayBuffer) {
   return { sheetName, rows };
 }
 
+function extractDefaultTabFromWorkbook(arrayBuffer, fallbackName = "불러온 이벤트") {
+  const workbook = XLSX.read(arrayBuffer, {
+    type: "array",
+    cellDates: true,
+    cellNF: false,
+    cellStyles: false
+  });
+
+  const sheetName =
+    workbook.SheetNames.find((name) => name.includes(fallbackName)) ??
+    workbook.SheetNames.find((name) => !name.includes("평가") && !name.includes("입력")) ??
+    workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+
+  if (!sheet?.["!ref"]) {
+    return {
+      sheetName,
+      tab: migrateLegacyTab({
+        name: fallbackName,
+        columns: ["지역", "지점"],
+        rows: []
+      })
+    };
+  }
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {
+    header: 1,
+    raw: false,
+    defval: ""
+  });
+
+  const columns = Array.isArray(rows[0]) ? rows[0].map((value) => String(value ?? "").trim()) : [];
+  const dataRows = rows
+    .slice(1)
+    .filter((row) => Array.isArray(row) && row.some((cell) => String(cell ?? "").trim() !== ""));
+
+  return {
+    sheetName,
+    tab: migrateLegacyTab({
+      name: fallbackName,
+      columns,
+      rows: dataRows
+    })
+  };
+}
+
 function ExternalScoreLink({ href, value }) {
   if (!href) {
     return <strong>{value}</strong>;
@@ -795,7 +841,7 @@ export default function HomePage() {
   const [hoveredRegion, setHoveredRegion] = useState(null);
   const saveTimeoutRef = useRef(null);
   const hasInitializedSaveRef = useRef(false);
-  const snsImportInputRef = useRef(null);
+  const importInputRef = useRef(null);
 
   function markDirty() {
     if (!isHydrated) return;
@@ -1468,6 +1514,28 @@ export default function HomePage() {
     }
   }
 
+  async function importDefaultWorkbook(file) {
+    if (!file || activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND) return;
+
+    const shouldReplace = window.confirm("현재 이벤트 탭 데이터를 업로드한 엑셀 시트 데이터로 교체할까요?");
+    if (!shouldReplace) return;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const { sheetName, tab } = extractDefaultTabFromWorkbook(arrayBuffer, activeTab?.name || "불러온 이벤트");
+
+      updateActiveTab((currentTab) => ({
+        ...currentTab,
+        events: tab.events,
+        rows: tab.rows
+      }));
+      setSaveState(`엑셀 '${sheetName}' 시트 반영됨`);
+    } catch (error) {
+      console.error("Failed to import default workbook.", error);
+      setSaveState("엑셀 불러오기 실패");
+    }
+  }
+
   function removeEvent(eventId) {
     if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND) return;
     updateActiveTab((tab) => ({
@@ -1887,24 +1955,24 @@ export default function HomePage() {
                 <button className="reset-button" onClick={addRow}>{activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : "+ 지점 행 추가"}</button>
                 {activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
                 <button className="reset-button" onClick={forceServerSave}>강제 서버 저장</button>
-                {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? (
-                  <>
-                    <button className="reset-button" onClick={() => snsImportInputRef.current?.click()}>엑셀 불러오기</button>
-                    <input
-                      ref={snsImportInputRef}
-                      type="file"
-                      accept=".xlsx,.xlsm,.xls"
-                      style={{ display: "none" }}
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          await importSnsWorkbook(file);
-                        }
-                        e.target.value = "";
-                      }}
-                    />
-                  </>
-                ) : null}
+                <button className="reset-button" onClick={() => importInputRef.current?.click()}>엑셀 불러오기</button>
+                <input
+                  ref={importInputRef}
+                  type="file"
+                  accept=".xlsx,.xlsm,.xls"
+                  style={{ display: "none" }}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND) {
+                        await importSnsWorkbook(file);
+                      } else {
+                        await importDefaultWorkbook(file);
+                      }
+                    }
+                    e.target.value = "";
+                  }}
+                />
               </div>
               <div className="program-chip-row">
                 {rawTabs.map((tab) => <button key={tab.id} className={`program-chip raw-tab-chip ${activeTab?.id === tab.id ? "active" : ""}`} onClick={() => setActiveTabId(tab.id)}>{tab.name}</button>)}
