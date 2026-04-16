@@ -649,6 +649,21 @@ export default function HomePage() {
 
     async function loadRawTabs() {
       try {
+        const cached = window.localStorage.getItem(BROWSER_SAVE_KEY);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          const normalizedTabs = normalizeRawTabs(parsed.rawTabs);
+
+          if (!ignore && normalizedTabs.length > 0) {
+            setRawTabs(normalizedTabs);
+            setActiveTabId(parsed.activeTabId || normalizedTabs[0].id);
+            setDashboardTabId(parsed.dashboardTabId || OVERVIEW_TAB_ID);
+            setPage(parsed.page === "rawdata" ? "rawdata" : "dashboard");
+            setSaveState("브라우저 저장본 복원됨");
+            return;
+          }
+        }
+
         const response = await fetch("/api/rawtabs", { cache: "no-store" });
         if (!response.ok) throw new Error("failed to load");
         const parsed = await response.json();
@@ -662,23 +677,7 @@ export default function HomePage() {
           setSaveState("서버 데이터 복원됨");
         }
       } catch {
-        try {
-          const cached = window.localStorage.getItem(BROWSER_SAVE_KEY);
-          if (!cached) throw new Error("no cached state");
-
-          const parsed = JSON.parse(cached);
-          const normalizedTabs = normalizeRawTabs(parsed.rawTabs);
-
-          if (!ignore && normalizedTabs.length > 0) {
-            setRawTabs(normalizedTabs);
-            setActiveTabId(parsed.activeTabId || normalizedTabs[0].id);
-            setDashboardTabId(parsed.dashboardTabId || OVERVIEW_TAB_ID);
-            setPage(parsed.page === "rawdata" ? "rawdata" : "dashboard");
-            setSaveState("브라우저 저장본 복원됨");
-          }
-        } catch {
-          if (!ignore) setSaveState("저장된 데이터 없음");
-        }
+        if (!ignore) setSaveState("저장된 데이터 없음");
       } finally {
         if (!ignore) setIsHydrated(true);
       }
