@@ -786,6 +786,11 @@ export default function HomePage() {
   const hasInitializedSaveRef = useRef(false);
   const snsImportInputRef = useRef(null);
 
+  function markDirty() {
+    if (!isHydrated) return;
+    setSaveState("변경 감지됨");
+  }
+
   useEffect(() => {
     let ignore = false;
 
@@ -1220,10 +1225,12 @@ export default function HomePage() {
   }, [dashboardRawTabs, snsSourceRows]);
 
   function updateActiveTab(mutator) {
+    markDirty();
     setRawTabs((current) => current.map((tab) => (tab.id === activeTabId ? mutator(tab) : tab)));
   }
 
   function addRawTab() {
+    markDirty();
     const nextId = `tab-${Date.now()}`;
     const nextIndex = rawTabs.length + 1;
     const nextTab = createTab(nextId, `새 활성화 방안 ${nextIndex}`, []);
@@ -1235,6 +1242,7 @@ export default function HomePage() {
 
   function removeActiveTab() {
     if (!activeTab || rawTabs.length === 1) return;
+    markDirty();
     const remaining = rawTabs.filter((tab) => tab.id !== activeTab.id);
     setRawTabs(remaining);
     setActiveTabId(remaining[0].id);
@@ -1395,7 +1403,7 @@ export default function HomePage() {
         ...tab,
         socialRows: rows
       }));
-      setSaveState(`엑셀 '${sheetName}' 시트 불러옴`);
+      setSaveState(`엑셀 '${sheetName}' 시트 반영됨`);
     } catch (error) {
       console.error("Failed to import SNS workbook.", error);
       setSaveState("엑셀 불러오기 실패");
