@@ -1291,6 +1291,12 @@ select:focus {
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
+.save-state-trigger span,
+.save-state-trigger strong {
+  color: #fff;
+  opacity: 1;
+}
+
 .save-state-trigger:hover {
   transform: translateY(-2px);
   border-color: rgba(255,255,255,.28);
@@ -1413,6 +1419,10 @@ select:focus {
   padding-top: 14px;
   padding-bottom: 14px;
   border-bottom: 1px solid rgba(214, 223, 237, 0.8);
+}
+
+.import-align-button {
+  margin-left: auto;
 }
 
 .utility-badge {

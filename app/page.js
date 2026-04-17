@@ -1967,11 +1967,11 @@ export default function HomePage() {
           <>
             <section className="sheet-panel utility-panel">
               <div className="utility-row">
-                <button className="reset-button" onClick={addRawTab}>+ RAWDATA 탭 추가</button>
+                <button className="reset-button" onClick={addRawTab}>+ 탭 추가</button>
                 <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>현재 탭 삭제</button>
                 <button className="reset-button" onClick={addRow}>{activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : "+ 지점 행 추가"}</button>
                 {activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
-                <button className="reset-button" onClick={() => importInputRef.current?.click()}>엑셀 불러오기</button>
+                <button className="reset-button import-align-button" onClick={() => importInputRef.current?.click()}>엑셀 불러오기</button>
                 <input
                   ref={importInputRef}
                   type="file"
