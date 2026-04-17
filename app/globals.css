@@ -682,11 +682,16 @@ input, select {
   padding: 16px 12px 4px;
 }
 
+.overview-board-panel {
+  overflow: visible;
+}
+
 .grade-column {
   border: 1px solid var(--grid);
   border-radius: 18px;
   background: linear-gradient(180deg, #fbfdff, #f4f8fe);
   padding: 14px;
+  overflow: visible;
 }
 
 .grade-column.warn {
@@ -715,11 +720,13 @@ input, select {
 .grade-card-list {
   display: grid;
   gap: 10px;
+  overflow: visible;
 }
 
 .grade-branch-entry {
   display: grid;
   gap: 8px;
+  overflow: visible;
 }
 
 .grade-branch-trigger {
@@ -763,6 +770,7 @@ input, select {
 
 .grade-branch-card {
   animation: overviewCardReveal .18s ease;
+  overflow: visible;
 }
 
 .grade-empty-card {

@@ -2180,7 +2180,7 @@ export default function HomePage() {
                   </article>
                 </section>
 
-                <section className="sheet-panel">
+                  <section className="sheet-panel overview-board-panel">
                   <div className="panel-title-row">
                     <h2>지점별 전체 현황 보드</h2>
                       <span className="note-text">일반 이벤트와 협업이벤트를 반영한 운영 점수 50%, SNS 평가 점수 50%를 합산한 그룹 보드입니다.</span>
