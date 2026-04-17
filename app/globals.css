@@ -828,13 +828,26 @@ input, select {
   left: auto;
   right: 0;
   top: calc(100% + 8px);
-  width: min(260px, 72vw);
+  width: min(360px, 78vw);
   z-index: 12;
 }
 
 .grade-metric-hover:hover .metric-tooltip {
   opacity: 1;
   transform: translateY(0) scale(1);
+}
+
+.grade-metric-hover .metric-tooltip-list {
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+  max-height: 220px;
+  align-items: start;
+}
+
+.grade-metric-hover .metric-tooltip-list li {
+  white-space: normal;
+  word-break: keep-all;
+  text-align: center;
 }
 
 .inline-score-link {
