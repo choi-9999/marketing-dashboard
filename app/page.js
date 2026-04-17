@@ -5,6 +5,7 @@ import * as XLSX from "xlsx";
 
 const OVERVIEW_TAB_ID = "__overall__";
 const SPECIAL_SOCIAL_TAB_KIND = "special-social";
+const SPECIAL_COLLAB_TAB_KIND = "special-collab";
 const BROWSER_SAVE_KEY = "branch-activation-dashboard-state";
 
 const createId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -46,6 +47,62 @@ const specialSocialColumns = [
   { key: "brandInfoScore", label: "브랜드/지점 정보 명확 (0~3)", type: "number", group: "instagram" },
   { key: "memo", label: "메모", type: "text", group: "memo" }
 ];
+
+const defaultCollabColumns = [
+  "지역",
+  "지점",
+  "협업 이벤트 A 홈페이지",
+  "협업 이벤트 A 블로그",
+  "협업 이벤트 A 인스타/언론기사"
+];
+
+function isSpecialTabKind(kind) {
+  return kind === SPECIAL_SOCIAL_TAB_KIND || kind === SPECIAL_COLLAB_TAB_KIND;
+}
+
+function normalizeCollabColumns(columns = []) {
+  const normalized = columns
+    .map((column) => String(column ?? "").trim())
+    .filter(Boolean);
+
+  const remaining = normalized.filter((column) => column !== "지역" && column !== "지점");
+  return ["지역", "지점", ...remaining];
+}
+
+function createSpecialCollabRow(columns = defaultCollabColumns, seed = {}) {
+  const values = Object.fromEntries(
+    normalizeCollabColumns(columns).map((column) => [column, seed[column] ?? ""])
+  );
+
+  values["지역"] = seed["지역"] ?? seed.region ?? values["지역"] ?? "";
+  values["지점"] = seed["지점"] ?? seed.branch ?? values["지점"] ?? "";
+
+  return {
+    id: seed.id || createId("collab-row"),
+    values
+  };
+}
+
+function createSpecialCollabTab(id, name, seededRows = [], columns = defaultCollabColumns) {
+  const normalizedColumns = normalizeCollabColumns(columns);
+  const rows = seededRows.length > 0
+    ? seededRows.map((row) => createSpecialCollabRow(normalizedColumns, row))
+    : [
+        createSpecialCollabRow(normalizedColumns, { 지역: "서울", 지점: "강남" }),
+        createSpecialCollabRow(normalizedColumns, { 지역: "경기", 지점: "분당정자" }),
+        createSpecialCollabRow(normalizedColumns, { 지역: "부산", 지점: "부산대" })
+      ];
+
+  return {
+    id,
+    name,
+    kind: SPECIAL_COLLAB_TAB_KIND,
+    events: [],
+    rows: [],
+    collabColumns: normalizedColumns,
+    collabRows: rows
+  };
+}
 
 function createSpecialSocialRow(seed = {}) {
   return {
@@ -166,7 +223,8 @@ const initialTabs = [
       eventValues: {}
     }
   ]),
-  createSpecialSocialTab("tab-social-1", "SNS 진단표")
+  createSpecialSocialTab("tab-social-1", "SNS 진단표"),
+  createSpecialCollabTab("tab-collab-1", "협업이벤트")
 ];
 
 function normalizeParticipantValue(value) {
@@ -204,6 +262,97 @@ function normalizeBranchKey(branch) {
     .toLowerCase();
 }
 
+function parseCollabColumnLabel(label) {
+  const rawLabel = String(label ?? "").trim();
+  if (!rawLabel || rawLabel === "지역" || rawLabel === "지점") {
+    return { eventName: "", channel: "" };
+  }
+
+  const suffixes = ["홈페이지", "블로그", "인스타/언론기사"];
+  const suffix = suffixes.find((item) => rawLabel.endsWith(item)) || "";
+  const eventName = suffix ? rawLabel.slice(0, -suffix.length).trim() : rawLabel;
+
+  return {
+    eventName,
+    channel: suffix || "URL"
+  };
+}
+
+function buildCollabSummary(tab) {
+  const columns = normalizeCollabColumns(tab?.collabColumns || []);
+  const urlColumns = columns.filter((column) => column !== "지역" && column !== "지점");
+  const eventMap = new Map();
+  const branchRows = [];
+  const allBranches = [];
+
+  (tab?.collabRows || []).forEach((row) => {
+    const values = row.values || {};
+    const region = normalizeRegionLabel(String(values["지역"] || "").trim());
+    const branch = String(values["지점"] || "").trim();
+    if (!branch) return;
+
+    const events = [];
+    let urlCount = 0;
+
+    urlColumns.forEach((column) => {
+      const url = String(values[column] || "").trim();
+      const { eventName, channel } = parseCollabColumnLabel(column);
+      if (!eventName) return;
+
+      if (!eventMap.has(eventName)) {
+        eventMap.set(eventName, {
+          id: eventName,
+          label: eventName,
+          branchCount: 0,
+          urlCount: 0
+        });
+      }
+
+      if (url) {
+        let eventEntry = events.find((item) => item.name === eventName);
+        if (!eventEntry) {
+          eventEntry = { name: eventName, links: [] };
+          events.push(eventEntry);
+          eventMap.get(eventName).branchCount += 1;
+        }
+
+        eventEntry.links.push({ label: channel, url });
+        eventMap.get(eventName).urlCount += 1;
+        urlCount += 1;
+      }
+    });
+
+    branchRows.push({
+      id: row.id,
+      region,
+      branch,
+      urlCount,
+      events
+    });
+    allBranches.push(branch);
+  });
+
+  const activeBranches = branchRows.filter((row) => row.urlCount > 0).length;
+  const totalUrls = branchRows.reduce((sum, row) => sum + row.urlCount, 0);
+  const eventOverview = [...eventMap.values()].sort((a, b) => b.branchCount - a.branchCount || b.urlCount - a.urlCount || a.label.localeCompare(b.label, "ko"));
+
+  return {
+    totalBranches: branchRows.length,
+    activeBranches,
+    inactiveBranches: Math.max(branchRows.length - activeBranches, 0),
+    totalUrls,
+    uniqueEvents: eventOverview.length,
+    branchRows,
+    branchOptions: branchRows.map((row) => row.branch).sort((a, b) => a.localeCompare(b, "ko")),
+    groupedBranches: branchRows.reduce((acc, row) => {
+      if (!acc.has(row.region)) acc.set(row.region, []);
+      acc.get(row.region).push(row.branch);
+      return acc;
+    }, new Map()),
+    eventOverview
+  };
+}
+
 function migrateLegacyTab(tab) {
   if (tab?.kind === SPECIAL_SOCIAL_TAB_KIND) {
     return {
@@ -215,6 +364,27 @@ function migrateLegacyTab(tab) {
       socialRows: Array.isArray(tab.socialRows) && tab.socialRows.length > 0
         ? tab.socialRows.map((row, index) => createSpecialSocialRow({ ...row, id: row?.id || createId(`social-row-${index}`) }))
         : [createSpecialSocialRow()]
+    };
+  }
+
+  if (tab?.kind === SPECIAL_COLLAB_TAB_KIND) {
+    const collabColumns = normalizeCollabColumns(tab.collabColumns || defaultCollabColumns);
+    return {
+      id: tab.id || createId("tab"),
+      name: tab.name || "협업이벤트",
+      kind: SPECIAL_COLLAB_TAB_KIND,
+      events: [],
+      rows: [],
+      collabColumns,
+      collabRows: Array.isArray(tab.collabRows) && tab.collabRows.length > 0
+        ? tab.collabRows.map((row, index) =>
+            createSpecialCollabRow(collabColumns, {
+              ...(row?.values || {}),
+              ...row,
+              id: row?.id || createId(`collab-row-${index}`)
+            })
+          )
+        : [createSpecialCollabRow(collabColumns)]
     };
   }
 
@@ -332,21 +502,24 @@ function migrateLegacyTab(tab) {
   };
 }
 
-function ensureSpecialInputTab(tabs) {
-  if (tabs.some((tab) => tab.kind === SPECIAL_SOCIAL_TAB_KIND)) {
-    return tabs;
-  }
-
+function ensureSpecialInputTabs(tabs) {
   const seededBranches = [...new Set(
     tabs
-      .filter((tab) => tab.kind !== SPECIAL_SOCIAL_TAB_KIND)
+      .filter((tab) => !isSpecialTabKind(tab.kind))
       .flatMap((tab) => tab.rows.map((row) => row.branch.trim()).filter(Boolean))
   )];
 
-  return [
-    ...tabs,
-    createSpecialSocialTab("tab-social-1", "SNS 진단표", seededBranches.map((branch) => ({ branch })))
-  ];
+  const nextTabs = [...tabs];
+
+  if (!nextTabs.some((tab) => tab.kind === SPECIAL_SOCIAL_TAB_KIND)) {
+    nextTabs.push(createSpecialSocialTab("tab-social-1", "SNS 진단표", seededBranches.map((branch) => ({ branch }))));
+  }
+
+  if (!nextTabs.some((tab) => tab.kind === SPECIAL_COLLAB_TAB_KIND)) {
+    nextTabs.push(createSpecialCollabTab("tab-collab-1", "협업이벤트", seededBranches.map((branch) => ({ 지점: branch }))));
+  }
+
+  return nextTabs;
 }
 
 function normalizeRawTabs(rawTabs) {
@@ -354,7 +527,7 @@ function normalizeRawTabs(rawTabs) {
     return initialTabs;
   }
 
-  return ensureSpecialInputTab(rawTabs.map(migrateLegacyTab));
+  return ensureSpecialInputTabs(rawTabs.map(migrateLegacyTab));
 }
 
 function summarizeTab(tab) {
@@ -366,6 +539,41 @@ function summarizeTab(tab) {
       branches: filledRows,
       participants: 0,
       activeBranches: 0
+    };
+  }
+
+  if (tab.kind === SPECIAL_COLLAB_TAB_KIND) {
+    const columns = normalizeCollabColumns(tab.collabColumns || []);
+    const urlColumns = columns.filter((column) => column !== "지역" && column !== "지점");
+    const rows = tab.collabRows || [];
+    const branchSet = new Set();
+    const activeBranchSet = new Set();
+    let filledRows = 0;
+    let urlCount = 0;
+
+    rows.forEach((row) => {
+      const values = row.values || {};
+      const region = String(values["지역"] || "").trim();
+      const branch = String(values["지점"] || "").trim();
+      if (!region && !branch) return;
+      filledRows += 1;
+      if (branch) branchSet.add(branch);
+
+      const hasAnyUrl = urlColumns.some((column) => String(values[column] || "").trim());
+      if (hasAnyUrl && branch) activeBranchSet.add(branch);
+      urlColumns.forEach((column) => {
+        if (String(values[column] || "").trim()) {
+          urlCount += 1;
+        }
+      });
+    });
+
+    return {
+      rows: filledRows,
+      events: [...new Set(urlColumns.map((column) => parseCollabColumnLabel(column).eventName).filter(Boolean))].length,
+      branches: branchSet.size,
+      participants: urlCount,
+      activeBranches: activeBranchSet.size
     };
   }
 
@@ -397,7 +605,7 @@ function summarizeTab(tab) {
 function buildBranchOverview(rawTabs) {
   const branchMap = new Map();
 
-  rawTabs.filter((tab) => tab.kind !== SPECIAL_SOCIAL_TAB_KIND).forEach((tab) => {
+  rawTabs.filter((tab) => !isSpecialTabKind(tab.kind)).forEach((tab) => {
     tab.rows.forEach((row) => {
       const branch = row.branch.trim();
       if (!branch) return;
@@ -443,7 +651,7 @@ function buildBranchOverview(rawTabs) {
 
 function buildEventOverview(rawTabs) {
   return rawTabs
-    .filter((tab) => tab.kind !== SPECIAL_SOCIAL_TAB_KIND)
+    .filter((tab) => !isSpecialTabKind(tab.kind))
     .flatMap((tab) =>
       tab.events.map((event) => {
         let branchCount = 0;
@@ -795,6 +1003,55 @@ function extractDefaultTabFromWorkbook(arrayBuffer, fallbackName = "불러온 �
   };
 }
 
+function extractCollabRowsFromWorkbook(arrayBuffer, fallbackName = "협업이벤트") {
+  const workbook = XLSX.read(arrayBuffer, {
+    type: "array",
+    cellDates: true,
+    cellNF: false,
+    cellStyles: false
+  });
+
+  const sheetName =
+    workbook.SheetNames.find((name) => name.includes(fallbackName)) ??
+    workbook.SheetNames.find((name) => !name.includes("평가") && !name.includes("입력")) ??
+    workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+
+  if (!sheet?.["!ref"]) {
+    return {
+      sheetName,
+      tab: createSpecialCollabTab(createId("tab-collab"), fallbackName, [], defaultCollabColumns)
+    };
+  }
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {
+    header: 1,
+    raw: false,
+    defval: ""
+  });
+
+  const collabColumns = normalizeCollabColumns(Array.isArray(rows[0]) ? rows[0] : []);
+  const dataRows = rows
+    .slice(1)
+    .filter((row) => Array.isArray(row) && row.some((cell) => String(cell ?? "").trim() !== ""));
+
+  return {
+    sheetName,
+    tab: createSpecialCollabTab(
+      createId("tab-collab"),
+      fallbackName,
+      dataRows.map((row) => {
+        const seed = {};
+        collabColumns.forEach((column, index) => {
+          seed[column] = String(row[index] ?? "").trim();
+        });
+        return seed;
+      }),
+      collabColumns
+    )
+  };
+}
+
 function ExternalScoreLink({ href, value }) {
   if (!href) {
     return <strong>{value}</strong>;
@@ -832,6 +1089,8 @@ export default function HomePage() {
   const [saveState, setSaveState] = useState("서버 저장 대기 중");
   const [isHydrated, setIsHydrated] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [selectedCollabBranch, setSelectedCollabBranch] = useState(null);
+  const [selectedCollabEvent, setSelectedCollabEvent] = useState(null);
   const [selectedOverviewBranch, setSelectedOverviewBranch] = useState(null);
   const [areEventChipsExpanded, setAreEventChipsExpanded] = useState(true);
   const [branchKeyword, setBranchKeyword] = useState("");
@@ -1020,7 +1279,7 @@ export default function HomePage() {
   );
 
   const dashboardRawTabs = useMemo(
-    () => rawTabs.filter((tab) => tab.kind !== SPECIAL_SOCIAL_TAB_KIND),
+    () => rawTabs.filter((tab) => !isSpecialTabKind(tab.kind)),
     [rawTabs]
   );
 
@@ -1031,10 +1290,13 @@ export default function HomePage() {
 
   const isOverviewDashboard = dashboardTabId === OVERVIEW_TAB_ID;
   const isSpecialDashboard = !isOverviewDashboard && selectedDashboardTab?.kind === SPECIAL_SOCIAL_TAB_KIND;
-  const dashboardTab = isSpecialDashboard ? null : selectedDashboardTab;
+  const isCollabDashboard = !isOverviewDashboard && selectedDashboardTab?.kind === SPECIAL_COLLAB_TAB_KIND;
+  const dashboardTab = isSpecialDashboard || isCollabDashboard ? null : selectedDashboardTab;
 
   useEffect(() => {
     setSelectedBranch(null);
+    setSelectedCollabBranch(null);
+    setSelectedCollabEvent(null);
     setSelectedOverviewBranch(null);
   }, [dashboardTabId]);
 
@@ -1042,6 +1304,10 @@ export default function HomePage() {
     setBranchKeyword("");
     setAreRegionsExpanded(false);
   }, [dashboardTabId]);
+
+  useEffect(() => {
+    setSelectedCollabEvent(null);
+  }, [selectedCollabBranch]);
 
   const dashboardTabs = useMemo(() => {
     if (isOverviewDashboard) return dashboardRawTabs;
@@ -1054,6 +1320,34 @@ export default function HomePage() {
   const hoveredRegionData = scopedSummary.regionOverview.find((item) => item.region === hoveredRegion) || null;
 
   const dashboardScopeLabel = isOverviewDashboard ? "전체 현황" : selectedDashboardTab?.name || "활성화 방안 대시보드";
+  const topbarCountLabel = page === "dashboard"
+    ? isSpecialDashboard
+      ? "진단 항목 수"
+      : isCollabDashboard
+        ? "진행 횟수"
+        : "이벤트 수"
+    : "이벤트 수";
+  const topbarBranchLabel = page === "dashboard"
+    ? isSpecialDashboard
+      ? "평가 지점 수"
+      : isCollabDashboard
+        ? "참여 지점 수"
+        : "고유 지점 수"
+    : "고유 지점 수";
+  const topbarCountValue = page === "dashboard"
+    ? isSpecialDashboard
+      ? specialSocialColumns.length
+      : isCollabDashboard
+        ? collabDashboardSummary.uniqueEvents
+        : scopedSummary.totalEvents
+    : dashboardSummary.totalEvents;
+  const topbarBranchValue = page === "dashboard"
+    ? isSpecialDashboard
+      ? snsSummary.totalBranches
+      : isCollabDashboard
+        ? collabDashboardSummary.activeBranches
+        : scopedSummary.uniqueBranches
+    : dashboardSummary.uniqueBranches;
 
   const branchOptions = useMemo(
     () =>
@@ -1223,6 +1517,92 @@ export default function HomePage() {
       D: snsSourceRows.filter((row) => row.grade === "D").length
     };
   }, [snsSourceRows]);
+
+  const collabDashboardSummary = useMemo(
+    () =>
+      isCollabDashboard
+        ? buildCollabSummary(selectedDashboardTab)
+        : {
+            totalBranches: 0,
+            activeBranches: 0,
+            inactiveBranches: 0,
+            totalUrls: 0,
+            uniqueEvents: 0,
+            branchRows: [],
+            branchOptions: [],
+            groupedBranches: new Map(),
+            eventOverview: []
+          },
+    [isCollabDashboard, selectedDashboardTab]
+  );
+
+  const collabBranchGroups = useMemo(() => {
+    if (!isCollabDashboard) return [];
+
+    return [...collabDashboardSummary.groupedBranches.entries()]
+      .map(([region, branches]) => ({
+        region,
+        branches: [...branches].sort((a, b) => a.localeCompare(b, "ko"))
+      }))
+      .sort((a, b) => {
+        const aIndex = regionDisplayOrder.indexOf(a.region);
+        const bIndex = regionDisplayOrder.indexOf(b.region);
+        const safeA = aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex;
+        const safeB = bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex;
+        return safeA - safeB || a.region.localeCompare(b.region, "ko");
+      });
+  }, [collabDashboardSummary.groupedBranches, isCollabDashboard]);
+
+  const visibleCollabBranchGroups = useMemo(() => {
+    const keyword = branchKeyword.trim().toLowerCase();
+    if (!keyword) return collabBranchGroups;
+
+    return collabBranchGroups
+      .map((group) => ({
+        ...group,
+        branches: group.branches.filter((branch) => branch.toLowerCase().includes(keyword))
+      }))
+      .filter((group) => group.branches.length > 0);
+  }, [branchKeyword, collabBranchGroups]);
+
+  const selectedCollabBranchRow = useMemo(
+    () => collabDashboardSummary.branchRows.find((row) => row.branch === selectedCollabBranch) || null,
+    [collabDashboardSummary.branchRows, selectedCollabBranch]
+  );
+
+  const collabEventList = useMemo(() => {
+    if (selectedCollabBranchRow) {
+      return selectedCollabBranchRow.events.map((event) => ({
+        id: event.name,
+        label: event.name,
+        branchCount: 1,
+        urlCount: event.links.length
+      }));
+    }
+
+    return collabDashboardSummary.eventOverview;
+  }, [collabDashboardSummary.eventOverview, selectedCollabBranchRow]);
+
+  const selectedCollabEventData = useMemo(() => {
+    if (!selectedCollabEvent) return null;
+
+    if (selectedCollabBranchRow) {
+      return selectedCollabBranchRow.events.find((event) => event.name === selectedCollabEvent) || null;
+    }
+
+    const links = collabDashboardSummary.branchRows.flatMap((row) => {
+      const event = row.events.find((item) => item.name === selectedCollabEvent);
+      return event
+        ? event.links.map((link) => ({
+            ...link,
+            branch: row.branch,
+            region: row.region
+          }))
+        : [];
+    });
+
+    return links.length > 0 ? { name: selectedCollabEvent, links } : null;
+  }, [collabDashboardSummary.branchRows, selectedCollabBranchRow, selectedCollabEvent]);
 
   const overallBranchScoreboard = useMemo(() => {
     const branchMap = new Map();
@@ -1402,6 +1782,23 @@ export default function HomePage() {
     }));
   }
 
+  function updateCollabCell(rowIndex, field, value) {
+    updateActiveTab((tab) => ({
+      ...tab,
+      collabRows: (tab.collabRows || []).map((row, index) =>
+        index === rowIndex
+          ? {
+              ...row,
+              values: {
+                ...row.values,
+                [field]: value
+              }
+            }
+          : row
+      )
+    }));
+  }
+
   function updateEventCell(rowIndex, eventId, field, value) {
     updateActiveTab((tab) => ({
       ...tab,
@@ -1445,6 +1842,13 @@ export default function HomePage() {
         };
       }
 
+      if (tab.kind === SPECIAL_COLLAB_TAB_KIND) {
+        return {
+          ...tab,
+          collabRows: [...(tab.collabRows || []), createSpecialCollabRow(tab.collabColumns || defaultCollabColumns)]
+        };
+      }
+
       return {
         ...tab,
         rows: [...tab.rows, createRow(tab.events.map((event) => event.id))]
@@ -1461,6 +1865,13 @@ export default function HomePage() {
         };
       }
 
+      if (tab.kind === SPECIAL_COLLAB_TAB_KIND) {
+        return {
+          ...tab,
+          collabRows: (tab.collabRows || []).filter((_, index) => index !== rowIndex)
+        };
+      }
+
       return {
         ...tab,
         rows: tab.rows.filter((_, index) => index !== rowIndex)
@@ -1469,7 +1880,7 @@ export default function HomePage() {
   }
 
   function addEvent() {
-    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND) return;
+    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND) return;
     const nextName = window.prompt("추가할 이벤트명을 입력하세요.", "신규 이벤트");
     if (!nextName) return;
 
@@ -1515,8 +1926,30 @@ export default function HomePage() {
     }
   }
 
+  async function importCollabWorkbook(file) {
+    if (!file || activeTab?.kind !== SPECIAL_COLLAB_TAB_KIND) return;
+
+    const shouldReplace = window.confirm("현재 협업이벤트 탭 데이터를 업로드한 엑셀 시트 데이터로 교체할까요?");
+    if (!shouldReplace) return;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const { sheetName, tab } = extractCollabRowsFromWorkbook(arrayBuffer, activeTab?.name || "협업이벤트");
+
+      updateActiveTab((currentTab) => ({
+        ...currentTab,
+        collabColumns: tab.collabColumns,
+        collabRows: tab.collabRows
+      }));
+      setSaveState(`엑셀 '${sheetName}' 시트 반영됨`);
+    } catch (error) {
+      console.error("Failed to import collab workbook.", error);
+      setSaveState("엑셀 불러오기 실패");
+    }
+  }
+
   async function importDefaultWorkbook(file) {
-    if (!file || activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND) return;
+    if (!file || activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND) return;
 
     const shouldReplace = window.confirm("현재 이벤트 탭 데이터를 업로드한 엑셀 시트 데이터로 교체할까요?");
     if (!shouldReplace) return;
@@ -1538,7 +1971,7 @@ export default function HomePage() {
   }
 
   function removeEvent(eventId) {
-    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND) return;
+    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND) return;
     updateActiveTab((tab) => ({
       ...tab,
       events: tab.events.filter((event) => event.id !== eventId),
@@ -1563,8 +1996,8 @@ export default function HomePage() {
         <div className="topbar-meta">
           <div className="meta-cell"><span>담당부서</span><strong>교육팀</strong></div>
           <div className="meta-cell"><span>대시보드 기준</span><strong>{page === "dashboard" ? dashboardScopeLabel : activeTab?.name || "-"}</strong></div>
-          <div className="meta-cell"><span>{page === "dashboard" && isSpecialDashboard ? "진단 항목 수" : "이벤트 수"}</span><strong>{page === "dashboard" ? (isSpecialDashboard ? specialSocialColumns.length : scopedSummary.totalEvents) : dashboardSummary.totalEvents}</strong></div>
-          <div className="meta-cell"><span>{page === "dashboard" && isSpecialDashboard ? "평가 지점 수" : "고유 지점 수"}</span><strong>{page === "dashboard" ? (isSpecialDashboard ? snsSummary.totalBranches : scopedSummary.uniqueBranches) : dashboardSummary.uniqueBranches}</strong></div>
+          <div className="meta-cell"><span>{topbarCountLabel}</span><strong>{topbarCountValue}</strong></div>
+          <div className="meta-cell"><span>{topbarBranchLabel}</span><strong>{topbarBranchValue}</strong></div>
           <button
             type="button"
             className="meta-cell highlight save-state-trigger"
@@ -1837,6 +2270,101 @@ export default function HomePage() {
                   </div>
                 </section>
               </>
+            ) : isCollabDashboard ? (
+              <>
+                <section className="sheet-grid kpi-grid">
+                  <article className="sheet-panel score-panel compact-score-panel">
+                    <div className="panel-title-row"><h2>{dashboardScopeLabel} 핵심 지표</h2><span className="status-pill good">KPI</span></div>
+                    <div className="score-layout">
+                      <div className="score-box strong"><span>진행 횟수</span><strong>{collabDashboardSummary.uniqueEvents}</strong><p>현재 탭의 전체 협업 이벤트 수입니다.</p></div>
+                      <div className="score-box hover-score-box"><span>참여 지점 수</span><strong>{collabDashboardSummary.activeBranches}</strong><p>URL이 1건 이상 등록된 지점 수입니다.</p></div>
+                      <div className="score-box warn hover-score-box"><span>미참여 지점 수</span><strong>{collabDashboardSummary.inactiveBranches}</strong><p>아직 URL 등록 이력이 없는 지점입니다.</p></div>
+                    </div>
+                  </article>
+                </section>
+
+                <section className="sheet-panel">
+                  <div className="panel-title-row"><h2>협업 URL 현황</h2><span className="note-text">{selectedCollabBranch ? `${selectedCollabBranch} 기준` : "전체 지점 기준"}</span></div>
+                  <div className="branch-selector-row">
+                    <button className={`branch-chip ${selectedCollabBranch === null ? "active" : ""}`} onClick={() => setSelectedCollabBranch(null)}>전체 보기</button>
+                    <input className="branch-search-input" placeholder="지점명 검색" value={branchKeyword} onChange={(e) => setBranchKeyword(e.target.value)} />
+                    <button className="branch-toggle-button" onClick={() => setAreRegionsExpanded((current) => !current)}>
+                      {areRegionsExpanded ? "권역 전체 접기" : "권역 전체 펼치기"}
+                    </button>
+                  </div>
+                  {shouldShowBranchGroups ? (
+                    visibleCollabBranchGroups.length > 0 ? (
+                      <div className="branch-group-list">
+                        {visibleCollabBranchGroups.map((group) => (
+                          <div className="branch-group" key={`collab-${group.region}`}>
+                            <div className="branch-group-title">{group.region}</div>
+                            <div className="branch-group-chips">
+                              {group.branches.map((branch) => (
+                                <button
+                                  key={`collab-branch-${branch}`}
+                                  className={`branch-chip ${selectedCollabBranch === branch ? "active" : ""}`}
+                                  onClick={() => setSelectedCollabBranch(branch)}
+                                >
+                                  {branch}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="branch-collapsed-hint">검색 결과에 맞는 지점이 없습니다.</div>
+                    )
+                  ) : (
+                    <div className="branch-collapsed-hint">권역 전체 펼치기를 누르거나 지점명을 검색하면 권역별 지점 목록이 열립니다.</div>
+                  )}
+                  <div className="event-analytics-panel collab-analytics-panel">
+                    <div className="event-chart-card">
+                      <div className="event-chart-head">
+                        <strong>{selectedCollabBranch ? `${selectedCollabBranch} 진행 이벤트` : `${dashboardScopeLabel} 진행 이벤트`}</strong>
+                        <span>이벤트명을 클릭하면 URL이 열립니다.</span>
+                      </div>
+                      <div className="collab-event-list">
+                        {collabEventList.length > 0 ? collabEventList.map((event) => (
+                          <button
+                            key={`collab-event-${event.id}`}
+                            className={`collab-event-item ${selectedCollabEvent === event.label ? "active" : ""}`}
+                            onClick={() => setSelectedCollabEvent(event.label)}
+                          >
+                            <span>{event.label}</span>
+                            <strong>{selectedCollabBranch ? `${event.urlCount}건` : `${event.branchCount}지점`}</strong>
+                          </button>
+                        )) : <div className="grade-empty-card">등록된 협업 이벤트가 없습니다.</div>}
+                      </div>
+                    </div>
+                    <div className="event-summary-card">
+                      <h3>현재 보기 요약</h3>
+                      <ul className="metric-list">
+                        <li><span>기준</span><strong>{selectedCollabBranch || "전체 지점"}</strong></li>
+                        <li><span>진행 횟수</span><strong>{collabEventList.length}</strong></li>
+                        <li><span>등록 URL 수</span><strong>{selectedCollabBranchRow ? selectedCollabBranchRow.urlCount : collabDashboardSummary.totalUrls}</strong></li>
+                        <li><span>선택 이벤트</span><strong>{selectedCollabEvent || "-"}</strong></li>
+                      </ul>
+                      <div className="collab-url-panel">
+                        <div className="metric-tooltip-title">{selectedCollabEvent ? `${selectedCollabEvent} URL` : "이벤트를 선택하세요"}</div>
+                        {selectedCollabEventData ? (
+                          <ul className="metric-tooltip-list collab-url-list">
+                            {selectedCollabEventData.links.map((link, index) => (
+                              <li key={`collab-link-${link.url}-${index}`}>
+                                <a className="inline-score-link" href={link.url} target="_blank" rel="noreferrer">
+                                  {selectedCollabBranch ? `${link.label}` : `${link.branch} · ${link.label}`}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className="branch-collapsed-hint small">이벤트명을 누르면 연결된 URL이 표시됩니다.</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </>
             ) : (
               <>
                 <section className="sheet-grid kpi-grid">
@@ -1969,8 +2497,10 @@ export default function HomePage() {
               <div className="utility-row">
                 <button className="reset-button" onClick={addRawTab}>+ 탭 추가</button>
                 <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>현재 탭 삭제</button>
-                <button className="reset-button" onClick={addRow}>{activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : "+ 지점 행 추가"}</button>
-                {activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
+                <button className="reset-button" onClick={addRow}>
+                  {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : activeTab?.kind === SPECIAL_COLLAB_TAB_KIND ? "+ URL 행 추가" : "+ 지점 행 추가"}
+                </button>
+                {!isSpecialTabKind(activeTab?.kind) ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
                 <button className="reset-button import-align-button" onClick={() => importInputRef.current?.click()}>엑셀 불러오기</button>
                 <input
                   ref={importInputRef}
@@ -1982,6 +2512,8 @@ export default function HomePage() {
                     if (file) {
                       if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND) {
                         await importSnsWorkbook(file);
+                      } else if (activeTab?.kind === SPECIAL_COLLAB_TAB_KIND) {
+                        await importCollabWorkbook(file);
                       } else {
                         await importDefaultWorkbook(file);
                       }
@@ -1997,19 +2529,19 @@ export default function HomePage() {
 
             {activeTab ? (
               <section className="sheet-panel">
-                <div className="panel-title-row"><h2>RAWDATA Studio</h2><span className="note-text">{activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? "SNS 채널 진단표 전용 입력 형식입니다." : "`지역`, `지점`은 고정이고 이벤트만 확장됩니다."}</span></div>
+                <div className="panel-title-row"><h2>RAWDATA Studio</h2><span className="note-text">{activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? "SNS 채널 진단표 전용 입력 형식입니다." : activeTab.kind === SPECIAL_COLLAB_TAB_KIND ? "지점별 협업 URL 등록 전용 입력 형식입니다." : "`지역`, `지점`은 고정이고 이벤트만 확장됩니다."}</span></div>
                 <div className="editor-toolbar">
                   <div className="editor-name-block">
                     <div className="editor-meta">탭 이름</div>
                     <input className="tab-name-input" value={activeTab.name} onChange={(e) => updateTabName(e.target.value)} />
                   </div>
-                  {activeTab.kind !== SPECIAL_SOCIAL_TAB_KIND ? (
+                  {!isSpecialTabKind(activeTab.kind) ? (
                     <button className="mini-button" onClick={() => setAreEventChipsExpanded((current) => !current)}>
                       {areEventChipsExpanded ? "이벤트명 접기" : "이벤트명 펼치기"}
                     </button>
                   ) : null}
                 </div>
-                {activeTab.kind !== SPECIAL_SOCIAL_TAB_KIND ? (
+                {!isSpecialTabKind(activeTab.kind) ? (
                   <>
                     <div className={`event-chip-list ${areEventChipsExpanded ? "" : "collapsed"}`}>
                       {activeTab.events.length > 0 ? activeTab.events.map((event) => (
@@ -2073,7 +2605,7 @@ export default function HomePage() {
                       </table>
                     </div>
                   </>
-                ) : (
+                ) : activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? (
                   <div className="table-shell special-input-shell">
                     <table className="excel-table special-input-table">
                       <thead>
@@ -2095,6 +2627,36 @@ export default function HomePage() {
                                   value={row[column.key] ?? ""}
                                   onChange={(e) => updateSpecialCell(rowIndex, column.key, e.target.value)}
                                   placeholder={column.label}
+                                />
+                              </td>
+                            ))}
+                            <td className="special-cell special-memo"><button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="table-shell special-input-shell">
+                    <table className="excel-table special-input-table">
+                      <thead>
+                        <tr>
+                          {(activeTab.collabColumns || defaultCollabColumns).map((column) => (
+                            <th key={column} className={`special-head ${column === "지역" || column === "지점" ? "special-identity" : "special-growth"}`}>{column}</th>
+                          ))}
+                          <th className="special-head special-memo">행 삭제</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(activeTab.collabRows || []).map((row, rowIndex) => (
+                          <tr key={row.id}>
+                            {(activeTab.collabColumns || defaultCollabColumns).map((column) => (
+                              <td key={`${row.id}-${column}`} className={`special-cell ${column === "지역" || column === "지점" ? "special-identity" : "special-growth"}`}>
+                                <input
+                                  type={column === "지역" || column === "지점" ? "text" : "url"}
+                                  value={row.values?.[column] ?? ""}
+                                  onChange={(e) => updateCollabCell(rowIndex, column, e.target.value)}
+                                  placeholder={column}
                                 />
                               </td>
                             ))}

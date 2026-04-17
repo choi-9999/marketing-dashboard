@@ -1470,6 +1470,69 @@ select:focus {
   background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(245,249,255,.95));
 }
 
+.collab-analytics-panel {
+  align-items: start;
+}
+
+.collab-event-list {
+  display: grid;
+  gap: 10px;
+}
+
+.collab-event-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid #d9e3f2;
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,247,255,.95));
+  color: #28436d;
+  text-align: left;
+  box-shadow: 0 8px 18px rgba(27, 47, 88, .05);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.collab-event-item:hover,
+.collab-event-item.active {
+  transform: translateY(-1px);
+  border-color: #9fb8e7;
+  box-shadow: 0 12px 24px rgba(27, 47, 88, .08);
+}
+
+.collab-event-item span {
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.collab-event-item strong {
+  color: #1d4f9b;
+  font-size: .86rem;
+  white-space: nowrap;
+}
+
+.collab-url-panel {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed #dce6f4;
+}
+
+.collab-url-list li a {
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal;
+  word-break: break-all;
+}
+
+.branch-collapsed-hint.small {
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
 .event-chart-head {
   margin-bottom: 14px;
 }
