@@ -1521,6 +1521,22 @@ export default function HomePage() {
     [isCollabDashboard, selectedDashboardTab]
   );
 
+  const collabActiveBranchTooltip = useMemo(
+    () =>
+      collabDashboardSummary.branchRows
+        .filter((row) => row.urlCount > 0)
+        .map((row) => row.branch),
+    [collabDashboardSummary.branchRows]
+  );
+
+  const collabInactiveBranchTooltip = useMemo(
+    () =>
+      collabDashboardSummary.branchRows
+        .filter((row) => row.urlCount === 0)
+        .map((row) => row.branch),
+    [collabDashboardSummary.branchRows]
+  );
+
   const topbarCountValue = page === "dashboard"
     ? isSpecialDashboard
       ? specialSocialColumns.length
@@ -2273,15 +2289,35 @@ export default function HomePage() {
             ) : isCollabDashboard ? (
               <>
                 <section className="sheet-grid kpi-grid">
-                  <article className="sheet-panel score-panel compact-score-panel">
-                    <div className="panel-title-row"><h2>{dashboardScopeLabel} 핵심 지표</h2><span className="status-pill good">KPI</span></div>
-                    <div className="score-layout">
-                      <div className="score-box strong"><span>진행 횟수</span><strong>{collabDashboardSummary.uniqueEvents}</strong><p>현재 탭의 전체 협업 이벤트 수입니다.</p></div>
-                      <div className="score-box hover-score-box"><span>참여 지점 수</span><strong>{collabDashboardSummary.activeBranches}</strong><p>URL이 1건 이상 등록된 지점 수입니다.</p></div>
-                      <div className="score-box warn hover-score-box"><span>미참여 지점 수</span><strong>{collabDashboardSummary.inactiveBranches}</strong><p>아직 URL 등록 이력이 없는 지점입니다.</p></div>
-                    </div>
-                  </article>
-                </section>
+                    <article className="sheet-panel score-panel compact-score-panel">
+                      <div className="panel-title-row"><h2>{dashboardScopeLabel} 핵심 지표</h2><span className="status-pill good">KPI</span></div>
+                      <div className="score-layout">
+                        <div className="score-box strong"><span>진행 횟수</span><strong>{collabDashboardSummary.uniqueEvents}</strong><p>현재 탭의 전체 협업 이벤트 수입니다.</p></div>
+                        <div className="score-box hover-score-box">
+                          <span>참여 지점 수</span>
+                          <strong>{collabDashboardSummary.activeBranches}</strong>
+                          <p>URL이 1건 이상 등록된 지점 수입니다.</p>
+                          <div className="score-tooltip">
+                            <div className="score-tooltip-title">참여 지점명</div>
+                            <ul className="score-tooltip-list">
+                              {collabActiveBranchTooltip.length > 0 ? collabActiveBranchTooltip.map((branch) => <li key={`collab-active-${branch}`}>{branch}</li>) : <li>해당 지점이 없습니다.</li>}
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="score-box warn hover-score-box">
+                          <span>미참여 지점 수</span>
+                          <strong>{collabDashboardSummary.inactiveBranches}</strong>
+                          <p>아직 URL 등록 이력이 없는 지점입니다.</p>
+                          <div className="score-tooltip">
+                            <div className="score-tooltip-title">미참여 지점명</div>
+                            <ul className="score-tooltip-list">
+                              {collabInactiveBranchTooltip.length > 0 ? collabInactiveBranchTooltip.map((branch) => <li key={`collab-inactive-${branch}`}>{branch}</li>) : <li>해당 지점이 없습니다.</li>}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  </section>
 
                 <section className="sheet-panel">
                   <div className="panel-title-row"><h2>협업 URL 현황</h2><span className="note-text">{selectedCollabBranch ? `${selectedCollabBranch} 기준` : "전체 지점 기준"}</span></div>
