@@ -840,6 +840,12 @@ input, select {
   z-index: 12;
 }
 
+.grade-column:first-child .grade-metric-hover .metric-tooltip,
+.grade-column:nth-child(2) .grade-metric-hover .metric-tooltip {
+  left: 0;
+  right: auto;
+}
+
 .grade-metric-hover:hover .metric-tooltip {
   opacity: 1;
   transform: translateY(0) scale(1);
