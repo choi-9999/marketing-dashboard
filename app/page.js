@@ -1620,6 +1620,14 @@ export default function HomePage() {
     return links.length > 0 ? { name: selectedCollabEvent, links } : null;
   }, [collabDashboardSummary.branchRows, selectedCollabBranchRow, selectedCollabEvent]);
 
+  const selectedCollabEventBranches = useMemo(() => {
+    if (!selectedCollabEventData || selectedCollabBranch) return [];
+
+    return [...new Set(selectedCollabEventData.links.map((link) => link.branch).filter(Boolean))].sort((a, b) =>
+      a.localeCompare(b, "ko")
+    );
+  }, [selectedCollabEventData, selectedCollabBranch]);
+
   const overallBranchScoreboard = useMemo(() => {
     const branchMap = new Map();
     const snsScoreMap = new Map(
@@ -2373,30 +2381,40 @@ export default function HomePage() {
                         )) : <div className="grade-empty-card">등록된 협업 이벤트가 없습니다.</div>}
                       </div>
                     </div>
-                    <div className="event-summary-card">
-                      <h3>현재 보기 요약</h3>
-                      <ul className="metric-list">
+                      <div className="event-summary-card">
+                        <h3>현재 보기 요약</h3>
+                        <ul className="metric-list">
                         <li><span>기준</span><strong>{selectedCollabBranch || "전체 지점"}</strong></li>
                         <li><span>진행 횟수</span><strong>{collabEventList.length}</strong></li>
                         <li><span>등록 URL 수</span><strong>{selectedCollabBranchRow ? selectedCollabBranchRow.urlCount : collabDashboardSummary.totalUrls}</strong></li>
                         <li><span>선택 이벤트</span><strong>{selectedCollabEvent || "-"}</strong></li>
-                      </ul>
-                      <div className="collab-url-panel">
-                        <div className="metric-tooltip-title">{selectedCollabEvent ? `${selectedCollabEvent} URL` : "이벤트를 선택하세요"}</div>
-                        {selectedCollabEventData ? (
-                          <ul className="metric-tooltip-list collab-url-list">
-                            {selectedCollabEventData.links.map((link, index) => (
-                              <li key={`collab-link-${link.url}-${index}`}>
-                                <a className="inline-score-link" href={link.url} target="_blank" rel="noreferrer">
-                                  {selectedCollabBranch ? `${link.label}` : `${link.branch} · ${link.label}`}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <div className="branch-collapsed-hint small">이벤트명을 누르면 연결된 URL이 표시됩니다.</div>
-                        )}
-                      </div>
+                        </ul>
+                        <div className="collab-url-panel">
+                          <div className="metric-tooltip-title">
+                            {selectedCollabEvent
+                              ? selectedCollabBranch
+                                ? `${selectedCollabEvent} URL`
+                                : `${selectedCollabEvent} 참여 지점`
+                              : "이벤트를 선택하세요"}
+                          </div>
+                          {selectedCollabEventData ? (
+                            <ul className="metric-tooltip-list collab-url-list">
+                              {selectedCollabBranch
+                                ? selectedCollabEventData.links.map((link, index) => (
+                                    <li key={`collab-link-${link.url}-${index}`}>
+                                      <a className="inline-score-link" href={link.url} target="_blank" rel="noreferrer">
+                                        {link.label}
+                                      </a>
+                                    </li>
+                                  ))
+                                : selectedCollabEventBranches.map((branch) => <li key={`collab-branch-${branch}`}>{branch}</li>)}
+                            </ul>
+                          ) : (
+                            <div className="branch-collapsed-hint small">
+                              이벤트명을 누르면 {selectedCollabBranch ? "연결된 URL" : "참여한 지점"}이 표시됩니다.
+                            </div>
+                          )}
+                        </div>
                     </div>
                   </div>
                 </section>
