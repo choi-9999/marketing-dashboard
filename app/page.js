@@ -1503,6 +1503,29 @@ export default function HomePage() {
     };
   }, [snsSourceRows]);
 
+  const overallCollabTab = useMemo(
+    () => rawTabs.find((tab) => tab.kind === SPECIAL_COLLAB_TAB_KIND) || null,
+    [rawTabs]
+  );
+
+  const overallCollabSummary = useMemo(
+    () =>
+      overallCollabTab
+        ? buildCollabSummary(overallCollabTab)
+        : {
+            totalBranches: 0,
+            activeBranches: 0,
+            inactiveBranches: 0,
+            totalUrls: 0,
+            uniqueEvents: 0,
+            branchRows: [],
+            branchOptions: [],
+            groupedBranches: new Map(),
+            eventOverview: []
+          },
+    [overallCollabTab]
+  );
+
   const collabDashboardSummary = useMemo(
     () =>
       isCollabDashboard
@@ -1635,6 +1658,7 @@ export default function HomePage() {
         .filter((row) => row.branch.trim())
         .map((row) => [normalizeBranchKey(row.branch), row])
     );
+    const planTypeCount = dashboardRawTabs.length + (overallCollabTab ? 1 : 0);
 
     dashboardRawTabs.forEach((tab) => {
       tab.rows.forEach((row) => {
@@ -1649,6 +1673,7 @@ export default function HomePage() {
             participatedEvents: 0,
             inactiveEvents: 0,
             totalParticipants: 0,
+            collabUrlCount: 0,
             activePlans: new Set()
           });
         }
@@ -1673,15 +1698,50 @@ export default function HomePage() {
       });
     });
 
+    if (overallCollabTab) {
+      overallCollabSummary.branchRows.forEach((row) => {
+        const branch = row.branch.trim();
+        if (!branch) return;
+
+        if (!branchMap.has(branch)) {
+          branchMap.set(branch, {
+            branch,
+            region: normalizeRegionLabel(row.region.trim()),
+            eligibleEvents: 0,
+            participatedEvents: 0,
+            inactiveEvents: 0,
+            totalParticipants: 0,
+            collabUrlCount: 0,
+            activePlans: new Set()
+          });
+        }
+
+        const target = branchMap.get(branch);
+        if (!target.region && row.region.trim()) {
+          target.region = normalizeRegionLabel(row.region.trim());
+        }
+
+        target.eligibleEvents += overallCollabSummary.uniqueEvents;
+        target.participatedEvents += row.events.length;
+        target.inactiveEvents += Math.max(overallCollabSummary.uniqueEvents - row.events.length, 0);
+        target.collabUrlCount += row.urlCount;
+
+        if (row.events.length > 0) {
+          target.activePlans.add(overallCollabTab.name);
+        }
+      });
+    }
+
     const rawList = [...branchMap.values()];
-    const maxParticipants = Math.max(...rawList.map((item) => item.totalParticipants), 1);
+    const maxActivityVolume = Math.max(...rawList.map((item) => item.totalParticipants + item.collabUrlCount), 1);
 
     const branches = rawList
       .map((item) => {
         const snsMatch = snsScoreMap.get(normalizeBranchKey(item.branch));
         const participationRate = item.eligibleEvents > 0 ? Math.round((item.participatedEvents / item.eligibleEvents) * 100) : 0;
-        const participantScore = Math.round((item.totalParticipants / maxParticipants) * 100);
-        const planCoverage = dashboardRawTabs.length > 0 ? Math.round((item.activePlans.size / dashboardRawTabs.length) * 100) : 0;
+        const activityVolume = item.totalParticipants + item.collabUrlCount;
+        const participantScore = Math.round((activityVolume / maxActivityVolume) * 100);
+        const planCoverage = planTypeCount > 0 ? Math.round((item.activePlans.size / planTypeCount) * 100) : 0;
         const stabilityScore = Math.max(0, 100 - Math.round((item.inactiveEvents / Math.max(item.eligibleEvents, 1)) * 100));
         const operationScore = Math.round(
           participationRate * 0.45 +
@@ -1701,6 +1761,7 @@ export default function HomePage() {
           participatedEvents: item.participatedEvents,
           inactiveEvents: item.inactiveEvents,
           totalParticipants: item.totalParticipants,
+          collabUrlCount: item.collabUrlCount,
           activePlanCount: item.activePlans.size,
           activePlans: [...item.activePlans].sort((a, b) => a.localeCompare(b, "ko")),
           participationRate,
@@ -1729,9 +1790,9 @@ export default function HomePage() {
       grouped,
       avgScore: branches.length > 0 ? Math.round(branches.reduce((sum, item) => sum + item.score, 0) / branches.length) : 0,
       topBranch: branches[0] || null,
-      atRiskCount: grouped["D그룹"].length
-    };
-  }, [dashboardRawTabs, snsSourceRows]);
+        atRiskCount: grouped["D그룹"].length
+      };
+  }, [dashboardRawTabs, overallCollabSummary, overallCollabTab, snsSourceRows]);
 
   function updateActiveTab(mutator) {
     markDirty();
@@ -2122,7 +2183,7 @@ export default function HomePage() {
                 <section className="sheet-panel">
                   <div className="panel-title-row">
                     <h2>지점별 전체 현황 보드</h2>
-                    <span className="note-text">운영 점수 50%와 SNS 평가 점수 50%를 합산한 그룹 보드입니다.</span>
+                      <span className="note-text">일반 이벤트와 협업이벤트를 반영한 운영 점수 50%, SNS 평가 점수 50%를 합산한 그룹 보드입니다.</span>
                   </div>
                   <div className="overview-summary-strip">
                     <div className="overview-summary-card"><span>전체 지점 수</span><strong>{overallBranchScoreboard.branches.length}</strong></div>
