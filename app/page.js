@@ -6,6 +6,7 @@ import * as XLSX from "xlsx";
 const OVERVIEW_TAB_ID = "__overall__";
 const SPECIAL_SOCIAL_TAB_KIND = "special-social";
 const SPECIAL_COLLAB_TAB_KIND = "special-collab";
+const SPECIAL_FACILITY_TAB_KIND = "special-facility";
 const BROWSER_SAVE_KEY = "branch-activation-dashboard-state";
 
 const createId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -56,8 +57,10 @@ const defaultCollabColumns = [
   "협업 이벤트 A 인스타/언론기사"
 ];
 
+const defaultFacilityColumns = ["지역", "지점", "시설영상 URL"];
+
 function isSpecialTabKind(kind) {
-  return kind === SPECIAL_SOCIAL_TAB_KIND || kind === SPECIAL_COLLAB_TAB_KIND;
+  return kind === SPECIAL_SOCIAL_TAB_KIND || kind === SPECIAL_COLLAB_TAB_KIND || kind === SPECIAL_FACILITY_TAB_KIND;
 }
 
 function normalizeCollabColumns(columns = []) {
@@ -101,6 +104,35 @@ function createSpecialCollabTab(id, name, seededRows = [], columns = defaultColl
     rows: [],
     collabColumns: normalizedColumns,
     collabRows: rows
+  };
+}
+
+function createSpecialFacilityRow(seed = {}) {
+  return {
+    id: seed.id || createId("facility-row"),
+    region: seed.region || seed["지역"] || "",
+    branch: seed.branch || seed["지점"] || "",
+    url: seed.url || seed["시설영상 URL"] || seed["URL"] || ""
+  };
+}
+
+function createSpecialFacilityTab(id, name, seededRows = []) {
+  const rows = seededRows.length > 0
+    ? seededRows.map((row) => createSpecialFacilityRow(row))
+    : [
+        createSpecialFacilityRow({ region: "서울", branch: "대치" }),
+        createSpecialFacilityRow({ region: "서울", branch: "강북" }),
+        createSpecialFacilityRow({ region: "경기", branch: "분당정자" })
+      ];
+
+  return {
+    id,
+    name,
+    kind: SPECIAL_FACILITY_TAB_KIND,
+    events: [],
+    rows: [],
+    facilityColumns: defaultFacilityColumns,
+    facilityRows: rows
   };
 }
 
@@ -224,7 +256,8 @@ const initialTabs = [
     }
   ]),
   createSpecialSocialTab("tab-social-1", "SNS 진단표"),
-  createSpecialCollabTab("tab-collab-1", "협업이벤트")
+  createSpecialCollabTab("tab-collab-1", "협업이벤트"),
+  createSpecialFacilityTab("tab-facility-1", "지점시설영상")
 ];
 
 function normalizeParticipantValue(value) {
@@ -353,6 +386,32 @@ function buildCollabSummary(tab) {
   };
 }
 
+function buildFacilitySummary(tab) {
+  const branchRows = (tab?.facilityRows || [])
+    .map((row) => ({
+      id: row.id,
+      region: normalizeRegionLabel(String(row.region || "").trim()),
+      branch: String(row.branch || "").trim(),
+      url: String(row.url || "").trim()
+    }))
+    .filter((row) => row.branch);
+
+  const activeBranchRows = branchRows.filter((row) => row.url);
+
+  return {
+    totalBranches: branchRows.length,
+    activeBranches: activeBranchRows.length,
+    inactiveBranches: Math.max(branchRows.length - activeBranchRows.length, 0),
+    totalUrls: activeBranchRows.length,
+    branchRows,
+    groupedBranches: branchRows.reduce((acc, row) => {
+      if (!acc.has(row.region)) acc.set(row.region, []);
+      acc.get(row.region).push(row);
+      return acc;
+    }, new Map())
+  };
+}
+
 function migrateLegacyTab(tab) {
   if (tab?.kind === SPECIAL_SOCIAL_TAB_KIND) {
     return {
@@ -385,6 +444,25 @@ function migrateLegacyTab(tab) {
             })
           )
         : [createSpecialCollabRow(collabColumns)]
+    };
+  }
+
+  if (tab?.kind === SPECIAL_FACILITY_TAB_KIND) {
+    return {
+      id: tab.id || createId("tab"),
+      name: tab.name || "지점시설영상",
+      kind: SPECIAL_FACILITY_TAB_KIND,
+      events: [],
+      rows: [],
+      facilityColumns: defaultFacilityColumns,
+      facilityRows: Array.isArray(tab.facilityRows) && tab.facilityRows.length > 0
+        ? tab.facilityRows.map((row, index) =>
+            createSpecialFacilityRow({
+              ...row,
+              id: row?.id || createId(`facility-row-${index}`)
+            })
+          )
+        : [createSpecialFacilityRow()]
     };
   }
 
@@ -503,20 +581,37 @@ function migrateLegacyTab(tab) {
 }
 
 function ensureSpecialInputTabs(tabs) {
-  const seededBranches = [...new Set(
-    tabs
+  const seededBranchRows = [
+    ...tabs
       .filter((tab) => !isSpecialTabKind(tab.kind))
-      .flatMap((tab) => tab.rows.map((row) => row.branch.trim()).filter(Boolean))
-  )];
+      .flatMap((tab) =>
+        tab.rows
+          .map((row) => ({
+            region: row.region?.trim?.() || "",
+            branch: row.branch?.trim?.() || ""
+          }))
+          .filter((row) => row.branch)
+      )
+      .reduce((acc, row) => {
+        if (!acc.some((item) => item.branch === row.branch)) {
+          acc.push(row);
+        }
+        return acc;
+      }, [])
+  ];
 
   const nextTabs = [...tabs];
 
   if (!nextTabs.some((tab) => tab.kind === SPECIAL_SOCIAL_TAB_KIND)) {
-    nextTabs.push(createSpecialSocialTab("tab-social-1", "SNS 진단표", seededBranches.map((branch) => ({ branch }))));
+    nextTabs.push(createSpecialSocialTab("tab-social-1", "SNS 진단표", seededBranchRows.map((row) => ({ branch: row.branch }))));
   }
 
   if (!nextTabs.some((tab) => tab.kind === SPECIAL_COLLAB_TAB_KIND)) {
-    nextTabs.push(createSpecialCollabTab("tab-collab-1", "협업이벤트", seededBranches.map((branch) => ({ 지점: branch }))));
+    nextTabs.push(createSpecialCollabTab("tab-collab-1", "협업이벤트", seededBranchRows.map((row) => ({ 지역: row.region, 지점: row.branch }))));
+  }
+
+  if (!nextTabs.some((tab) => tab.kind === SPECIAL_FACILITY_TAB_KIND)) {
+    nextTabs.push(createSpecialFacilityTab("tab-facility-1", "지점시설영상", seededBranchRows));
   }
 
   return nextTabs;
@@ -1052,6 +1147,51 @@ function extractCollabRowsFromWorkbook(arrayBuffer, fallbackName = "협업이벤
   };
 }
 
+function extractFacilityRowsFromWorkbook(arrayBuffer, fallbackName = "지점시설영상") {
+  const workbook = XLSX.read(arrayBuffer, {
+    type: "array",
+    cellDates: true,
+    cellNF: false,
+    cellStyles: false
+  });
+
+  const sheetName =
+    workbook.SheetNames.find((name) => name.includes(fallbackName)) ??
+    workbook.SheetNames.find((name) => !name.includes("평가") && !name.includes("입력")) ??
+    workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+
+  if (!sheet?.["!ref"]) {
+    return {
+      sheetName,
+      tab: createSpecialFacilityTab(createId("tab-facility"), fallbackName, [])
+    };
+  }
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {
+    header: 1,
+    raw: false,
+    defval: ""
+  });
+
+  const dataRows = rows
+    .slice(1)
+    .filter((row) => Array.isArray(row) && row.some((cell) => String(cell ?? "").trim() !== ""));
+
+  return {
+    sheetName,
+    tab: createSpecialFacilityTab(
+      createId("tab-facility"),
+      fallbackName,
+      dataRows.map((row) => ({
+        region: String(row[0] ?? "").trim(),
+        branch: String(row[1] ?? "").trim(),
+        url: String(row[2] ?? "").trim()
+      }))
+    )
+  };
+}
+
 function ExternalScoreLink({ href, value }) {
   if (!href) {
     return <strong>{value}</strong>;
@@ -1291,7 +1431,8 @@ export default function HomePage() {
   const isOverviewDashboard = dashboardTabId === OVERVIEW_TAB_ID;
   const isSpecialDashboard = !isOverviewDashboard && selectedDashboardTab?.kind === SPECIAL_SOCIAL_TAB_KIND;
   const isCollabDashboard = !isOverviewDashboard && selectedDashboardTab?.kind === SPECIAL_COLLAB_TAB_KIND;
-  const dashboardTab = isSpecialDashboard || isCollabDashboard ? null : selectedDashboardTab;
+  const isFacilityDashboard = !isOverviewDashboard && selectedDashboardTab?.kind === SPECIAL_FACILITY_TAB_KIND;
+  const dashboardTab = isSpecialDashboard || isCollabDashboard || isFacilityDashboard ? null : selectedDashboardTab;
 
   useEffect(() => {
     setSelectedBranch(null);
@@ -1325,6 +1466,8 @@ export default function HomePage() {
       ? "진단 항목 수"
       : isCollabDashboard
         ? "진행 횟수"
+        : isFacilityDashboard
+          ? "등록 URL 수"
         : "이벤트 수"
     : "이벤트 수";
   const topbarBranchLabel = page === "dashboard"
@@ -1332,6 +1475,8 @@ export default function HomePage() {
       ? "평가 지점 수"
       : isCollabDashboard
         ? "참여 지점 수"
+        : isFacilityDashboard
+          ? "연결 지점 수"
         : "고유 지점 수"
     : "고유 지점 수";
   const branchOptions = useMemo(
@@ -1526,6 +1671,48 @@ export default function HomePage() {
     [overallCollabTab]
   );
 
+  const facilityDashboardSummary = useMemo(
+    () =>
+      isFacilityDashboard
+        ? buildFacilitySummary(selectedDashboardTab)
+        : {
+            totalBranches: 0,
+            activeBranches: 0,
+            inactiveBranches: 0,
+            totalUrls: 0,
+            branchRows: [],
+            groupedBranches: new Map()
+          },
+    [isFacilityDashboard, selectedDashboardTab]
+  );
+
+  const facilityActiveBranchTooltip = useMemo(
+    () => facilityDashboardSummary.branchRows.filter((row) => row.url).map((row) => row.branch),
+    [facilityDashboardSummary.branchRows]
+  );
+
+  const facilityInactiveBranchTooltip = useMemo(
+    () => facilityDashboardSummary.branchRows.filter((row) => !row.url).map((row) => row.branch),
+    [facilityDashboardSummary.branchRows]
+  );
+
+  const facilityRegionGroups = useMemo(
+    () =>
+      [...facilityDashboardSummary.groupedBranches.entries()]
+        .map(([region, branches]) => ({
+          region,
+          branches: [...branches].sort((a, b) => a.branch.localeCompare(b.branch, "ko"))
+        }))
+        .sort((a, b) => {
+          const aIndex = regionDisplayOrder.indexOf(a.region);
+          const bIndex = regionDisplayOrder.indexOf(b.region);
+          const safeA = aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex;
+          const safeB = bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex;
+          return safeA - safeB || a.region.localeCompare(b.region, "ko");
+        }),
+    [facilityDashboardSummary.groupedBranches]
+  );
+
   const collabDashboardSummary = useMemo(
     () =>
       isCollabDashboard
@@ -1565,6 +1752,8 @@ export default function HomePage() {
       ? specialSocialColumns.length
       : isCollabDashboard
         ? collabDashboardSummary.uniqueEvents
+        : isFacilityDashboard
+          ? facilityDashboardSummary.totalUrls
         : scopedSummary.totalEvents
     : dashboardSummary.totalEvents;
   const topbarBranchValue = page === "dashboard"
@@ -1572,6 +1761,8 @@ export default function HomePage() {
       ? snsSummary.totalBranches
       : isCollabDashboard
         ? collabDashboardSummary.activeBranches
+        : isFacilityDashboard
+          ? facilityDashboardSummary.activeBranches
         : scopedSummary.uniqueBranches
     : dashboardSummary.uniqueBranches;
 
@@ -1884,6 +2075,20 @@ export default function HomePage() {
     }));
   }
 
+  function updateFacilityCell(rowIndex, field, value) {
+    updateActiveTab((tab) => ({
+      ...tab,
+      facilityRows: (tab.facilityRows || []).map((row, index) =>
+        index === rowIndex
+          ? {
+              ...row,
+              [field]: value
+            }
+          : row
+      )
+    }));
+  }
+
   function updateEventCell(rowIndex, eventId, field, value) {
     updateActiveTab((tab) => ({
       ...tab,
@@ -1934,6 +2139,13 @@ export default function HomePage() {
         };
       }
 
+      if (tab.kind === SPECIAL_FACILITY_TAB_KIND) {
+        return {
+          ...tab,
+          facilityRows: [...(tab.facilityRows || []), createSpecialFacilityRow()]
+        };
+      }
+
       return {
         ...tab,
         rows: [...tab.rows, createRow(tab.events.map((event) => event.id))]
@@ -1957,6 +2169,13 @@ export default function HomePage() {
         };
       }
 
+      if (tab.kind === SPECIAL_FACILITY_TAB_KIND) {
+        return {
+          ...tab,
+          facilityRows: (tab.facilityRows || []).filter((_, index) => index !== rowIndex)
+        };
+      }
+
       return {
         ...tab,
         rows: tab.rows.filter((_, index) => index !== rowIndex)
@@ -1965,7 +2184,7 @@ export default function HomePage() {
   }
 
   function addEvent() {
-    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND) return;
+    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND || activeTab?.kind === SPECIAL_FACILITY_TAB_KIND) return;
     const nextName = window.prompt("추가할 이벤트명을 입력하세요.", "신규 이벤트");
     if (!nextName) return;
 
@@ -2033,8 +2252,30 @@ export default function HomePage() {
     }
   }
 
+  async function importFacilityWorkbook(file) {
+    if (!file || activeTab?.kind !== SPECIAL_FACILITY_TAB_KIND) return;
+
+    const shouldReplace = window.confirm("현재 지점시설영상 탭 데이터를 업로드한 엑셀 시트 데이터로 교체할까요?");
+    if (!shouldReplace) return;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const { sheetName, tab } = extractFacilityRowsFromWorkbook(arrayBuffer, activeTab?.name || "지점시설영상");
+
+      updateActiveTab((currentTab) => ({
+        ...currentTab,
+        facilityColumns: tab.facilityColumns,
+        facilityRows: tab.facilityRows
+      }));
+      setSaveState(`엑셀 '${sheetName}' 시트 반영됨`);
+    } catch (error) {
+      console.error("Failed to import facility workbook.", error);
+      setSaveState("엑셀 불러오기 실패");
+    }
+  }
+
   async function importDefaultWorkbook(file) {
-    if (!file || activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND) return;
+    if (!file || activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND || activeTab?.kind === SPECIAL_FACILITY_TAB_KIND) return;
 
     const shouldReplace = window.confirm("현재 이벤트 탭 데이터를 업로드한 엑셀 시트 데이터로 교체할까요?");
     if (!shouldReplace) return;
@@ -2355,6 +2596,75 @@ export default function HomePage() {
                   </div>
                 </section>
               </>
+            ) : isFacilityDashboard ? (
+              <>
+                <section className="sheet-grid kpi-grid">
+                  <article className="sheet-panel score-panel compact-score-panel">
+                    <div className="panel-title-row"><h2>{dashboardScopeLabel} 핵심 지표</h2><span className="status-pill good">VIDEO</span></div>
+                    <div className="score-layout">
+                      <div className="score-box strong"><span>등록 URL 수</span><strong>{facilityDashboardSummary.totalUrls}</strong><p>현재 탭에 연결된 시설영상 URL 수입니다.</p></div>
+                      <div className="score-box hover-score-box">
+                        <span>참여 지점 수</span>
+                        <strong>{facilityDashboardSummary.activeBranches}</strong>
+                        <p>시설영상 URL이 등록된 지점 수입니다.</p>
+                        <div className="score-tooltip">
+                          <div className="score-tooltip-title">참여 지점명</div>
+                          <ul className="score-tooltip-list">
+                            {facilityActiveBranchTooltip.length > 0 ? facilityActiveBranchTooltip.map((branch) => <li key={`facility-active-${branch}`}>{branch}</li>) : <li>해당 지점이 없습니다.</li>}
+                          </ul>
+                        </div>
+                      </div>
+                      <div className="score-box warn hover-score-box">
+                        <span>미참여 지점 수</span>
+                        <strong>{facilityDashboardSummary.inactiveBranches}</strong>
+                        <p>시설영상 URL이 아직 없는 지점 수입니다.</p>
+                        <div className="score-tooltip">
+                          <div className="score-tooltip-title">미참여 지점명</div>
+                          <ul className="score-tooltip-list">
+                            {facilityInactiveBranchTooltip.length > 0 ? facilityInactiveBranchTooltip.map((branch) => <li key={`facility-inactive-${branch}`}>{branch}</li>) : <li>해당 지점이 없습니다.</li>}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                </section>
+
+                <section className="sheet-panel">
+                  <div className="panel-title-row"><h2>권역별 시설영상 현황</h2><span className="note-text">지점명을 누르면 시설영상 URL이 새 탭에서 열립니다.</span></div>
+                  <div className="facility-region-board">
+                    {facilityRegionGroups.length > 0 ? facilityRegionGroups.map((group) => (
+                      <section className="facility-region-card" key={`facility-region-${group.region}`}>
+                        <div className="facility-region-head">
+                          <strong>{group.region}</strong>
+                          <span>{group.branches.length}개 지점</span>
+                        </div>
+                        <div className="facility-branch-grid">
+                          {group.branches.map((row) =>
+                            row.url ? (
+                              <a
+                                key={`facility-branch-${row.branch}`}
+                                className="facility-branch-link"
+                                href={row.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                title={`${row.branch} 시설영상 열기`}
+                              >
+                                {row.branch}
+                              </a>
+                            ) : (
+                              <div key={`facility-branch-${row.branch}`} className="facility-branch-link disabled" title="시설영상 URL 미등록">
+                                {row.branch}
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </section>
+                    )) : (
+                      <div className="grade-empty-card">등록된 시설영상 URL이 없습니다.</div>
+                    )}
+                  </div>
+                </section>
+              </>
             ) : isCollabDashboard ? (
               <>
                 <section className="sheet-grid kpi-grid">
@@ -2613,7 +2923,7 @@ export default function HomePage() {
                 <button className="reset-button" onClick={addRawTab}>+ 탭 추가</button>
                 <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>현재 탭 삭제</button>
                 <button className="reset-button" onClick={addRow}>
-                  {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : activeTab?.kind === SPECIAL_COLLAB_TAB_KIND ? "+ URL 행 추가" : "+ 지점 행 추가"}
+                  {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : activeTab?.kind === SPECIAL_COLLAB_TAB_KIND ? "+ URL 행 추가" : activeTab?.kind === SPECIAL_FACILITY_TAB_KIND ? "+ 영상 행 추가" : "+ 지점 행 추가"}
                 </button>
                 {!isSpecialTabKind(activeTab?.kind) ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
                 <button className="reset-button import-align-button" onClick={() => importInputRef.current?.click()}>엑셀 불러오기</button>
@@ -2629,6 +2939,8 @@ export default function HomePage() {
                         await importSnsWorkbook(file);
                       } else if (activeTab?.kind === SPECIAL_COLLAB_TAB_KIND) {
                         await importCollabWorkbook(file);
+                      } else if (activeTab?.kind === SPECIAL_FACILITY_TAB_KIND) {
+                        await importFacilityWorkbook(file);
                       } else {
                         await importDefaultWorkbook(file);
                       }
@@ -2644,7 +2956,7 @@ export default function HomePage() {
 
             {activeTab ? (
               <section className="sheet-panel">
-                <div className="panel-title-row"><h2>RAWDATA Studio</h2><span className="note-text">{activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? "SNS 채널 진단표 전용 입력 형식입니다." : activeTab.kind === SPECIAL_COLLAB_TAB_KIND ? "지점별 협업 URL 등록 전용 입력 형식입니다." : "`지역`, `지점`은 고정이고 이벤트만 확장됩니다."}</span></div>
+                <div className="panel-title-row"><h2>RAWDATA Studio</h2><span className="note-text">{activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? "SNS 채널 진단표 전용 입력 형식입니다." : activeTab.kind === SPECIAL_COLLAB_TAB_KIND ? "지점별 협업 URL 등록 전용 입력 형식입니다." : activeTab.kind === SPECIAL_FACILITY_TAB_KIND ? "지점 시설영상 URL 전용 입력 형식입니다." : "`지역`, `지점`은 고정이고 이벤트만 확장됩니다."}</span></div>
                 <div className="editor-toolbar">
                   <div className="editor-name-block">
                     <div className="editor-meta">탭 이름</div>
@@ -2745,6 +3057,35 @@ export default function HomePage() {
                                 />
                               </td>
                             ))}
+                            <td className="special-cell special-memo"><button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : activeTab.kind === SPECIAL_FACILITY_TAB_KIND ? (
+                  <div className="table-shell special-input-shell">
+                    <table className="excel-table special-input-table">
+                      <thead>
+                        <tr>
+                          <th className="special-head special-identity">지역</th>
+                          <th className="special-head special-identity">지점</th>
+                          <th className="special-head special-growth">시설영상 URL</th>
+                          <th className="special-head special-memo">행 삭제</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(activeTab.facilityRows || []).map((row, rowIndex) => (
+                          <tr key={row.id}>
+                            <td className="special-cell special-identity">
+                              <input type="text" value={row.region ?? ""} onChange={(e) => updateFacilityCell(rowIndex, "region", e.target.value)} placeholder="지역" />
+                            </td>
+                            <td className="special-cell special-identity">
+                              <input type="text" value={row.branch ?? ""} onChange={(e) => updateFacilityCell(rowIndex, "branch", e.target.value)} placeholder="지점" />
+                            </td>
+                            <td className="special-cell special-growth">
+                              <input type="url" value={row.url ?? ""} onChange={(e) => updateFacilityCell(rowIndex, "url", e.target.value)} placeholder="시설영상 URL" />
+                            </td>
                             <td className="special-cell special-memo"><button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button></td>
                           </tr>
                         ))}
