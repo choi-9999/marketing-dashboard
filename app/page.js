@@ -1298,6 +1298,7 @@ export default function HomePage() {
           inactiveEvents: item.inactiveEvents,
           totalParticipants: item.totalParticipants,
           activePlanCount: item.activePlans.size,
+          activePlans: [...item.activePlans].sort((a, b) => a.localeCompare(b, "ko")),
           participationRate,
           operationScore,
           score,
@@ -1564,7 +1565,15 @@ export default function HomePage() {
           <div className="meta-cell"><span>대시보드 기준</span><strong>{page === "dashboard" ? dashboardScopeLabel : activeTab?.name || "-"}</strong></div>
           <div className="meta-cell"><span>{page === "dashboard" && isSpecialDashboard ? "진단 항목 수" : "이벤트 수"}</span><strong>{page === "dashboard" ? (isSpecialDashboard ? specialSocialColumns.length : scopedSummary.totalEvents) : dashboardSummary.totalEvents}</strong></div>
           <div className="meta-cell"><span>{page === "dashboard" && isSpecialDashboard ? "평가 지점 수" : "고유 지점 수"}</span><strong>{page === "dashboard" ? (isSpecialDashboard ? snsSummary.totalBranches : scopedSummary.uniqueBranches) : dashboardSummary.uniqueBranches}</strong></div>
-          <div className="meta-cell highlight"><span>저장 상태</span><strong>{saveState}</strong></div>
+          <button
+            type="button"
+            className="meta-cell highlight save-state-trigger"
+            onClick={forceServerSave}
+            title="클릭해서 지금 상태를 서버에 저장"
+          >
+            <span>저장 상태</span>
+            <strong>{saveState}</strong>
+          </button>
         </div>
       </header>
 
@@ -1698,21 +1707,29 @@ export default function HomePage() {
                                     <span>SNS 점수</span>
                                     <strong>{branch.snsScore === null ? "-" : `${branch.snsScore}점`}</strong>
                                   </div>
-                                  <div className="grade-metric-row">
-                                    <span>참여율</span>
-                                    <strong>{branch.participationRate}%</strong>
+                                  <div className="grade-metric-row grade-metric-hover">
+                                    <span>참여 활성화 방안</span>
+                                    <strong>{branch.activePlanCount}개</strong>
+                                    <div className="metric-tooltip">
+                                      <div className="metric-tooltip-title">참여한 활성화 방안</div>
+                                      <ul className="metric-tooltip-list">
+                                        {branch.activePlans.length > 0
+                                          ? branch.activePlans.map((planName) => <li key={`${branch.branch}-${planName}`}>{planName}</li>)
+                                          : <li>참여한 활성화 방안이 없습니다.</li>}
+                                      </ul>
+                                    </div>
                                   </div>
                                   <div className="grade-metric-row">
                                     <span>참여 횟수</span>
                                     <strong>{branch.participatedEvents}회</strong>
                                   </div>
                                   <div className="grade-metric-row">
-                                    <span>총 참여 인원</span>
-                                    <strong>{branch.totalParticipants}명</strong>
+                                    <span>참여율</span>
+                                    <strong>{branch.participationRate}%</strong>
                                   </div>
                                   <div className="grade-metric-row">
-                                    <span>참여 활성화 방안</span>
-                                    <strong>{branch.activePlanCount}개</strong>
+                                    <span>총 참여 인원</span>
+                                    <strong>{branch.totalParticipants}명</strong>
                                   </div>
                                 </article>
                               ) : null}
@@ -1954,7 +1971,6 @@ export default function HomePage() {
                 <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>현재 탭 삭제</button>
                 <button className="reset-button" onClick={addRow}>{activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : "+ 지점 행 추가"}</button>
                 {activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
-                <button className="reset-button" onClick={forceServerSave}>강제 서버 저장</button>
                 <button className="reset-button" onClick={() => importInputRef.current?.click()}>엑셀 불러오기</button>
                 <input
                   ref={importInputRef}

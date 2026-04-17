@@ -819,6 +819,24 @@ input, select {
   font-size: .84rem;
 }
 
+.grade-metric-hover {
+  position: relative;
+  overflow: visible;
+}
+
+.grade-metric-hover .metric-tooltip {
+  left: auto;
+  right: 0;
+  top: calc(100% + 8px);
+  width: min(260px, 72vw);
+  z-index: 12;
+}
+
+.grade-metric-hover:hover .metric-tooltip {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 .inline-score-link {
   color: #2153a4;
   font-size: .84rem;
@@ -1264,6 +1282,23 @@ select:focus {
 
 .meta-cell.highlight {
   border-color: rgba(255,230,170,.22);
+}
+
+.save-state-trigger {
+  appearance: none;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.save-state-trigger:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.28);
+  box-shadow: 0 14px 26px rgba(10, 31, 76, .16);
+}
+
+.save-state-trigger:active {
+  transform: translateY(0);
 }
 
 .page-tabs {
