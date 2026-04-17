@@ -1334,21 +1334,6 @@ export default function HomePage() {
         ? "참여 지점 수"
         : "고유 지점 수"
     : "고유 지점 수";
-  const topbarCountValue = page === "dashboard"
-    ? isSpecialDashboard
-      ? specialSocialColumns.length
-      : isCollabDashboard
-        ? collabDashboardSummary.uniqueEvents
-        : scopedSummary.totalEvents
-    : dashboardSummary.totalEvents;
-  const topbarBranchValue = page === "dashboard"
-    ? isSpecialDashboard
-      ? snsSummary.totalBranches
-      : isCollabDashboard
-        ? collabDashboardSummary.activeBranches
-        : scopedSummary.uniqueBranches
-    : dashboardSummary.uniqueBranches;
-
   const branchOptions = useMemo(
     () =>
       (dashboardTab?.rows || [])
@@ -1535,6 +1520,21 @@ export default function HomePage() {
           },
     [isCollabDashboard, selectedDashboardTab]
   );
+
+  const topbarCountValue = page === "dashboard"
+    ? isSpecialDashboard
+      ? specialSocialColumns.length
+      : isCollabDashboard
+        ? collabDashboardSummary.uniqueEvents
+        : scopedSummary.totalEvents
+    : dashboardSummary.totalEvents;
+  const topbarBranchValue = page === "dashboard"
+    ? isSpecialDashboard
+      ? snsSummary.totalBranches
+      : isCollabDashboard
+        ? collabDashboardSummary.activeBranches
+        : scopedSummary.uniqueBranches
+    : dashboardSummary.uniqueBranches;
 
   const collabBranchGroups = useMemo(() => {
     if (!isCollabDashboard) return [];
