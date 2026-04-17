@@ -1526,6 +1526,18 @@ select:focus {
   word-break: break-all;
 }
 
+.collab-branch-grid-list {
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+  max-height: 220px;
+}
+
+.collab-branch-grid-list li {
+  white-space: normal;
+  word-break: keep-all;
+  text-align: center;
+}
+
 .branch-collapsed-hint.small {
   margin-top: 10px;
   padding: 0;

@@ -2398,7 +2398,7 @@ export default function HomePage() {
                               : "이벤트를 선택하세요"}
                           </div>
                           {selectedCollabEventData ? (
-                            <ul className="metric-tooltip-list collab-url-list">
+                            <ul className={`metric-tooltip-list collab-url-list ${selectedCollabBranch ? "" : "collab-branch-grid-list"}`.trim()}>
                               {selectedCollabBranch
                                 ? selectedCollabEventData.links.map((link, index) => (
                                     <li key={`collab-link-${link.url}-${index}`}>
