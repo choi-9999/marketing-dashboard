@@ -874,24 +874,36 @@ function getRecentActivityScore(count, thresholds) {
   return 0;
 }
 
-function isDormantSince(dateString, baseDateString) {
+function isDormantSince(dateString, baseDateString, thresholdDays = 30) {
   if (!dateString) return false;
   const base = new Date(baseDateString);
   const target = new Date(dateString);
   if (Number.isNaN(base.getTime()) || Number.isNaN(target.getTime())) return false;
   const diff = Math.floor((base - target) / (1000 * 60 * 60 * 24));
-  return diff > 30;
+  return diff > thresholdDays;
 }
 
 function summarizeSnsRow(row, baseDate = snsEvaluationBaseDate) {
   const hasBlog = !isMissingChannelUrl(row.blogUrl);
   const hasInstagram = !isMissingChannelUrl(row.instagramUrl);
 
-  const blogActivity = hasBlog ? Math.max(0, getRecentActivityScore(row.blogRecentPosts, [[8, 30], [5, 25], [3, 20], [1, 10]]) - (isDormantSince(row.blogLastPosted, baseDate) ? 5 : 0)) : 0;
+  const blogActivity = hasBlog
+    ? Math.max(
+        0,
+        getRecentActivityScore(row.blogRecentPosts, [[8, 30], [5, 25], [3, 20], [1, 10]]) -
+          (isDormantSince(row.blogLastPosted, baseDate, 60) ? 15 : 0)
+      )
+    : 0;
   const blogReaction = hasBlog ? Number(row.blogVisitScore || 0) : 0;
   const blogScore = hasBlog ? Number(((blogActivity + blogReaction) / 35 * 50).toFixed(1)) : 0;
 
-  const instagramActivity = hasInstagram ? Math.max(0, getRecentActivityScore(row.instagramRecentPosts, [[12, 30], [8, 25], [4, 20], [1, 10]]) - (isDormantSince(row.instagramLastPosted, baseDate) ? 5 : 0)) : 0;
+  const instagramActivity = hasInstagram
+    ? Math.max(
+        0,
+        getRecentActivityScore(row.instagramRecentPosts, [[12, 30], [8, 25], [4, 20], [1, 10]]) -
+          (isDormantSince(row.instagramLastPosted, baseDate, 30) ? 5 : 0)
+      )
+    : 0;
   const instagramContent = hasInstagram
     ? [
         row.instagramDesignScore,
@@ -912,7 +924,7 @@ function summarizeSnsRow(row, baseDate = snsEvaluationBaseDate) {
       : instagramScore === 0
         ? blogScore * 2
         : blogScore + instagramScore;
-  const missingPenalty = (hasBlog ? 0 : 5) + (hasInstagram ? 0 : 5);
+  const missingPenalty = (hasBlog ? 0 : 10) + (hasInstagram ? 0 : 5);
   const finalScore = Number(Math.max(0, combinedScore - missingPenalty).toFixed(1));
   const grade = finalScore >= 80 ? "A" : finalScore >= 60 ? "B" : finalScore >= 40 ? "C" : "D";
 
