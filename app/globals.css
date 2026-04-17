@@ -955,6 +955,7 @@ input, select {
 .hover-score-box:hover .score-tooltip {
   opacity: 1;
   transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 .score-tooltip-title {
