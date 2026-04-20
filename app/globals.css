@@ -546,6 +546,31 @@ input, select {
   padding: 14px 12px 0;
 }
 
+.dashboard-search-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 16px 0;
+}
+
+.dashboard-search-row-tight {
+  padding-top: 10px;
+}
+
+.dashboard-search-input {
+  flex: 0 1 260px;
+  width: 260px;
+  max-width: 100%;
+  background: #fff;
+}
+
+.dashboard-search-note {
+  color: var(--muted);
+  font-size: .82rem;
+}
+
 .branch-chip {
   border: 1px solid var(--grid-strong);
   background: #f5f8fd;

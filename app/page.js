@@ -1244,6 +1244,8 @@ export default function HomePage() {
   const [selectedCollabBranch, setSelectedCollabBranch] = useState(null);
   const [selectedCollabEvent, setSelectedCollabEvent] = useState(null);
   const [selectedOverviewBranch, setSelectedOverviewBranch] = useState(null);
+  const [overviewSearch, setOverviewSearch] = useState("");
+  const [snsSearch, setSnsSearch] = useState("");
   const [areEventChipsExpanded, setAreEventChipsExpanded] = useState(true);
   const [branchKeyword, setBranchKeyword] = useState("");
   const [areRegionsExpanded, setAreRegionsExpanded] = useState(false);
@@ -1456,6 +1458,8 @@ export default function HomePage() {
   useEffect(() => {
     setBranchKeyword("");
     setAreRegionsExpanded(false);
+    setOverviewSearch("");
+    setSnsSearch("");
   }, [dashboardTabId]);
 
   useEffect(() => {
@@ -1625,27 +1629,34 @@ export default function HomePage() {
     [selectedDashboardTab]
   );
 
+  const filteredSnsDashboardRows = useMemo(() => {
+    const keyword = snsSearch.trim().toLowerCase();
+    if (!keyword) return snsDashboardRows.filter((row) => row.branch.trim());
+
+    return snsDashboardRows.filter((row) => row.branch.trim() && row.branch.toLowerCase().includes(keyword));
+  }, [snsDashboardRows, snsSearch]);
+
   const snsSourceRows = useMemo(() => {
     const snsTab = rawTabs.find((tab) => tab.kind === SPECIAL_SOCIAL_TAB_KIND);
     return snsTab ? (snsTab.socialRows || []).map((row) => summarizeSnsRow(row)) : [];
   }, [rawTabs]);
 
   const snsGradeGroups = useMemo(() => ({
-    A: snsDashboardRows.filter((row) => row.grade === "A"),
-    B: snsDashboardRows.filter((row) => row.grade === "B"),
-    C: snsDashboardRows.filter((row) => row.grade === "C"),
-    D: snsDashboardRows.filter((row) => row.grade === "D")
-  }), [snsDashboardRows]);
+    A: filteredSnsDashboardRows.filter((row) => row.grade === "A"),
+    B: filteredSnsDashboardRows.filter((row) => row.grade === "B"),
+    C: filteredSnsDashboardRows.filter((row) => row.grade === "C"),
+    D: filteredSnsDashboardRows.filter((row) => row.grade === "D")
+  }), [filteredSnsDashboardRows]);
 
   const snsSummary = useMemo(() => {
-    const totalBranches = snsDashboardRows.filter((row) => row.branch.trim()).length;
-    const averageScore = totalBranches > 0 ? Number((snsDashboardRows.reduce((sum, row) => sum + row.finalScore, 0) / totalBranches).toFixed(1)) : 0;
-    const bothChannels = snsDashboardRows.filter((row) => row.hasBlog && row.hasInstagram).length;
-    const missingChannels = snsDashboardRows.filter((row) => !row.hasBlog || !row.hasInstagram).length;
-    const topBranches = [...snsDashboardRows].sort((a, b) => b.finalScore - a.finalScore).slice(0, 8);
-    const lowBranches = [...snsDashboardRows].sort((a, b) => a.finalScore - b.finalScore).slice(0, 8);
+    const totalBranches = filteredSnsDashboardRows.length;
+    const averageScore = totalBranches > 0 ? Number((filteredSnsDashboardRows.reduce((sum, row) => sum + row.finalScore, 0) / totalBranches).toFixed(1)) : 0;
+    const bothChannels = filteredSnsDashboardRows.filter((row) => row.hasBlog && row.hasInstagram).length;
+    const missingChannels = filteredSnsDashboardRows.filter((row) => !row.hasBlog || !row.hasInstagram).length;
+    const topBranches = [...filteredSnsDashboardRows].sort((a, b) => b.finalScore - a.finalScore).slice(0, 8);
+    const lowBranches = [...filteredSnsDashboardRows].sort((a, b) => a.finalScore - b.finalScore).slice(0, 8);
     return { totalBranches, averageScore, bothChannels, missingChannels, topBranches, lowBranches };
-  }, [snsDashboardRows]);
+  }, [filteredSnsDashboardRows]);
 
   const overallSnsSummary = useMemo(() => {
     const totalBranches = snsSourceRows.filter((row) => row.branch.trim()).length;
@@ -1991,11 +2002,41 @@ export default function HomePage() {
     return {
       branches,
       grouped,
-      avgScore: branches.length > 0 ? Math.round(branches.reduce((sum, item) => sum + item.score, 0) / branches.length) : 0,
-      topBranch: branches[0] || null,
+        avgScore: branches.length > 0 ? Math.round(branches.reduce((sum, item) => sum + item.score, 0) / branches.length) : 0,
+        topBranch: branches[0] || null,
         atRiskCount: grouped["D그룹"].length
       };
   }, [dashboardRawTabs, overallCollabSummary, overallCollabTab, snsSourceRows]);
+
+  const filteredOverviewBranchScoreboard = useMemo(() => {
+    const keyword = overviewSearch.trim().toLowerCase();
+    const branches = !keyword
+      ? overallBranchScoreboard.branches
+      : overallBranchScoreboard.branches.filter((branch) =>
+          branch.branch.toLowerCase().includes(keyword) ||
+          branch.region.toLowerCase().includes(keyword) ||
+          branch.activePlans.some((plan) => plan.toLowerCase().includes(keyword))
+        );
+
+    const grouped = {
+      "A그룹": [],
+      "B그룹": [],
+      "C그룹": [],
+      "D그룹": []
+    };
+
+    branches.forEach((branch) => {
+      grouped[branch.grade].push(branch);
+    });
+
+    return {
+      branches,
+      grouped,
+      avgScore: branches.length > 0 ? Math.round(branches.reduce((sum, item) => sum + item.score, 0) / branches.length) : 0,
+      topBranch: branches[0] || null,
+      atRiskCount: grouped["D그룹"].length
+    };
+  }, [overallBranchScoreboard.branches, overviewSearch]);
 
   function updateActiveTab(mutator) {
     markDirty();
@@ -2381,51 +2422,51 @@ export default function HomePage() {
 
             {isOverviewDashboard ? (
               <>
-                <section className="sheet-grid kpi-grid">
+                  <section className="sheet-grid kpi-grid">
                   <article className="sheet-panel score-panel compact-score-panel">
                     <div className="panel-title-row"><h2>전체 현황 그룹 요약</h2><span className="status-pill good">SCORE</span></div>
                     <div className="score-layout">
                       <div className="score-box strong hover-score-box">
                         <span>A그룹</span>
-                        <strong>{overallBranchScoreboard.grouped["A그룹"].length}</strong>
+                        <strong>{filteredOverviewBranchScoreboard.grouped["A그룹"].length}</strong>
                         <p>우수 운영 상태의 지점입니다.</p>
                         <div className="score-tooltip">
                           <div className="score-tooltip-title">A그룹 지점명</div>
                           <ul className="score-tooltip-list">
-                            {overallBranchScoreboard.grouped["A그룹"].length > 0 ? overallBranchScoreboard.grouped["A그룹"].map((branch) => <li key={`grade-a-${branch.branch}`}>{branch.branch}</li>) : <li>해당 지점이 없습니다.</li>}
+                            {filteredOverviewBranchScoreboard.grouped["A그룹"].length > 0 ? filteredOverviewBranchScoreboard.grouped["A그룹"].map((branch) => <li key={`grade-a-${branch.branch}`}>{branch.branch}</li>) : <li>해당 지점이 없습니다.</li>}
                           </ul>
                         </div>
                       </div>
                       <div className="score-box hover-score-box">
                         <span>B그룹</span>
-                        <strong>{overallBranchScoreboard.grouped["B그룹"].length}</strong>
+                        <strong>{filteredOverviewBranchScoreboard.grouped["B그룹"].length}</strong>
                         <p>안정적으로 운영 중인 지점입니다.</p>
                         <div className="score-tooltip">
                           <div className="score-tooltip-title">B그룹 지점명</div>
                           <ul className="score-tooltip-list">
-                            {overallBranchScoreboard.grouped["B그룹"].length > 0 ? overallBranchScoreboard.grouped["B그룹"].map((branch) => <li key={`grade-b-${branch.branch}`}>{branch.branch}</li>) : <li>해당 지점이 없습니다.</li>}
+                            {filteredOverviewBranchScoreboard.grouped["B그룹"].length > 0 ? filteredOverviewBranchScoreboard.grouped["B그룹"].map((branch) => <li key={`grade-b-${branch.branch}`}>{branch.branch}</li>) : <li>해당 지점이 없습니다.</li>}
                           </ul>
                         </div>
                       </div>
                       <div className="score-box hover-score-box">
                         <span>C그룹</span>
-                        <strong>{overallBranchScoreboard.grouped["C그룹"].length}</strong>
+                        <strong>{filteredOverviewBranchScoreboard.grouped["C그룹"].length}</strong>
                         <p>보완이 필요한 지점입니다.</p>
                         <div className="score-tooltip">
                           <div className="score-tooltip-title">C그룹 지점명</div>
                           <ul className="score-tooltip-list">
-                            {overallBranchScoreboard.grouped["C그룹"].length > 0 ? overallBranchScoreboard.grouped["C그룹"].map((branch) => <li key={`grade-c-${branch.branch}`}>{branch.branch}</li>) : <li>해당 지점이 없습니다.</li>}
+                            {filteredOverviewBranchScoreboard.grouped["C그룹"].length > 0 ? filteredOverviewBranchScoreboard.grouped["C그룹"].map((branch) => <li key={`grade-c-${branch.branch}`}>{branch.branch}</li>) : <li>해당 지점이 없습니다.</li>}
                           </ul>
                         </div>
                       </div>
                       <div className="score-box warn hover-score-box">
                         <span>D그룹</span>
-                        <strong>{overallBranchScoreboard.grouped["D그룹"].length}</strong>
+                        <strong>{filteredOverviewBranchScoreboard.grouped["D그룹"].length}</strong>
                         <p>집중 관리가 필요한 지점입니다.</p>
                         <div className="score-tooltip">
                           <div className="score-tooltip-title">D그룹 지점명</div>
                           <ul className="score-tooltip-list">
-                            {overallBranchScoreboard.grouped["D그룹"].length > 0 ? overallBranchScoreboard.grouped["D그룹"].map((branch) => <li key={`grade-d-${branch.branch}`}>{branch.branch}</li>) : <li>해당 지점이 없습니다.</li>}
+                            {filteredOverviewBranchScoreboard.grouped["D그룹"].length > 0 ? filteredOverviewBranchScoreboard.grouped["D그룹"].map((branch) => <li key={`grade-d-${branch.branch}`}>{branch.branch}</li>) : <li>해당 지점이 없습니다.</li>}
                           </ul>
                         </div>
                       </div>
@@ -2438,11 +2479,20 @@ export default function HomePage() {
                     <h2>지점별 전체 현황 보드</h2>
                       <span className="note-text">일반 이벤트와 협업이벤트를 반영한 운영 점수 50%, SNS 평가 점수 50%를 합산한 그룹 보드입니다.</span>
                   </div>
+                  <div className="dashboard-search-row">
+                    <input
+                      className="dashboard-search-input"
+                      value={overviewSearch}
+                      onChange={(e) => setOverviewSearch(e.target.value)}
+                      placeholder="지점명 또는 권역 검색"
+                    />
+                    <span className="dashboard-search-note">검색 결과 {filteredOverviewBranchScoreboard.branches.length}개 지점</span>
+                  </div>
                   <div className="overview-summary-strip">
-                    <div className="overview-summary-card"><span>전체 지점 수</span><strong>{overallBranchScoreboard.branches.length}</strong></div>
-                    <div className="overview-summary-card"><span>평균 점수</span><strong>{overallBranchScoreboard.avgScore}점</strong></div>
-                    <div className="overview-summary-card"><span>최상위 지점</span><strong>{overallBranchScoreboard.topBranch?.branch || "-"}</strong></div>
-                    <div className="overview-summary-card warn"><span>집중 관리 지점</span><strong>{overallBranchScoreboard.atRiskCount}</strong></div>
+                    <div className="overview-summary-card"><span>전체 지점 수</span><strong>{filteredOverviewBranchScoreboard.branches.length}</strong></div>
+                    <div className="overview-summary-card"><span>평균 점수</span><strong>{filteredOverviewBranchScoreboard.avgScore}점</strong></div>
+                    <div className="overview-summary-card"><span>최상위 지점</span><strong>{filteredOverviewBranchScoreboard.topBranch?.branch || "-"}</strong></div>
+                    <div className="overview-summary-card warn"><span>집중 관리 지점</span><strong>{filteredOverviewBranchScoreboard.atRiskCount}</strong></div>
                   </div>
                   <div className="grade-board">
                     {["A그룹", "B그룹", "C그룹", "D그룹"].map((grade) => (
@@ -2450,11 +2500,11 @@ export default function HomePage() {
                         <div className="grade-column-head">
                           <div>
                             <strong>{grade}</strong>
-                            <span>{overallBranchScoreboard.grouped[grade].length}개 지점</span>
+                            <span>{filteredOverviewBranchScoreboard.grouped[grade].length}개 지점</span>
                           </div>
                         </div>
                         <div className="grade-card-list">
-                          {overallBranchScoreboard.grouped[grade].length > 0 ? overallBranchScoreboard.grouped[grade].map((branch) => (
+                          {filteredOverviewBranchScoreboard.grouped[grade].length > 0 ? filteredOverviewBranchScoreboard.grouped[grade].map((branch) => (
                             <div className="grade-branch-entry" key={`${grade}-${branch.branch}`}>
                               <button
                                 className={`grade-branch-trigger ${selectedOverviewBranch === branch.branch ? "active" : ""}`}
@@ -2528,6 +2578,15 @@ export default function HomePage() {
 
                 <section className="sheet-panel">
                   <div className="panel-title-row"><h2>SNS 등급 분포</h2><span className="note-text">엑셀 평가결과 기준일 {snsEvaluationBaseDate}</span></div>
+                  <div className="dashboard-search-row dashboard-search-row-tight">
+                    <input
+                      className="dashboard-search-input"
+                      value={snsSearch}
+                      onChange={(e) => setSnsSearch(e.target.value)}
+                      placeholder="지점명 검색"
+                    />
+                    <span className="dashboard-search-note">검색 결과 {filteredSnsDashboardRows.length}개 지점</span>
+                  </div>
                   <div className="grade-board sns-grade-board">
                     {["A", "B", "C", "D"].map((grade) => (
                       <section className={`grade-column ${grade === "D" ? "warn" : ""}`} key={grade}>
@@ -2592,7 +2651,7 @@ export default function HomePage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {snsDashboardRows.filter((row) => row.branch.trim()).map((row) => (
+                        {filteredSnsDashboardRows.map((row) => (
                           <tr key={`sns-table-${row.branch}`}>
                             <td>{row.branch}</td>
                             <td>{row.blogScore}</td>
