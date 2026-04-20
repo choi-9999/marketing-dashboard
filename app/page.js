@@ -2537,13 +2537,13 @@ export default function HomePage() {
                             <span>{snsGradeGroups[grade].length}개 지점</span>
                           </div>
                         </div>
-                        <div className="grade-card-list">
-                          {snsGradeGroups[grade].length > 0 ? snsGradeGroups[grade].slice(0, 8).map((row) => (
-                            <article className="grade-branch-card" key={`sns-grade-${grade}-${row.branch}`}>
-                              <div className="grade-branch-head"><strong>{row.branch}</strong><span>{row.finalScore}점</span></div>
-                              <div className="grade-metric-row"><span>블로그 점수</span><ExternalScoreLink href={row.hasBlog ? row.blogUrl : ""} value={row.blogScore} /></div>
-                              <div className="grade-metric-row"><span>인스타 점수</span><ExternalScoreLink href={row.hasInstagram ? row.instagramUrl : ""} value={row.instagramScore} /></div>
-                            </article>
+                          <div className="grade-card-list">
+                           {snsGradeGroups[grade].length > 0 ? snsGradeGroups[grade].map((row) => (
+                              <article className="grade-branch-card" key={`sns-grade-${grade}-${row.branch}`}>
+                                <div className="grade-branch-head"><strong>{row.branch}</strong><span>{row.finalScore}점</span></div>
+                                <div className="grade-metric-row"><span>블로그 점수</span><ExternalScoreLink href={row.hasBlog ? row.blogUrl : ""} value={row.blogScore} /></div>
+                                <div className="grade-metric-row"><span>인스타 점수</span><ExternalScoreLink href={row.hasInstagram ? row.instagramUrl : ""} value={row.instagramScore} /></div>
+                              </article>
                           )) : <div className="grade-empty-card">해당 등급 지점이 없습니다.</div>}
                         </div>
                       </section>

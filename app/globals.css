@@ -723,6 +723,12 @@ input, select {
   overflow: visible;
 }
 
+.sns-grade-board .grade-card-list {
+  max-height: 760px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
 .grade-branch-entry {
   display: grid;
   gap: 8px;
