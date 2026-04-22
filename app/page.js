@@ -29,6 +29,15 @@ const regionMapShapes = [
 
 const regionDisplayOrder = ["서울", "경기", "인천", "강원", "충청", "전라", "경상", "제주", "기숙"];
 const snsEvaluationBaseDate = "2026-03-24";
+const eventScheduleMap = {
+  "25윈터": "23.12.06. - 23.12.31.",
+  "25정규": "24.01.19. - 24.02.22.",
+  "25반수": "24.05.10. - 24.06.03.",
+  "26윈터": "24.11.22. - 25.01.10.",
+  "26정규": "25.02.07. - 25.03.07.",
+  "26반수": "25.04.18. - 25.06.02.",
+  "27정규": "25.12.19. - 26.01.16."
+};
 
 const specialSocialColumns = [
   { key: "branch", label: "지점", type: "text", group: "identity" },
@@ -1244,6 +1253,7 @@ export default function HomePage() {
   const [selectedCollabBranch, setSelectedCollabBranch] = useState(null);
   const [selectedCollabEvent, setSelectedCollabEvent] = useState(null);
   const [selectedOverviewBranch, setSelectedOverviewBranch] = useState(null);
+  const [selectedChartEventId, setSelectedChartEventId] = useState(null);
   const [overviewSearch, setOverviewSearch] = useState("");
   const [snsSearch, setSnsSearch] = useState("");
   const [areEventChipsExpanded, setAreEventChipsExpanded] = useState(true);
@@ -1453,6 +1463,7 @@ export default function HomePage() {
     setSelectedCollabBranch(null);
     setSelectedCollabEvent(null);
     setSelectedOverviewBranch(null);
+    setSelectedChartEventId(null);
   }, [dashboardTabId]);
 
   useEffect(() => {
@@ -1465,6 +1476,10 @@ export default function HomePage() {
   useEffect(() => {
     setSelectedCollabEvent(null);
   }, [selectedCollabBranch]);
+
+  useEffect(() => {
+    setSelectedChartEventId(null);
+  }, [selectedBranch]);
 
   const dashboardTabs = useMemo(() => {
     if (isOverviewDashboard) return dashboardRawTabs;
@@ -1559,19 +1574,35 @@ export default function HomePage() {
       return dashboardTab.events.map((event) => ({
         id: event.id,
         label: event.name,
-        participants: Number(row?.eventValues?.[event.id]?.participants || 0)
+        participants: Number(row?.eventValues?.[event.id]?.participants || 0),
+        schedule: eventScheduleMap[event.name] || "일정 미등록",
+        participatingBranches: Number(row?.eventValues?.[event.id]?.participants || 0) > 0 ? [selectedBranch] : [],
+        branchCount: Number(row?.eventValues?.[event.id]?.participants || 0) > 0 ? 1 : 0,
+        participationRate: Number(row?.eventValues?.[event.id]?.participants || 0) > 0 ? 100 : 0
       }));
     }
 
     return dashboardTab.events.map((event) => ({
       id: event.id,
       label: event.name,
+      schedule: eventScheduleMap[event.name] || "일정 미등록",
       participants: dashboardTab.rows.reduce(
         (sum, row) => sum + Number(row.eventValues?.[event.id]?.participants || 0),
         0
-      )
+      ),
+      participatingBranches: dashboardTab.rows
+        .filter((row) => Number(row.eventValues?.[event.id]?.participants || 0) > 0)
+        .map((row) => row.branch.trim())
+        .filter(Boolean),
+      branchCount: dashboardTab.rows.filter((row) => Number(row.eventValues?.[event.id]?.participants || 0) > 0).length,
+      participationRate:
+        branchOptions.length > 0
+          ? Math.round(
+              (dashboardTab.rows.filter((row) => Number(row.eventValues?.[event.id]?.participants || 0) > 0).length / branchOptions.length) * 100
+            )
+          : 0
     }));
-  }, [dashboardTab, isOverviewDashboard, selectedBranch]);
+  }, [branchOptions.length, dashboardTab, isOverviewDashboard, selectedBranch]);
 
   const maxChartParticipants = useMemo(
     () => Math.max(...branchChartData.map((item) => item.participants), 1),
@@ -1592,6 +1623,11 @@ export default function HomePage() {
     if (branchChartData.length === 0) return 0;
     return Math.round((participatedEventCount / branchChartData.length) * 100);
   }, [branchChartData.length, participatedEventCount]);
+
+  const selectedChartEvent = useMemo(
+    () => branchChartData.find((item) => item.id === selectedChartEventId) || null,
+    [branchChartData, selectedChartEventId]
+  );
 
   const activeBranchTooltip = useMemo(
     () =>
@@ -2944,45 +2980,75 @@ export default function HomePage() {
                         <span>세로 막대 그래프</span>
                       </div>
                       <div className="event-combo-chart">
-                        <div
-                          className="event-bars"
-                          style={{ gridTemplateColumns: `repeat(${Math.max(branchChartData.length, 1)}, minmax(0, 1fr))` }}
-                        >
-                          {branchChartData.map((item) => (
-                            <div className="event-bar-item" key={item.id}>
-                              <div className="event-bar-value">{item.participants}</div>
-                              <div className="event-bar-track">
-                                <div
-                                  className="event-bar-fill"
-                                  style={{ height: `${Math.max((item.participants / maxChartParticipants) * 100, item.participants > 0 ? 10 : 0)}%` }}
-                                />
-                              </div>
-                              <div className="event-bar-label">{item.label}</div>
-                            </div>
-                          ))}
+                          <div
+                            className="event-bars"
+                            style={{ gridTemplateColumns: `repeat(${Math.max(branchChartData.length, 1)}, minmax(0, 1fr))` }}
+                          >
+                            {branchChartData.map((item) => (
+                              <button
+                                type="button"
+                                className={`event-bar-item ${selectedChartEventId === item.id ? "active" : ""}`}
+                                key={item.id}
+                                onClick={() => setSelectedChartEventId((current) => current === item.id ? null : item.id)}
+                                title={`${item.label} · ${item.schedule}`}
+                              >
+                                <div className="event-bar-value">{item.participants}</div>
+                                <div className="event-bar-track">
+                                  <div
+                                    className="event-bar-fill"
+                                    style={{ height: `${Math.max((item.participants / maxChartParticipants) * 100, item.participants > 0 ? 10 : 0)}%` }}
+                                  />
+                                </div>
+                                <div className="event-bar-label">{item.label}</div>
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
+                      <div className="event-summary-card">
+                        <h3>현재 보기 요약</h3>
+                        <ul className="metric-list">
+                          {selectedChartEvent ? (
+                            <>
+                              <li><span>이벤트명</span><strong>{selectedChartEvent.label}</strong></li>
+                              <li><span>진행 일정</span><strong>{selectedChartEvent.schedule}</strong></li>
+                              <li><span>참여율</span><strong>{selectedChartEvent.participationRate}%</strong></li>
+                              <li><span>참여 인원</span><strong>{selectedChartEvent.participants}명</strong></li>
+                              <li className="metric-list-stacked">
+                                <div className="metric-stack-head">
+                                  <span>참여 지점</span>
+                                  <strong>{selectedChartEvent.branchCount}개</strong>
+                                </div>
+                                <div className="metric-chip-list">
+                                  {selectedChartEvent.participatingBranches.length > 0
+                                    ? selectedChartEvent.participatingBranches.map((branch) => (
+                                        <span className="metric-chip" key={`${selectedChartEvent.id}-${branch}`}>{branch}</span>
+                                      ))
+                                    : <span className="metric-empty-copy">참여 지점이 없습니다.</span>}
+                                </div>
+                              </li>
+                            </>
+                          ) : (
+                            <>
+                              <li><span>기준</span><strong>{selectedBranch || "전체 지점"}</strong></li>
+                              <li className="metric-hover-item">
+                                <span>참여 횟수</span>
+                                <strong>{participatedEventCount}</strong>
+                                <div className="metric-tooltip">
+                                  <div className="metric-tooltip-title">참여한 이벤트명</div>
+                                  <ul className="metric-tooltip-list">
+                                    {participatedEventLabels.length > 0 ? participatedEventLabels.map((label) => <li key={label}>{label}</li>) : <li>참여한 이벤트가 없습니다.</li>}
+                                  </ul>
+                                </div>
+                              </li>
+                              <li><span>총 참여 인원</span><strong>{branchChartData.reduce((sum, item) => sum + item.participants, 0)}</strong></li>
+                              <li><span>참여율</span><strong>{participationRate}%</strong></li>
+                              <li><span>최다 참여 이벤트</span><strong>{[...branchChartData].sort((a, b) => b.participants - a.participants)[0]?.label || "-"}</strong></li>
+                            </>
+                          )}
+                        </ul>
+                      </div>
                     </div>
-                    <div className="event-summary-card">
-                      <h3>현재 보기 요약</h3>
-                      <ul className="metric-list">
-                        <li><span>기준</span><strong>{selectedBranch || "전체 지점"}</strong></li>
-                        <li className="metric-hover-item">
-                          <span>참여 횟수</span>
-                          <strong>{participatedEventCount}</strong>
-                          <div className="metric-tooltip">
-                            <div className="metric-tooltip-title">참여한 이벤트명</div>
-                            <ul className="metric-tooltip-list">
-                              {participatedEventLabels.length > 0 ? participatedEventLabels.map((label) => <li key={label}>{label}</li>) : <li>참여한 이벤트가 없습니다.</li>}
-                            </ul>
-                          </div>
-                        </li>
-                        <li><span>총 참여 인원</span><strong>{branchChartData.reduce((sum, item) => sum + item.participants, 0)}</strong></li>
-                        <li><span>참여율</span><strong>{participationRate}%</strong></li>
-                        <li><span>최다 참여 이벤트</span><strong>{[...branchChartData].sort((a, b) => b.participants - a.participants)[0]?.label || "-"}</strong></li>
-                      </ul>
-                    </div>
-                  </div>
                 </section>
               </>
             )}
