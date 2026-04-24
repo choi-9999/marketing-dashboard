@@ -386,9 +386,20 @@ function groupCollabColumns(columns = []) {
 function buildCollabSummary(tab) {
   const columns = normalizeCollabColumns(tab?.collabColumns || []);
   const urlColumns = columns.filter((column) => column !== "지역" && column !== "지점");
+  const orderedEventNames = [...new Set(urlColumns.map((column) => parseCollabColumnLabel(column).eventName).filter(Boolean))];
   const eventMap = new Map();
   const branchRows = [];
   const allBranches = [];
+
+  orderedEventNames.forEach((eventName, index) => {
+    eventMap.set(eventName, {
+      id: eventName,
+      label: eventName,
+      branchCount: 0,
+      urlCount: 0,
+      order: index
+    });
+  });
 
   (tab?.collabRows || []).forEach((row) => {
     const values = row.values || {};
@@ -403,15 +414,6 @@ function buildCollabSummary(tab) {
       const url = String(values[column] || "").trim();
       const { eventName, channel } = parseCollabColumnLabel(column);
       if (!eventName) return;
-
-      if (!eventMap.has(eventName)) {
-        eventMap.set(eventName, {
-          id: eventName,
-          label: eventName,
-          branchCount: 0,
-          urlCount: 0
-        });
-      }
 
       if (url) {
         let eventEntry = events.find((item) => item.name === eventName);
@@ -439,7 +441,7 @@ function buildCollabSummary(tab) {
 
   const activeBranches = branchRows.filter((row) => row.urlCount > 0).length;
   const totalUrls = branchRows.reduce((sum, row) => sum + row.urlCount, 0);
-  const eventOverview = [...eventMap.values()].sort((a, b) => b.branchCount - a.branchCount || b.urlCount - a.urlCount || a.label.localeCompare(b.label, "ko"));
+  const eventOverview = [...eventMap.values()].sort((a, b) => a.order - b.order);
 
   return {
     totalBranches: branchRows.length,
@@ -1938,31 +1940,66 @@ export default function HomePage() {
   const selectedCollabEventData = useMemo(() => {
     if (!selectedCollabEvent) return null;
 
+    const channelOrder = ["홈페이지", "블로그", "인스타/언론기사"];
+    const createChannelMap = () =>
+      Object.fromEntries(channelOrder.map((channel) => [channel, []]));
+
     if (selectedCollabBranchRow) {
-      return selectedCollabBranchRow.events.find((event) => event.name === selectedCollabEvent) || null;
+      const event = selectedCollabBranchRow.events.find((item) => item.name === selectedCollabEvent);
+      if (!event) return null;
+
+      const channels = createChannelMap();
+      event.links.forEach((link) => {
+        if (!channels[link.label]) channels[link.label] = [];
+        channels[link.label].push({
+          branch: selectedCollabBranchRow.branch,
+          region: selectedCollabBranchRow.region,
+          url: link.url,
+          label: link.label
+        });
+      });
+
+      return {
+        name: selectedCollabEvent,
+        channels
+      };
     }
 
-    const links = collabDashboardSummary.branchRows.flatMap((row) => {
+    const channels = createChannelMap();
+
+    collabDashboardSummary.branchRows.forEach((row) => {
       const event = row.events.find((item) => item.name === selectedCollabEvent);
-      return event
-        ? event.links.map((link) => ({
-            ...link,
-            branch: row.branch,
-            region: row.region
-          }))
-        : [];
+      if (!event) return;
+
+      event.links.forEach((link) => {
+        if (!channels[link.label]) channels[link.label] = [];
+        channels[link.label].push({
+          label: link.label,
+          url: link.url,
+          branch: row.branch,
+          region: row.region
+        });
+      });
     });
 
-    return links.length > 0 ? { name: selectedCollabEvent, links } : null;
+    Object.keys(channels).forEach((channel) => {
+      channels[channel] = channels[channel]
+        .sort((a, b) => a.branch.localeCompare(b.branch, "ko"))
+        .map((link) => ({
+          ...link,
+          id: `${channel}-${link.branch}-${link.url}`
+        }));
+    });
+
+    const hasAnyLinks = Object.values(channels).some((items) => items.length > 0);
+
+    return hasAnyLinks
+      ? {
+          name: selectedCollabEvent,
+          channels
+        }
+      : null;
   }, [collabDashboardSummary.branchRows, selectedCollabBranchRow, selectedCollabEvent]);
-
-  const selectedCollabEventBranches = useMemo(() => {
-    if (!selectedCollabEventData || selectedCollabBranch) return [];
-
-    return [...new Set(selectedCollabEventData.links.map((link) => link.branch).filter(Boolean))].sort((a, b) =>
-      a.localeCompare(b, "ko")
-    );
-  }, [selectedCollabEventData, selectedCollabBranch]);
 
   const overallBranchScoreboard = useMemo(() => {
     const branchMap = new Map();
@@ -3015,32 +3052,46 @@ export default function HomePage() {
                         <li><span>등록 URL 수</span><strong>{selectedCollabBranchRow ? selectedCollabBranchRow.urlCount : collabDashboardSummary.totalUrls}</strong></li>
                         <li><span>선택 이벤트</span><strong>{selectedCollabEvent || "-"}</strong></li>
                         </ul>
-                        <div className="collab-url-panel">
-                          <div className="metric-tooltip-title">
-                            {selectedCollabEvent
-                              ? selectedCollabBranch
-                                ? `${selectedCollabEvent} URL`
-                                : `${selectedCollabEvent} 참여 지점`
-                              : "이벤트를 선택하세요"}
-                          </div>
-                          {selectedCollabEventData ? (
-                            <ul className={`metric-tooltip-list collab-url-list ${selectedCollabBranch ? "" : "collab-branch-grid-list"}`.trim()}>
-                              {selectedCollabBranch
-                                ? selectedCollabEventData.links.map((link, index) => (
-                                    <li key={`collab-link-${link.url}-${index}`}>
-                                      <a className="inline-score-link" href={link.url} target="_blank" rel="noreferrer">
-                                        {link.label}
-                                      </a>
-                                    </li>
-                                  ))
-                                : selectedCollabEventBranches.map((branch) => <li key={`collab-branch-${branch}`}>{branch}</li>)}
-                            </ul>
-                          ) : (
-                            <div className="branch-collapsed-hint small">
-                              이벤트명을 누르면 {selectedCollabBranch ? "연결된 URL" : "참여한 지점"}이 표시됩니다.
+                          <div className="collab-url-panel">
+                            <div className="metric-tooltip-title">
+                              {selectedCollabEvent
+                                ? `${selectedCollabEvent} 채널별 현황`
+                                : "이벤트를 선택하세요"}
                             </div>
-                          )}
-                        </div>
+                            {selectedCollabEventData ? (
+                              <div className="collab-channel-groups">
+                                {["홈페이지", "블로그", "인스타/언론기사"].map((channel) => {
+                                  const channelItems = selectedCollabEventData.channels?.[channel] || [];
+                                  return (
+                                    <section className="collab-channel-group" key={`${selectedCollabEvent}-${channel}`}>
+                                      <div className="collab-channel-head">
+                                        <strong>{channel}</strong>
+                                        <span>{channelItems.length}개</span>
+                                      </div>
+                                      <div className="collab-channel-branch-grid">
+                                        {channelItems.length > 0 ? channelItems.map((item) => (
+                                          <a
+                                            key={item.id || `${channel}-${item.branch}-${item.url}`}
+                                            className="collab-branch-link"
+                                            href={item.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            title={`${item.branch} ${channel} 열기`}
+                                          >
+                                            {item.branch}
+                                          </a>
+                                        )) : <div className="collab-channel-empty">등록된 지점이 없습니다.</div>}
+                                      </div>
+                                    </section>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <div className="branch-collapsed-hint small">
+                                이벤트명을 누르면 채널별 참여 지점이 표시됩니다.
+                              </div>
+                            )}
+                          </div>
                     </div>
                   </div>
                 </section>
