@@ -1888,6 +1888,11 @@ select:focus {
   background: #eef6d9;
 }
 
+.special-collab-group {
+  background: var(--collab-column-bg, #eef6d9);
+  border-color: var(--collab-column-border, #d5e5a8);
+}
+
 .special-memo {
   background: #f4f7fb;
 }

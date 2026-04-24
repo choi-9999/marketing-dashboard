@@ -53,6 +53,14 @@ const eventScheduleMap = {
   "26반수": "25.04.18. - 25.06.02.",
   "27정규": "25.12.19. - 26.01.16."
 };
+const collabEventColorPalette = [
+  { bg: "#eef6d9", border: "#d5e5a8" },
+  { bg: "#e7f0ff", border: "#c8dafd" },
+  { bg: "#fff1e4", border: "#f2d2b0" },
+  { bg: "#efe6ff", border: "#d9c5fb" },
+  { bg: "#e6f7f4", border: "#bfe7df" },
+  { bg: "#fff4d8", border: "#efd99a" }
+];
 
 const specialSocialColumns = [
   { key: "branch", label: "지점", type: "text", group: "identity" },
@@ -332,6 +340,21 @@ function parseCollabColumnLabel(label) {
   return {
     eventName,
     channel: suffix || "URL"
+  };
+}
+
+function getCollabColumnThemeStyle(label) {
+  if (label === "지역" || label === "지점") return undefined;
+
+  const { eventName } = parseCollabColumnLabel(label);
+  if (!eventName) return undefined;
+
+  const hash = [...eventName].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const theme = collabEventColorPalette[hash % collabEventColorPalette.length];
+
+  return {
+    "--collab-column-bg": theme.bg,
+    "--collab-column-border": theme.border
   };
 }
 
@@ -3281,21 +3304,31 @@ export default function HomePage() {
                   <div className="table-shell special-input-shell">
                     <table className="excel-table special-input-table">
                       <thead>
-                        <tr>
-                          {(activeTab.collabColumns || defaultCollabColumns).map((column) => (
-                            <th key={column} className={`special-head ${column === "지역" || column === "지점" ? "special-identity" : "special-growth"}`}>{column}</th>
-                          ))}
-                          <th className="special-head special-memo">행 삭제</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(activeTab.collabRows || []).map((row, rowIndex) => (
-                          <tr key={row.id}>
+                          <tr>
                             {(activeTab.collabColumns || defaultCollabColumns).map((column) => (
-                              <td key={`${row.id}-${column}`} className={`special-cell ${column === "지역" || column === "지점" ? "special-identity" : "special-growth"}`}>
-                                <input
-                                  type={column === "지역" || column === "지점" ? "text" : "url"}
-                                  value={row.values?.[column] ?? ""}
+                            <th
+                              key={column}
+                              className={`special-head ${column === "지역" || column === "지점" ? "special-identity" : "special-collab-group"}`}
+                              style={getCollabColumnThemeStyle(column)}
+                            >
+                              {column}
+                            </th>
+                            ))}
+                            <th className="special-head special-memo">행 삭제</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(activeTab.collabRows || []).map((row, rowIndex) => (
+                            <tr key={row.id}>
+                              {(activeTab.collabColumns || defaultCollabColumns).map((column) => (
+                              <td
+                                key={`${row.id}-${column}`}
+                                className={`special-cell ${column === "지역" || column === "지점" ? "special-identity" : "special-collab-group"}`}
+                                style={getCollabColumnThemeStyle(column)}
+                              >
+                                  <input
+                                    type={column === "지역" || column === "지점" ? "text" : "url"}
+                                    value={row.values?.[column] ?? ""}
                                   onChange={(e) => updateCollabCell(rowIndex, column, e.target.value)}
                                   placeholder={column}
                                 />
