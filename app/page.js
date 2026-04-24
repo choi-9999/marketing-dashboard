@@ -2288,12 +2288,45 @@ export default function HomePage() {
   }
 
   function addEvent() {
-    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND || activeTab?.kind === SPECIAL_FACILITY_TAB_KIND) return;
+    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_FACILITY_TAB_KIND) return;
     const nextName = window.prompt("추가할 이벤트명을 입력하세요.", "신규 이벤트");
     if (!nextName) return;
+    const trimmedName = nextName.trim();
+    if (!trimmedName) return;
+
+    if (activeTab?.kind === SPECIAL_COLLAB_TAB_KIND) {
+      const nextColumns = [
+        `${trimmedName} 홈페이지`,
+        `${trimmedName} 블로그`,
+        `${trimmedName} 인스타/언론기사`
+      ];
+
+      const hasDuplicate = nextColumns.some((column) => (activeTab.collabColumns || []).includes(column));
+      if (hasDuplicate) {
+        setSaveState("같은 이름의 협업 이벤트 열이 이미 있습니다");
+        return;
+      }
+
+      updateActiveTab((tab) => {
+        const existingColumns = (tab.collabColumns || defaultCollabColumns).filter((column) => column !== "지역" && column !== "지점");
+        const collabColumns = ["지역", "지점", ...nextColumns, ...existingColumns];
+
+        return {
+          ...tab,
+          collabColumns,
+          collabRows: (tab.collabRows || []).map((row) =>
+            createSpecialCollabRow(collabColumns, {
+              ...(row.values || {}),
+              id: row.id
+            })
+          )
+        };
+      });
+      return;
+    }
 
     updateActiveTab((tab) => {
-      const newEvent = createEvent(nextName.trim());
+      const newEvent = createEvent(trimmedName);
       return {
         ...tab,
         events: [...tab.events, newEvent],
@@ -3071,14 +3104,14 @@ export default function HomePage() {
         ) : (
           <>
             <section className="sheet-panel utility-panel">
-              <div className="utility-row">
-                <button className="reset-button" onClick={addRawTab}>+ 탭 추가</button>
-                <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>현재 탭 삭제</button>
-                <button className="reset-button" onClick={addRow}>
-                  {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : activeTab?.kind === SPECIAL_COLLAB_TAB_KIND ? "+ URL 행 추가" : activeTab?.kind === SPECIAL_FACILITY_TAB_KIND ? "+ 영상 행 추가" : "+ 지점 행 추가"}
-                </button>
-                {!isSpecialTabKind(activeTab?.kind) ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
-                <button className="reset-button import-align-button" onClick={() => importInputRef.current?.click()}>엑셀 불러오기</button>
+                <div className="utility-row">
+                  <button className="reset-button" onClick={addRawTab}>+ 탭 추가</button>
+                  <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>현재 탭 삭제</button>
+                  <button className="reset-button" onClick={addRow}>
+                    {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : activeTab?.kind === SPECIAL_COLLAB_TAB_KIND ? "+ URL 행 추가" : activeTab?.kind === SPECIAL_FACILITY_TAB_KIND ? "+ 영상 행 추가" : "+ 지점 행 추가"}
+                  </button>
+                  {activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND && activeTab?.kind !== SPECIAL_FACILITY_TAB_KIND ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
+                  <button className="reset-button import-align-button" onClick={() => importInputRef.current?.click()}>엑셀 불러오기</button>
                 <input
                   ref={importInputRef}
                   type="file"
