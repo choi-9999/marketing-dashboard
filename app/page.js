@@ -358,6 +358,31 @@ function getCollabColumnThemeStyle(label) {
   };
 }
 
+function groupCollabColumns(columns = []) {
+  const normalized = normalizeCollabColumns(columns);
+  const groups = [];
+  const groupMap = new Map();
+
+  normalized.forEach((column) => {
+    if (column === "지역" || column === "지점") return;
+    const { eventName, channel } = parseCollabColumnLabel(column);
+    if (!eventName) return;
+
+    if (!groupMap.has(eventName)) {
+      const group = { eventName, columns: [] };
+      groupMap.set(eventName, group);
+      groups.push(group);
+    }
+
+    groupMap.get(eventName).columns.push({
+      key: column,
+      label: channel || column
+    });
+  });
+
+  return groups;
+}
+
 function buildCollabSummary(tab) {
   const columns = normalizeCollabColumns(tab?.collabColumns || []);
   const urlColumns = columns.filter((column) => column !== "지역" && column !== "지점");
@@ -2202,6 +2227,58 @@ export default function HomePage() {
     }));
   }
 
+  function renameCollabEvent(previousName, nextName) {
+    const trimmedName = nextName.trim();
+    if (!previousName || !trimmedName || previousName === trimmedName) return;
+
+    const nextColumns = [
+      `${trimmedName} 홈페이지`,
+      `${trimmedName} 블로그`,
+      `${trimmedName} 인스타/언론기사`
+    ];
+
+    const duplicateExists = (activeTab?.collabColumns || []).some((column) => {
+      const { eventName } = parseCollabColumnLabel(column);
+      return eventName === trimmedName && eventName !== previousName;
+    });
+
+    if (duplicateExists) {
+      setSaveState("같은 이름의 협업 이벤트가 이미 있습니다");
+      return;
+    }
+
+    updateActiveTab((tab) => {
+      const previousColumns = [
+        `${previousName} 홈페이지`,
+        `${previousName} 블로그`,
+        `${previousName} 인스타/언론기사`
+      ];
+
+      const collabColumns = (tab.collabColumns || defaultCollabColumns).map((column) => {
+        const matchedIndex = previousColumns.indexOf(column);
+        return matchedIndex === -1 ? column : nextColumns[matchedIndex];
+      });
+
+      return {
+        ...tab,
+        collabColumns,
+        collabRows: (tab.collabRows || []).map((row) => {
+          const nextValues = { ...(row.values || {}) };
+
+          previousColumns.forEach((column, index) => {
+            nextValues[nextColumns[index]] = nextValues[column] ?? "";
+            delete nextValues[column];
+          });
+
+          return {
+            ...row,
+            values: nextValues
+          };
+        })
+      };
+    });
+  }
+
   function updateFacilityCell(rowIndex, field, value) {
     updateActiveTab((tab) => ({
       ...tab,
@@ -3162,8 +3239,8 @@ export default function HomePage() {
               </div>
             </section>
 
-            {activeTab ? (
-              <section className="sheet-panel">
+              {activeTab ? (
+                <section className="sheet-panel">
                 <div className="panel-title-row"><h2>RAWDATA Studio</h2><span className="note-text">{activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? "SNS 채널 진단표 전용 입력 형식입니다." : activeTab.kind === SPECIAL_COLLAB_TAB_KIND ? "지점별 협업 URL 등록 전용 입력 형식입니다." : activeTab.kind === SPECIAL_FACILITY_TAB_KIND ? "지점 시설영상 URL 전용 입력 형식입니다." : "`지역`, `지점`은 고정이고 이벤트만 확장됩니다."}</span></div>
                 <div className="editor-toolbar">
                   <div className="editor-name-block">
@@ -3300,48 +3377,93 @@ export default function HomePage() {
                       </tbody>
                     </table>
                   </div>
-                ) : (
-                  <div className="table-shell special-input-shell">
-                    <table className="excel-table special-input-table">
-                      <thead>
+                  ) : (
+                    <div className="table-shell special-input-shell">
+                      {(() => {
+                        const collabColumns = activeTab.collabColumns || defaultCollabColumns;
+                        const collabEventGroups = groupCollabColumns(collabColumns);
+
+                        return (
+                      <table className="excel-table special-input-table">
+                        <thead>
                           <tr>
-                            {(activeTab.collabColumns || defaultCollabColumns).map((column) => (
-                            <th
-                              key={column}
-                              className={`special-head ${column === "지역" || column === "지점" ? "special-identity" : "special-collab-group"}`}
-                              style={getCollabColumnThemeStyle(column)}
-                            >
-                              {column}
-                            </th>
+                            <th className="special-head special-identity" rowSpan={2}>지역</th>
+                            <th className="special-head special-identity" rowSpan={2}>지점</th>
+                            {collabEventGroups.map((group) => (
+                              <th
+                                key={`group-${group.eventName}`}
+                                className="special-head special-collab-group special-collab-group-head"
+                                style={getCollabColumnThemeStyle(group.columns[0]?.key)}
+                                colSpan={group.columns.length}
+                              >
+                                <input
+                                  className="collab-group-name-input"
+                                  value={group.eventName}
+                                  onChange={(e) => renameCollabEvent(group.eventName, e.target.value)}
+                                />
+                              </th>
                             ))}
-                            <th className="special-head special-memo">행 삭제</th>
+                            <th className="special-head special-memo" rowSpan={2}>행 삭제</th>
+                          </tr>
+                          <tr>
+                            {collabEventGroups.flatMap((group) =>
+                              group.columns.map((column) => (
+                                <th
+                                  key={`head-${column.key}`}
+                                  className="special-head special-collab-group special-collab-channel"
+                                  style={getCollabColumnThemeStyle(column.key)}
+                                >
+                                  {column.label}
+                                </th>
+                              ))
+                            )}
                           </tr>
                         </thead>
                         <tbody>
                           {(activeTab.collabRows || []).map((row, rowIndex) => (
                             <tr key={row.id}>
-                              {(activeTab.collabColumns || defaultCollabColumns).map((column) => (
-                              <td
-                                key={`${row.id}-${column}`}
-                                className={`special-cell ${column === "지역" || column === "지점" ? "special-identity" : "special-collab-group"}`}
-                                style={getCollabColumnThemeStyle(column)}
-                              >
-                                  <input
-                                    type={column === "지역" || column === "지점" ? "text" : "url"}
-                                    value={row.values?.[column] ?? ""}
-                                  onChange={(e) => updateCollabCell(rowIndex, column, e.target.value)}
-                                  placeholder={column}
+                              <td className="special-cell special-identity">
+                                <input
+                                  type="text"
+                                  value={row.values?.["지역"] ?? ""}
+                                  onChange={(e) => updateCollabCell(rowIndex, "지역", e.target.value)}
+                                  placeholder="지역"
                                 />
                               </td>
-                            ))}
-                            <td className="special-cell special-memo"><button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </section>
+                              <td className="special-cell special-identity">
+                                <input
+                                  type="text"
+                                  value={row.values?.["지점"] ?? ""}
+                                  onChange={(e) => updateCollabCell(rowIndex, "지점", e.target.value)}
+                                  placeholder="지점"
+                                />
+                              </td>
+                              {collabEventGroups.flatMap((group) =>
+                                group.columns.map((column) => (
+                                  <td
+                                    key={`${row.id}-${column.key}`}
+                                    className="special-cell special-collab-group"
+                                    style={getCollabColumnThemeStyle(column.key)}
+                                  >
+                                    <input
+                                      type="url"
+                                      value={row.values?.[column.key] ?? ""}
+                                      onChange={(e) => updateCollabCell(rowIndex, column.key, e.target.value)}
+                                      placeholder={`${group.eventName} ${column.label}`}
+                                    />
+                                  </td>
+                                ))
+                              )}
+                              <td className="special-cell special-memo"><button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </section>
             ) : null}
           </>
         )}
