@@ -256,13 +256,20 @@ function createSpecialMentorTab(id, name, seededRows = []) {
         })
       ];
 
+  const sortedRows = [...rows].sort((a, b) => {
+    const yA = parseInt(a.year, 10) || 0;
+    const yB = parseInt(b.year, 10) || 0;
+    if (yB !== yA) return yB - yA;
+    return (a.name || "").localeCompare(b.name || "", "ko");
+  });
+
   return {
     id,
     name,
     kind: SPECIAL_MENTOR_TAB_KIND,
     events: [],
     rows: [],
-    mentorRows: rows
+    mentorRows: sortedRows
   };
 }
 
@@ -599,15 +606,21 @@ function migrateLegacyTab(tab) {
   }
 
   if (tab?.kind === SPECIAL_MENTOR_TAB_KIND) {
+    const sortedMentorRows = (Array.isArray(tab.mentorRows) ? tab.mentorRows : [])
+      .map((row, index) => createSpecialMentorRow({ ...row, id: row?.id || createId(`mentor-row-${index}`) }))
+      .sort((a, b) => {
+        const yA = parseInt(a.year, 10) || 0;
+        const yB = parseInt(b.year, 10) || 0;
+        if (yB !== yA) return yB - yA;
+        return (a.name || "").localeCompare(b.name || "", "ko");
+      });
     return {
       id: tab.id || createId("tab"),
       name: tab.name || "멘토단 및 장학생",
       kind: SPECIAL_MENTOR_TAB_KIND,
       events: [],
       rows: [],
-      mentorRows: Array.isArray(tab.mentorRows) && tab.mentorRows.length > 0
-        ? tab.mentorRows.map((row, index) => createSpecialMentorRow({ ...row, id: row?.id || createId(`mentor-row-${index}`) }))
-        : []
+      mentorRows: sortedMentorRows
     };
   }
 
@@ -766,12 +779,28 @@ function ensureSpecialInputTabs(tabs) {
   return nextTabs;
 }
 
+function getSortedRawTabs(tabs) {
+  if (!Array.isArray(tabs)) return [];
+  return tabs.map((tab) => {
+    if (tab.kind === SPECIAL_MENTOR_TAB_KIND && Array.isArray(tab.mentorRows)) {
+      const sorted = [...tab.mentorRows].sort((a, b) => {
+        const yA = parseInt(a.year, 10) || 0;
+        const yB = parseInt(b.year, 10) || 0;
+        if (yB !== yA) return yB - yA;
+        return (a.name || "").localeCompare(b.name || "", "ko");
+      });
+      return { ...tab, mentorRows: sorted };
+    }
+    return tab;
+  });
+}
+
 function normalizeRawTabs(rawTabs) {
   if (!Array.isArray(rawTabs) || rawTabs.length === 0) {
     return initialTabs;
   }
 
-  return ensureSpecialInputTabs(rawTabs.map(migrateLegacyTab));
+  return getSortedRawTabs(ensureSpecialInputTabs(rawTabs.map(migrateLegacyTab)));
 }
 
 function summarizeTab(tab) {
@@ -1440,7 +1469,14 @@ function extractMentorRowsFromWorkbook(arrayBuffer) {
     }
   });
 
-  return { sheetName, rows };
+  const sortedRows = [...rows].sort((a, b) => {
+    const yA = parseInt(a.year, 10) || 0;
+    const yB = parseInt(b.year, 10) || 0;
+    if (yB !== yA) return yB - yA;
+    return (a.name || "").localeCompare(b.name || "", "ko");
+  });
+
+  return { sheetName, rows: sortedRows };
 }
 
 function ExternalScoreLink({ href, value }) {
@@ -1475,6 +1511,10 @@ function formatStatusTimestamp(value) {
 export default function HomePage() {
   const [page, setPage] = useState("dashboard");
   const [rawTabs, setRawTabs] = useState(initialTabs);
+
+  const sortMentorRowsState = () => {
+    setRawTabs((current) => getSortedRawTabs(current));
+  };
   const [activeTabId, setActiveTabId] = useState(initialTabs[0].id);
   const [dashboardTabId, setDashboardTabId] = useState(OVERVIEW_TAB_ID);
   const [saveState, setSaveState] = useState("서버 저장 대기 중");
@@ -1505,9 +1545,12 @@ export default function HomePage() {
   }
 
   async function forceServerSave() {
+    const sortedTabs = getSortedRawTabs(rawTabs);
+    setRawTabs(sortedTabs);
+
     const payload = {
       page,
-      rawTabs,
+      rawTabs: sortedTabs,
       activeTabId,
       dashboardTabId
     };
@@ -1624,9 +1667,10 @@ export default function HomePage() {
     setSaveState("변경 감지됨");
 
     saveTimeoutRef.current = setTimeout(async () => {
+      const sortedTabs = getSortedRawTabs(rawTabs);
       const payload = {
         page,
-        rawTabs,
+        rawTabs: sortedTabs,
         activeTabId,
         dashboardTabId
       };
@@ -1793,7 +1837,7 @@ export default function HomePage() {
 
   const filteredMentorRows = useMemo(() => {
     const search = mentorSearch.trim().toLowerCase();
-    return mentorRows.filter((r) => {
+    const filtered = mentorRows.filter((r) => {
       const matchesSearch = !search ||
         r.name.toLowerCase().includes(search) ||
         (r.year && r.year.toLowerCase().includes(search)) ||
@@ -1807,6 +1851,13 @@ export default function HomePage() {
       const matchesUniv = mentorUnivFilter === "all" || r.university === mentorUnivFilter;
 
       return matchesSearch && matchesBranch && matchesUniv;
+    });
+
+    return filtered.sort((a, b) => {
+      const yA = parseInt(a.year, 10) || 0;
+      const yB = parseInt(b.year, 10) || 0;
+      if (yB !== yA) return yB - yA;
+      return (a.name || "").localeCompare(b.name || "", "ko");
     });
   }, [mentorRows, mentorSearch, mentorBranchFilter, mentorUnivFilter]);
 
@@ -2905,8 +2956,24 @@ export default function HomePage() {
       </header>
 
       <div className="page-tabs">
-        <button className={`page-tab ${page === "dashboard" ? "active" : ""}`} onClick={() => setPage("dashboard")}>Dashboard</button>
-        <button className={`page-tab ${page === "rawdata" ? "active" : ""}`} onClick={() => setPage("rawdata")}>RAWDATA Studio</button>
+        <button
+          className={`page-tab ${page === "dashboard" ? "active" : ""}`}
+          onClick={() => {
+            sortMentorRowsState();
+            setPage("dashboard");
+          }}
+        >
+          Dashboard
+        </button>
+        <button
+          className={`page-tab ${page === "rawdata" ? "active" : ""}`}
+          onClick={() => {
+            sortMentorRowsState();
+            setPage("rawdata");
+          }}
+        >
+          RAWDATA Studio
+        </button>
       </div>
 
       <main className="sheet-body">
@@ -2925,6 +2992,7 @@ export default function HomePage() {
                     key={tab.id}
                     className={`program-chip ${selectedDashboardTab?.id === tab.id && !isOverviewDashboard ? "active" : ""}`}
                     onClick={() => {
+                      sortMentorRowsState();
                       setDashboardTabId(tab.id);
                       setActiveTabId(tab.id);
                     }}
@@ -3750,7 +3818,18 @@ export default function HomePage() {
                 />
               </div>
               <div className="program-chip-row">
-                {rawTabs.map((tab) => <button key={tab.id} className={`program-chip raw-tab-chip ${activeTab?.id === tab.id ? "active" : ""}`} onClick={() => setActiveTabId(tab.id)}>{tab.name}</button>)}
+                {rawTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    className={`program-chip raw-tab-chip ${activeTab?.id === tab.id ? "active" : ""}`}
+                    onClick={() => {
+                      sortMentorRowsState();
+                      setActiveTabId(tab.id);
+                    }}
+                  >
+                    {tab.name}
+                  </button>
+                ))}
               </div>
             </section>
 
