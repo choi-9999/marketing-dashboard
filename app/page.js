@@ -3550,7 +3550,6 @@ export default function HomePage() {
                             <tr>
                               <th>연도</th>
                               <th>이름</th>
-                              <th>연락처</th>
                               <th>합격 대학</th>
                               <th>학과</th>
                               <th>지점</th>
@@ -3563,7 +3562,6 @@ export default function HomePage() {
                               <tr key={row.id}>
                                 <td>{row.year}</td>
                                 <td style={{ fontWeight: "600" }}>{row.name}</td>
-                                <td>{row.phone}</td>
                                 <td>{row.university}</td>
                                 <td>{row.department}</td>
                                 <td><span className="status-pill good">{row.branch}</span></td>
@@ -3594,7 +3592,6 @@ export default function HomePage() {
                             <tr>
                               <th>연도</th>
                               <th>이름</th>
-                              <th>연락처</th>
                               <th>합격 대학</th>
                               <th>학과</th>
                               <th>지점</th>
@@ -3607,7 +3604,6 @@ export default function HomePage() {
                               <tr key={row.id}>
                                 <td>{row.year}</td>
                                 <td>{row.name}</td>
-                                <td>{row.phone}</td>
                                 <td>{row.university}</td>
                                 <td>{row.department}</td>
                                 <td><span className="status-pill good">{row.branch}</span></td>
@@ -3979,7 +3975,6 @@ export default function HomePage() {
                           <th className="special-head special-identity" style={{ width: "80px", textAlign: "center" }}>멘토여부</th>
                           <th className="special-head special-identity" style={{ width: "90px" }}>연도</th>
                           <th className="special-head special-identity" style={{ width: "120px" }}>이름</th>
-                          <th className="special-head special-identity" style={{ width: "140px" }}>연락처</th>
                           <th className="special-head special-growth" style={{ width: "160px" }}>합격 대학</th>
                           <th className="special-head special-growth" style={{ width: "140px" }}>학과</th>
                           <th className="special-head special-identity" style={{ width: "130px" }}>지점</th>
@@ -4014,14 +4009,6 @@ export default function HomePage() {
                                 value={row.name ?? ""}
                                 onChange={(e) => updateMentorCell(rowIndex, "name", e.target.value)}
                                 placeholder="이름"
-                              />
-                            </td>
-                            <td className="special-cell special-identity">
-                              <input
-                                type="text"
-                                value={row.phone ?? ""}
-                                onChange={(e) => updateMentorCell(rowIndex, "phone", e.target.value)}
-                                placeholder="연락처"
                               />
                             </td>
                             <td className="special-cell special-growth">
