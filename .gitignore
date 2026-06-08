@@ -3,3 +3,6 @@ node_modules
 tmp_sns_xlsx
 dashboard-preview.pdf
 dashboard-preview.png
+
+.vercel
+.env*

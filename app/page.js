@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as XLSX from "xlsx";
@@ -7,6 +7,7 @@ const OVERVIEW_TAB_ID = "__overall__";
 const SPECIAL_SOCIAL_TAB_KIND = "special-social";
 const SPECIAL_COLLAB_TAB_KIND = "special-collab";
 const SPECIAL_FACILITY_TAB_KIND = "special-facility";
+const SPECIAL_MENTOR_TAB_KIND = "special-mentor";
 const BROWSER_SAVE_KEY = "branch-activation-dashboard-state";
 
 const createId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -54,12 +55,12 @@ const eventScheduleMap = {
   "27정규": "25.12.19. - 26.01.16."
 };
 const collabEventColorPalette = [
-  { bg: "#eef6d9", border: "#d5e5a8" },
-  { bg: "#e7f0ff", border: "#c8dafd" },
-  { bg: "#fff1e4", border: "#f2d2b0" },
-  { bg: "#efe6ff", border: "#d9c5fb" },
-  { bg: "#e6f7f4", border: "#bfe7df" },
-  { bg: "#fff4d8", border: "#efd99a" }
+  { bg: "#f0f4ff", border: "#dbebff" },
+  { bg: "#f0fcf9", border: "#d1f4ec" },
+  { bg: "#f5f6ff", border: "#e0e3ff" },
+  { bg: "#f0f9ff", border: "#e0f2fe" },
+  { bg: "#f8fafc", border: "#e2e8f0" },
+  { bg: "#f0fdf4", border: "#dcfce7" }
 ];
 
 const specialSocialColumns = [
@@ -92,7 +93,7 @@ const defaultCollabColumns = [
 const defaultFacilityColumns = ["지역", "지점", "시설영상 URL"];
 
 function isSpecialTabKind(kind) {
-  return kind === SPECIAL_SOCIAL_TAB_KIND || kind === SPECIAL_COLLAB_TAB_KIND || kind === SPECIAL_FACILITY_TAB_KIND;
+  return kind === SPECIAL_SOCIAL_TAB_KIND || kind === SPECIAL_COLLAB_TAB_KIND || kind === SPECIAL_FACILITY_TAB_KIND || kind === SPECIAL_MENTOR_TAB_KIND;
 }
 
 function normalizeCollabColumns(columns = []) {
@@ -209,6 +210,62 @@ function createSpecialSocialTab(id, name, seededRows = []) {
   };
 }
 
+function createSpecialMentorRow(seed = {}) {
+  return {
+    id: seed.id || createId("mentor-row"),
+    year: String(seed.year ?? seed["연도"] ?? new Date().getFullYear()),
+    name: String(seed.name ?? seed["이름"] ?? ""),
+    phone: String(seed.phone ?? seed["번호"] ?? seed["연락처"] ?? ""),
+    university: String(seed.university ?? seed["합격 대학"] ?? seed["합격대학"] ?? ""),
+    department: String(seed.department ?? seed["학과"] ?? ""),
+    branch: String(seed.branch ?? seed["지점"] ?? ""),
+    group: String(seed.group ?? seed["1억장학금"] ?? seed["장학그룹"] ?? ""),
+    amount: Number(seed.amount ?? seed["1억 장학금"] ?? seed["장학금액"] ?? 0),
+    isMentor: Boolean(seed.isMentor ?? seed["멘토단여부"] ?? seed["멘토단"] ?? false),
+    memo: String(seed.memo ?? seed["비고"] ?? "")
+  };
+}
+
+function createSpecialMentorTab(id, name, seededRows = []) {
+  const rows = seededRows.length > 0
+    ? seededRows.map((row) => createSpecialMentorRow(row))
+    : [
+        createSpecialMentorRow({
+          year: "2026",
+          name: "김철수",
+          phone: "010-1234-5678",
+          university: "서울대학교",
+          department: "의예과",
+          branch: "강남",
+          group: "1그룹",
+          amount: 3000000,
+          isMentor: true,
+          memo: "우수 멘토"
+        }),
+        createSpecialMentorRow({
+          year: "2026",
+          name: "이영희",
+          phone: "010-5678-1234",
+          university: "연세대학교",
+          department: "치의예과",
+          branch: "대치",
+          group: "2그룹",
+          amount: 2000000,
+          isMentor: false,
+          memo: ""
+        })
+      ];
+
+  return {
+    id,
+    name,
+    kind: SPECIAL_MENTOR_TAB_KIND,
+    events: [],
+    rows: [],
+    mentorRows: rows
+  };
+}
+
 function createRow(eventIds = [], seed = {}) {
   const eventValues = Object.fromEntries(
     eventIds.map((eventId) => [
@@ -289,7 +346,8 @@ const initialTabs = [
   ]),
   createSpecialSocialTab("tab-social-1", "SNS 진단표"),
   createSpecialCollabTab("tab-collab-1", "협업이벤트"),
-  createSpecialFacilityTab("tab-facility-1", "지점시설영상")
+  createSpecialFacilityTab("tab-facility-1", "지점시설영상"),
+  createSpecialMentorTab("tab-mentor-1", "멘토단 및 장학생")
 ];
 
 function normalizeParticipantValue(value) {
@@ -540,6 +598,19 @@ function migrateLegacyTab(tab) {
     };
   }
 
+  if (tab?.kind === SPECIAL_MENTOR_TAB_KIND) {
+    return {
+      id: tab.id || createId("tab"),
+      name: tab.name || "멘토단 및 장학생",
+      kind: SPECIAL_MENTOR_TAB_KIND,
+      events: [],
+      rows: [],
+      mentorRows: Array.isArray(tab.mentorRows) && tab.mentorRows.length > 0
+        ? tab.mentorRows.map((row, index) => createSpecialMentorRow({ ...row, id: row?.id || createId(`mentor-row-${index}`) }))
+        : []
+    };
+  }
+
   if (Array.isArray(tab.events)) {
     const events = tab.events.map((event, index) => ({
       id: event?.id || createId(`event-${index}`),
@@ -688,6 +759,10 @@ function ensureSpecialInputTabs(tabs) {
     nextTabs.push(createSpecialFacilityTab("tab-facility-1", "지점시설영상", seededBranchRows));
   }
 
+  if (!nextTabs.some((tab) => tab.kind === SPECIAL_MENTOR_TAB_KIND)) {
+    nextTabs.push(createSpecialMentorTab("tab-mentor-1", "멘토단 및 장학생", []));
+  }
+
   return nextTabs;
 }
 
@@ -700,6 +775,18 @@ function normalizeRawTabs(rawTabs) {
 }
 
 function summarizeTab(tab) {
+  if (tab.kind === SPECIAL_MENTOR_TAB_KIND) {
+    const filledRows = (tab.mentorRows || []).filter((row) => row.name.trim()).length;
+    const mentorCount = (tab.mentorRows || []).filter((row) => row.name.trim() && row.isMentor).length;
+    return {
+      rows: filledRows,
+      events: 0,
+      branches: new Set((tab.mentorRows || []).map((row) => row.branch.trim()).filter(Boolean)).size,
+      participants: mentorCount,
+      activeBranches: new Set((tab.mentorRows || []).filter((row) => row.isMentor).map((row) => row.branch.trim()).filter(Boolean)).size
+    };
+  }
+
   if (tab.kind === SPECIAL_SOCIAL_TAB_KIND) {
     const filledRows = (tab.socialRows || []).filter((row) => row.branch.trim()).length;
     return {
@@ -1278,6 +1365,84 @@ function extractFacilityRowsFromWorkbook(arrayBuffer, fallbackName = "지점시�
   };
 }
 
+function extractMentorRowsFromWorkbook(arrayBuffer) {
+  const workbook = XLSX.read(arrayBuffer, {
+    type: "array",
+    cellDates: true,
+    cellNF: false,
+    cellStyles: false
+  });
+
+  const sheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+
+  if (!sheet?.["!ref"]) {
+    return { sheetName, rows: [] };
+  }
+
+  const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+  const rows = [];
+
+  rawRows.forEach((row, index) => {
+    let year = "";
+    let name = "";
+    let phone = "";
+    let university = "";
+    let department = "";
+    let branch = "";
+    let group = "";
+    let amount = 0;
+    let memo = "";
+    let isMentor = false;
+
+    Object.entries(row).forEach(([key, val]) => {
+      const keyVal = String(key).trim();
+      const strVal = String(val ?? "").trim();
+
+      if (keyVal === "연도" || keyVal.includes("year")) {
+        year = strVal;
+      } else if (keyVal === "이름" || keyVal === "성명" || keyVal.includes("name")) {
+        name = strVal;
+      } else if (keyVal === "번호" || keyVal.includes("연락처") || keyVal.includes("phone")) {
+        phone = strVal;
+      } else if (keyVal === "합격 대학" || keyVal === "합격대학" || keyVal.includes("university")) {
+        university = strVal;
+      } else if (keyVal === "학과" || keyVal.includes("department")) {
+        department = strVal;
+      } else if (keyVal === "지점" || keyVal.includes("branch")) {
+        branch = strVal;
+      } else if (keyVal === "1억장학금" || keyVal === "장학그룹" || keyVal.includes("group")) {
+        group = strVal;
+      } else if (keyVal === "1억 장학금" || keyVal === "장학금액" || keyVal === "장학금" || keyVal.includes("amount")) {
+        const cleanedVal = strVal.replace(/[^0-9.-]+/g, "");
+        amount = Number(cleanedVal) || 0;
+      } else if (keyVal === "비고" || keyVal === "메모" || keyVal.includes("memo")) {
+        memo = strVal;
+      } else if (keyVal.includes("멘토") || keyVal.includes("isMentor")) {
+        isMentor = strVal.includes("O") || strVal.includes("o") || strVal.includes("true") || strVal.includes("참") || strVal.includes("예") || strVal.includes("1");
+      }
+    });
+
+    if (name || branch || university) {
+      rows.push(createSpecialMentorRow({
+        id: createId(`mentor-row-${index}`),
+        year,
+        name,
+        phone,
+        university,
+        department,
+        branch,
+        group,
+        amount,
+        isMentor,
+        memo
+      }));
+    }
+  });
+
+  return { sheetName, rows };
+}
+
 function ExternalScoreLink({ href, value }) {
   if (!href) {
     return <strong>{value}</strong>;
@@ -1321,6 +1486,9 @@ export default function HomePage() {
   const [selectedChartEventId, setSelectedChartEventId] = useState(null);
   const [overviewSearch, setOverviewSearch] = useState("");
   const [snsSearch, setSnsSearch] = useState("");
+  const [mentorSearch, setMentorSearch] = useState("");
+  const [mentorBranchFilter, setMentorBranchFilter] = useState("all");
+  const [mentorUnivFilter, setMentorUnivFilter] = useState("all");
   const [areEventChipsExpanded, setAreEventChipsExpanded] = useState(true);
   const [branchKeyword, setBranchKeyword] = useState("");
   const [areRegionsExpanded, setAreRegionsExpanded] = useState(false);
@@ -1521,7 +1689,8 @@ export default function HomePage() {
   const isSpecialDashboard = !isOverviewDashboard && selectedDashboardTab?.kind === SPECIAL_SOCIAL_TAB_KIND;
   const isCollabDashboard = !isOverviewDashboard && selectedDashboardTab?.kind === SPECIAL_COLLAB_TAB_KIND;
   const isFacilityDashboard = !isOverviewDashboard && selectedDashboardTab?.kind === SPECIAL_FACILITY_TAB_KIND;
-  const dashboardTab = isSpecialDashboard || isCollabDashboard || isFacilityDashboard ? null : selectedDashboardTab;
+  const isMentorDashboard = !isOverviewDashboard && selectedDashboardTab?.kind === SPECIAL_MENTOR_TAB_KIND;
+  const dashboardTab = isSpecialDashboard || isCollabDashboard || isFacilityDashboard || isMentorDashboard ? null : selectedDashboardTab;
 
   useEffect(() => {
     setSelectedBranch(null);
@@ -1536,6 +1705,9 @@ export default function HomePage() {
     setAreRegionsExpanded(false);
     setOverviewSearch("");
     setSnsSearch("");
+    setMentorSearch("");
+    setMentorBranchFilter("all");
+    setMentorUnivFilter("all");
   }, [dashboardTabId]);
 
   useEffect(() => {
@@ -1564,7 +1736,9 @@ export default function HomePage() {
         ? "진행 횟수"
         : isFacilityDashboard
           ? "등록 URL 수"
-        : "이벤트 수"
+          : isMentorDashboard
+            ? "멘토단 인원"
+            : "이벤트 수"
     : "이벤트 수";
   const topbarBranchLabel = page === "dashboard"
     ? isSpecialDashboard
@@ -1573,7 +1747,9 @@ export default function HomePage() {
         ? "참여 지점 수"
         : isFacilityDashboard
           ? "연결 지점 수"
-        : "고유 지점 수"
+          : isMentorDashboard
+            ? "총 1억 장학생 인원"
+            : "고유 지점 수"
     : "고유 지점 수";
   const branchOptions = useMemo(
     () =>
@@ -1583,6 +1759,59 @@ export default function HomePage() {
         .filter((branch, index, list) => list.indexOf(branch) === index),
     [dashboardTab]
   );
+
+  const allBranches = useMemo(() => {
+    const list = rawTabs
+      .filter((tab) => !isSpecialTabKind(tab.kind))
+      .flatMap((tab) => tab.rows.map((row) => row.branch.trim()))
+      .filter(Boolean);
+    return [...new Set(list)].sort();
+  }, [rawTabs]);
+
+  const mentorRows = useMemo(() => {
+    if (selectedDashboardTab?.kind === SPECIAL_MENTOR_TAB_KIND) {
+      return selectedDashboardTab.mentorRows || [];
+    }
+    return [];
+  }, [selectedDashboardTab]);
+
+  const mentorStats = useMemo(() => {
+    const total = mentorRows.length;
+    const mentors = mentorRows.filter((r) => r.isMentor).length;
+    const scholars = total - mentors;
+    const amountSum = mentorRows.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+    return { total, mentors, scholars, amountSum };
+  }, [mentorRows]);
+
+  const mentorBranchOptions = useMemo(() => {
+    return ["all", ...new Set(mentorRows.map((r) => r.branch.trim()).filter(Boolean))].sort();
+  }, [mentorRows]);
+
+  const mentorUnivOptions = useMemo(() => {
+    return ["all", ...new Set(mentorRows.map((r) => r.university.trim()).filter(Boolean))].sort();
+  }, [mentorRows]);
+
+  const filteredMentorRows = useMemo(() => {
+    const search = mentorSearch.trim().toLowerCase();
+    return mentorRows.filter((r) => {
+      const matchesSearch = !search ||
+        r.name.toLowerCase().includes(search) ||
+        (r.year && r.year.toLowerCase().includes(search)) ||
+        (r.university && r.university.toLowerCase().includes(search)) ||
+        (r.department && r.department.toLowerCase().includes(search)) ||
+        (r.branch && r.branch.toLowerCase().includes(search)) ||
+        (r.group && r.group.toLowerCase().includes(search)) ||
+        (r.memo && r.memo.toLowerCase().includes(search));
+
+      const matchesBranch = mentorBranchFilter === "all" || r.branch === mentorBranchFilter;
+      const matchesUniv = mentorUnivFilter === "all" || r.university === mentorUnivFilter;
+
+      return matchesSearch && matchesBranch && matchesUniv;
+    });
+  }, [mentorRows, mentorSearch, mentorBranchFilter, mentorUnivFilter]);
+
+  const mentorsList = useMemo(() => filteredMentorRows.filter((r) => r.isMentor), [filteredMentorRows]);
+  const scholarsList = useMemo(() => filteredMentorRows.filter((r) => !r.isMentor), [filteredMentorRows]);
 
   const branchGroups = useMemo(() => {
     if (!dashboardTab || isOverviewDashboard) return [];
@@ -1878,7 +2107,9 @@ export default function HomePage() {
         ? collabDashboardSummary.uniqueEvents
         : isFacilityDashboard
           ? facilityDashboardSummary.totalUrls
-        : scopedSummary.totalEvents
+          : isMentorDashboard
+            ? mentorStats.mentors
+            : scopedSummary.totalEvents
     : dashboardSummary.totalEvents;
   const topbarBranchValue = page === "dashboard"
     ? isSpecialDashboard
@@ -1887,7 +2118,9 @@ export default function HomePage() {
         ? collabDashboardSummary.activeBranches
         : isFacilityDashboard
           ? facilityDashboardSummary.activeBranches
-        : scopedSummary.uniqueBranches
+          : isMentorDashboard
+            ? mentorStats.scholars
+            : scopedSummary.uniqueBranches
     : dashboardSummary.uniqueBranches;
 
   const collabBranchGroups = useMemo(() => {
@@ -2330,6 +2563,27 @@ export default function HomePage() {
     }));
   }
 
+  function updateMentorCell(rowIndex, field, value) {
+    updateActiveTab((tab) => ({
+      ...tab,
+      mentorRows: (tab.mentorRows || []).map((row, index) => {
+        if (index === rowIndex) {
+          let updatedValue = value;
+          if (field === "isMentor") {
+            updatedValue = Boolean(value);
+          } else if (field === "amount") {
+            updatedValue = Number(value) || 0;
+          }
+          return {
+            ...row,
+            [field]: updatedValue
+          };
+        }
+        return row;
+      })
+    }));
+  }
+
   function updateEventCell(rowIndex, eventId, field, value) {
     updateActiveTab((tab) => ({
       ...tab,
@@ -2387,6 +2641,13 @@ export default function HomePage() {
         };
       }
 
+      if (tab.kind === SPECIAL_MENTOR_TAB_KIND) {
+        return {
+          ...tab,
+          mentorRows: [...(tab.mentorRows || []), createSpecialMentorRow()]
+        };
+      }
+
       return {
         ...tab,
         rows: [...tab.rows, createRow(tab.events.map((event) => event.id))]
@@ -2417,6 +2678,13 @@ export default function HomePage() {
         };
       }
 
+      if (tab.kind === SPECIAL_MENTOR_TAB_KIND) {
+        return {
+          ...tab,
+          mentorRows: (tab.mentorRows || []).filter((_, index) => index !== rowIndex)
+        };
+      }
+
       return {
         ...tab,
         rows: tab.rows.filter((_, index) => index !== rowIndex)
@@ -2425,7 +2693,7 @@ export default function HomePage() {
   }
 
   function addEvent() {
-    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_FACILITY_TAB_KIND) return;
+    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_FACILITY_TAB_KIND || activeTab?.kind === SPECIAL_MENTOR_TAB_KIND) return;
     const nextName = window.prompt("추가할 이벤트명을 입력하세요.", "신규 이벤트");
     if (!nextName) return;
     const trimmedName = nextName.trim();
@@ -2548,8 +2816,34 @@ export default function HomePage() {
     }
   }
 
+  async function importMentorWorkbook(file) {
+    if (!file || activeTab?.kind !== SPECIAL_MENTOR_TAB_KIND) return;
+
+    const shouldReplace = window.confirm("현재 멘토단 및 장학생 탭 데이터를 업로드한 엑셀 시트 데이터로 교체할까요?");
+    if (!shouldReplace) return;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const { sheetName, rows } = extractMentorRowsFromWorkbook(arrayBuffer);
+
+      if (rows.length === 0) {
+        setSaveState("가져올 멘토단 및 장학생 데이터 없음");
+        return;
+      }
+
+      updateActiveTab((tab) => ({
+        ...tab,
+        mentorRows: rows
+      }));
+      setSaveState(`엑셀 '${sheetName}' 시트 반영됨`);
+    } catch (error) {
+      console.error("Failed to import mentor workbook.", error);
+      setSaveState("엑셀 불러오기 실패");
+    }
+  }
+
   async function importDefaultWorkbook(file) {
-    if (!file || activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND || activeTab?.kind === SPECIAL_FACILITY_TAB_KIND) return;
+    if (!file || activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND || activeTab?.kind === SPECIAL_FACILITY_TAB_KIND || activeTab?.kind === SPECIAL_MENTOR_TAB_KIND) return;
 
     const shouldReplace = window.confirm("현재 이벤트 탭 데이터를 업로드한 엑셀 시트 데이터로 교체할까요?");
     if (!shouldReplace) return;
@@ -2571,7 +2865,7 @@ export default function HomePage() {
   }
 
   function removeEvent(eventId) {
-    if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND || activeTab?.kind === SPECIAL_COLLAB_TAB_KIND) return;
+    if (isSpecialTabKind(activeTab?.kind)) return;
     updateActiveTab((tab) => ({
       ...tab,
       events: tab.events.filter((event) => event.id !== eventId),
@@ -3096,6 +3390,174 @@ export default function HomePage() {
                   </div>
                 </section>
               </>
+            ) : isMentorDashboard ? (
+              <>
+                <section className="sheet-grid kpi-grid">
+                  <article className="sheet-panel score-panel compact-score-panel">
+                    <div className="panel-title-row">
+                      <h2>{dashboardScopeLabel} 핵심 지표</h2>
+                      <span className="status-pill good" style={{ background: "rgba(59, 130, 246, 0.15)", color: "#3b82f6", border: "1px solid rgba(59, 130, 246, 0.3)" }}>MENTOR</span>
+                    </div>
+                    <div className="score-layout">
+                      <div className="score-box strong">
+                        <span>전체 인원</span>
+                        <strong>{mentorStats.total}명</strong>
+                        <p>멘토단 및 장학생 전체 등록 인원입니다.</p>
+                      </div>
+                      <div className="score-box">
+                        <span>멘토단</span>
+                        <strong>{mentorStats.mentors}명</strong>
+                        <p>멘토로 임명된 장학생 인원입니다.</p>
+                      </div>
+                      <div className="score-box">
+                        <span>총 1억 장학생</span>
+                        <strong>{mentorStats.scholars}명</strong>
+                        <p>멘토단이 아닌 총 1억 장학생 인원입니다.</p>
+                      </div>
+                      <div className="score-box primary-metric" style={{ background: "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%)", border: "1px solid rgba(59, 130, 246, 0.2)" }}>
+                        <span style={{ color: "var(--metric-accent-color)" }}>총 지급 장학금액</span>
+                        <strong style={{ color: "var(--metric-accent-color)" }}>{mentorStats.amountSum.toLocaleString()}원</strong>
+                        <p>등록된 전체 장학금 지급 합계액입니다.</p>
+                      </div>
+                    </div>
+                  </article>
+                </section>
+
+                <section className="sheet-panel">
+                  <div className="panel-title-row">
+                    <h2>멘토단 및 장학생 상세 조회</h2>
+                    <span className="note-text">이름, 대학, 학과, 메모 등으로 검색하거나 필터를 적용하세요.</span>
+                  </div>
+
+                  <div className="dashboard-search-row dashboard-search-row-tight" style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap", marginBottom: "20px" }}>
+                    <input
+                      className="dashboard-search-input"
+                      value={mentorSearch}
+                      onChange={(e) => setMentorSearch(e.target.value)}
+                      placeholder="이름, 연도, 대학교, 학과, 메모 등 검색..."
+                      style={{ flex: "1", minWidth: "200px" }}
+                    />
+                    
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <select
+                        className="branch-selector-dropdown"
+                        value={mentorBranchFilter}
+                        onChange={(e) => setMentorBranchFilter(e.target.value)}
+                        style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--panel-bg)", color: "var(--text-color)" }}
+                      >
+                        <option value="all">전체 지점</option>
+                        {mentorBranchOptions.filter(o => o !== "all").map((branch) => (
+                          <option key={branch} value={branch}>{branch}</option>
+                        ))}
+                      </select>
+
+                      <select
+                        className="branch-selector-dropdown"
+                        value={mentorUnivFilter}
+                        onChange={(e) => setMentorUnivFilter(e.target.value)}
+                        style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--panel-bg)", color: "var(--text-color)" }}
+                      >
+                        <option value="all">전체 대학교</option>
+                        {mentorUnivOptions.filter(o => o !== "all").map((univ) => (
+                          <option key={univ} value={univ}>{univ}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <span className="dashboard-search-note" style={{ marginLeft: "auto" }}>
+                      검색 결과 {filteredMentorRows.length}명 (멘토단 {mentorsList.length}명 / 장학생 {scholarsList.length}명)
+                    </span>
+                  </div>
+
+                  {/* 멘토단 리스트 (상단) */}
+                  <div className="mentor-section-container" style={{ marginBottom: "30px" }}>
+                    <h3 style={{ fontSize: "1.2rem", fontWeight: "600", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px", color: "var(--metric-accent-color)" }}>
+                      <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", background: "var(--metric-accent-color)" }}></span>
+                      멘토단 리스트 ({mentorsList.length}명)
+                    </h3>
+                    {mentorsList.length > 0 ? (
+                      <div className="table-shell">
+                        <table className="excel-table compact-table">
+                          <thead>
+                            <tr>
+                              <th>연도</th>
+                              <th>이름</th>
+                              <th>연락처</th>
+                              <th>합격 대학</th>
+                              <th>학과</th>
+                              <th>지점</th>
+                              <th>장학 그룹</th>
+                              <th>장학 금액</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {mentorsList.map((row) => (
+                              <tr key={row.id}>
+                                <td>{row.year}</td>
+                                <td style={{ fontWeight: "600" }}>{row.name}</td>
+                                <td>{row.phone}</td>
+                                <td>{row.university}</td>
+                                <td>{row.department}</td>
+                                <td><span className="status-pill good">{row.branch}</span></td>
+                                <td>{row.group}</td>
+                                <td style={{ textAlign: "right" }}>{Number(row.amount).toLocaleString()}원</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="grade-empty-card" style={{ padding: "20px", textAlign: "center", background: "rgba(255, 255, 255, 0.02)", border: "1px dashed var(--border-color)", borderRadius: "8px" }}>
+                        조건에 부합하는 멘토단 학생이 없습니다.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 장학생 리스트 (하단) */}
+                  <div className="scholar-section-container">
+                    <h3 style={{ fontSize: "1.2rem", fontWeight: "600", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px", color: "var(--text-color)" }}>
+                      <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", background: "var(--text-color)" }}></span>
+                      장학생 리스트 ({scholarsList.length}명)
+                    </h3>
+                    {scholarsList.length > 0 ? (
+                      <div className="table-shell">
+                        <table className="excel-table compact-table">
+                          <thead>
+                            <tr>
+                              <th>연도</th>
+                              <th>이름</th>
+                              <th>연락처</th>
+                              <th>합격 대학</th>
+                              <th>학과</th>
+                              <th>지점</th>
+                              <th>장학 그룹</th>
+                              <th>장학 금액</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {scholarsList.map((row) => (
+                              <tr key={row.id}>
+                                <td>{row.year}</td>
+                                <td>{row.name}</td>
+                                <td>{row.phone}</td>
+                                <td>{row.university}</td>
+                                <td>{row.department}</td>
+                                <td><span className="status-pill good">{row.branch}</span></td>
+                                <td>{row.group}</td>
+                                <td style={{ textAlign: "right" }}>{Number(row.amount).toLocaleString()}원</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="grade-empty-card" style={{ padding: "20px", textAlign: "center", background: "rgba(255, 255, 255, 0.02)", border: "1px dashed var(--border-color)", borderRadius: "8px" }}>
+                        조건에 부합하는 장학생 학생이 없습니다.
+                      </div>
+                    )}
+                  </div>
+                </section>
+              </>
             ) : (
               <>
                 <section className="sheet-grid kpi-grid">
@@ -3259,9 +3721,9 @@ export default function HomePage() {
                   <button className="reset-button" onClick={addRawTab}>+ 탭 추가</button>
                   <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>현재 탭 삭제</button>
                   <button className="reset-button" onClick={addRow}>
-                    {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : activeTab?.kind === SPECIAL_COLLAB_TAB_KIND ? "+ URL 행 추가" : activeTab?.kind === SPECIAL_FACILITY_TAB_KIND ? "+ 영상 행 추가" : "+ 지점 행 추가"}
+                    {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : activeTab?.kind === SPECIAL_COLLAB_TAB_KIND ? "+ URL 행 추가" : activeTab?.kind === SPECIAL_FACILITY_TAB_KIND ? "+ 영상 행 추가" : activeTab?.kind === SPECIAL_MENTOR_TAB_KIND ? "+ 학생 추가" : "+ 지점 행 추가"}
                   </button>
-                  {activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND && activeTab?.kind !== SPECIAL_FACILITY_TAB_KIND ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
+                  {activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND && activeTab?.kind !== SPECIAL_FACILITY_TAB_KIND && activeTab?.kind !== SPECIAL_MENTOR_TAB_KIND ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
                   <button className="reset-button import-align-button" onClick={() => importInputRef.current?.click()}>엑셀 불러오기</button>
                 <input
                   ref={importInputRef}
@@ -3277,6 +3739,8 @@ export default function HomePage() {
                         await importCollabWorkbook(file);
                       } else if (activeTab?.kind === SPECIAL_FACILITY_TAB_KIND) {
                         await importFacilityWorkbook(file);
+                      } else if (activeTab?.kind === SPECIAL_MENTOR_TAB_KIND) {
+                        await importMentorWorkbook(file);
                       } else {
                         await importDefaultWorkbook(file);
                       }
@@ -3292,7 +3756,7 @@ export default function HomePage() {
 
               {activeTab ? (
                 <section className="sheet-panel">
-                <div className="panel-title-row"><h2>RAWDATA Studio</h2><span className="note-text">{activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? "SNS 채널 진단표 전용 입력 형식입니다." : activeTab.kind === SPECIAL_COLLAB_TAB_KIND ? "지점별 협업 URL 등록 전용 입력 형식입니다." : activeTab.kind === SPECIAL_FACILITY_TAB_KIND ? "지점 시설영상 URL 전용 입력 형식입니다." : "`지역`, `지점`은 고정이고 이벤트만 확장됩니다."}</span></div>
+                <div className="panel-title-row"><h2>RAWDATA Studio</h2><span className="note-text">{activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? "SNS 채널 진단표 전용 입력 형식입니다." : activeTab.kind === SPECIAL_COLLAB_TAB_KIND ? "지점별 협업 URL 등록 전용 입력 형식입니다." : activeTab.kind === SPECIAL_FACILITY_TAB_KIND ? "지점 시설영상 URL 전용 입력 형식입니다." : activeTab.kind === SPECIAL_MENTOR_TAB_KIND ? "멘토단 및 장학생 인적사항 관리 전용 입력 형식입니다." : "`지역`, `지점`은 고정이고 이벤트만 확장됩니다."}</span></div>
                 <div className="editor-toolbar">
                   <div className="editor-name-block">
                     <div className="editor-meta">탭 이름</div>
@@ -3428,6 +3892,120 @@ export default function HomePage() {
                       </tbody>
                     </table>
                   </div>
+                ) : activeTab.kind === SPECIAL_MENTOR_TAB_KIND ? (
+                  <div className="table-shell special-input-shell">
+                    <table className="excel-table special-input-table">
+                      <thead>
+                        <tr>
+                          <th className="special-head special-identity" style={{ width: "80px", textAlign: "center" }}>멘토여부</th>
+                          <th className="special-head special-identity" style={{ width: "90px" }}>연도</th>
+                          <th className="special-head special-identity" style={{ width: "120px" }}>이름</th>
+                          <th className="special-head special-identity" style={{ width: "140px" }}>연락처</th>
+                          <th className="special-head special-growth" style={{ width: "160px" }}>합격 대학</th>
+                          <th className="special-head special-growth" style={{ width: "140px" }}>학과</th>
+                          <th className="special-head special-identity" style={{ width: "130px" }}>지점</th>
+                          <th className="special-head special-blog" style={{ width: "110px" }}>장학 그룹</th>
+                          <th className="special-head special-blog-score" style={{ width: "130px" }}>장학 금액</th>
+                          <th className="special-head special-memo">비고</th>
+                          <th className="special-head special-memo" style={{ width: "80px" }}>행 삭제</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(activeTab.mentorRows || []).map((row, rowIndex) => (
+                          <tr key={row.id}>
+                            <td className="special-cell special-identity" style={{ textAlign: "center" }}>
+                              <input
+                                type="checkbox"
+                                checked={row.isMentor || false}
+                                onChange={(e) => updateMentorCell(rowIndex, "isMentor", e.target.checked)}
+                                style={{ width: "20px", height: "20px", cursor: "pointer" }}
+                              />
+                            </td>
+                            <td className="special-cell special-identity">
+                              <input
+                                type="text"
+                                value={row.year ?? ""}
+                                onChange={(e) => updateMentorCell(rowIndex, "year", e.target.value)}
+                                placeholder="연도"
+                              />
+                            </td>
+                            <td className="special-cell special-identity">
+                              <input
+                                type="text"
+                                value={row.name ?? ""}
+                                onChange={(e) => updateMentorCell(rowIndex, "name", e.target.value)}
+                                placeholder="이름"
+                              />
+                            </td>
+                            <td className="special-cell special-identity">
+                              <input
+                                type="text"
+                                value={row.phone ?? ""}
+                                onChange={(e) => updateMentorCell(rowIndex, "phone", e.target.value)}
+                                placeholder="연락처"
+                              />
+                            </td>
+                            <td className="special-cell special-growth">
+                              <input
+                                type="text"
+                                value={row.university ?? ""}
+                                onChange={(e) => updateMentorCell(rowIndex, "university", e.target.value)}
+                                placeholder="합격 대학"
+                              />
+                            </td>
+                            <td className="special-cell special-growth">
+                              <input
+                                type="text"
+                                value={row.department ?? ""}
+                                onChange={(e) => updateMentorCell(rowIndex, "department", e.target.value)}
+                                placeholder="학과"
+                              />
+                            </td>
+                            <td className="special-cell special-identity">
+                              <select
+                                value={row.branch ?? ""}
+                                onChange={(e) => updateMentorCell(rowIndex, "branch", e.target.value)}
+                                style={{ width: "100%", height: "100%", border: "none", background: "transparent", color: "var(--text-color)", outline: "none" }}
+                              >
+                                <option value="" style={{ background: "var(--panel-bg)" }}>지점 선택</option>
+                                {allBranches.map((branch) => (
+                                  <option key={branch} value={branch} style={{ background: "var(--panel-bg)" }}>{branch}</option>
+                                ))}
+                              </select>
+                            </td>
+                            <td className="special-cell special-blog">
+                              <input
+                                type="text"
+                                value={row.group ?? ""}
+                                onChange={(e) => updateMentorCell(rowIndex, "group", e.target.value)}
+                                placeholder="예: 1그룹"
+                              />
+                            </td>
+                            <td className="special-cell special-blog-score">
+                              <input
+                                type="number"
+                                min="0"
+                                value={row.amount ?? ""}
+                                onChange={(e) => updateMentorCell(rowIndex, "amount", e.target.value)}
+                                placeholder="장학 금액"
+                              />
+                            </td>
+                            <td className="special-cell special-memo">
+                              <input
+                                type="text"
+                                value={row.memo ?? ""}
+                                onChange={(e) => updateMentorCell(rowIndex, "memo", e.target.value)}
+                                placeholder="비고"
+                              />
+                            </td>
+                            <td className="special-cell special-memo" style={{ textAlign: "center" }}>
+                              <button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                   ) : (
                     <div className="table-shell special-input-shell">
                       {(() => {
@@ -3443,7 +4021,7 @@ export default function HomePage() {
                             {collabEventGroups.map((group) => (
                               <th
                                 key={`group-${group.eventName}`}
-                                className="special-head special-collab-group special-collab-group-head"
+                                className="special-head special-collab-group special-collab-group-head event-group-start"
                                 style={getCollabColumnThemeStyle(group.columns[0]?.key)}
                                 colSpan={group.columns.length}
                               >
@@ -3458,10 +4036,10 @@ export default function HomePage() {
                           </tr>
                           <tr>
                             {collabEventGroups.flatMap((group) =>
-                              group.columns.map((column) => (
+                              group.columns.map((column, colIndex) => (
                                 <th
                                   key={`head-${column.key}`}
-                                  className="special-head special-collab-group special-collab-channel"
+                                  className={`special-head special-collab-group special-collab-channel ${colIndex === 0 ? "event-group-start" : ""}`}
                                   style={getCollabColumnThemeStyle(column.key)}
                                 >
                                   {column.label}
@@ -3490,10 +4068,10 @@ export default function HomePage() {
                                 />
                               </td>
                               {collabEventGroups.flatMap((group) =>
-                                group.columns.map((column) => (
+                                group.columns.map((column, colIndex) => (
                                   <td
                                     key={`${row.id}-${column.key}`}
-                                    className="special-cell special-collab-group"
+                                    className={`special-cell special-collab-group ${colIndex === 0 ? "event-group-start" : ""}`}
                                     style={getCollabColumnThemeStyle(column.key)}
                                   >
                                     <input
