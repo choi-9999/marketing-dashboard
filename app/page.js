@@ -1508,6 +1508,58 @@ function formatStatusTimestamp(value) {
   });
 }
 
+function VideoModal({ isOpen, onClose, url, branchName }) {
+  if (!isOpen || !url) return null;
+
+  const getEmbedUrl = (videoUrl) => {
+    if (!videoUrl) return null;
+    
+    // YouTube video ID regex
+    const ytReg = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const ytMatch = videoUrl.match(ytReg);
+    if (ytMatch && ytMatch[2].length === 11) {
+      return `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1`;
+    }
+
+    return videoUrl;
+  };
+
+  const embedUrl = getEmbedUrl(url);
+
+  return (
+    <div className="video-modal-backdrop" onClick={onClose}>
+      <div className="video-modal-container" onClick={(e) => e.stopPropagation()}>
+        <div className="video-modal-header">
+          <h3>🎥 {branchName} 시설영상</h3>
+          <button className="video-modal-close-btn" onClick={onClose} aria-label="Close modal">✕</button>
+        </div>
+        <div className="video-modal-body">
+          <div className="video-iframe-wrapper">
+            {embedUrl ? (
+              <iframe
+                src={embedUrl}
+                title={`${branchName} 시설영상`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            ) : (
+              <div style={{ color: "var(--text)", textAlign: "center", padding: "40px" }}>영상 URL 형식이 잘못되었습니다.</div>
+            )}
+          </div>
+          <a
+            className="video-modal-fallback-btn"
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>🔗</span> 동영상 원본 페이지 직접 가기 (새 창)
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const [page, setPage] = useState("dashboard");
   const [rawTabs, setRawTabs] = useState(initialTabs);
@@ -1692,7 +1744,7 @@ export default function HomePage() {
       mentorTotalAmount
     };
   }, [rawTabs]);
-
+
   const sortMentorRowsState = () => {
     setRawTabs((current) => getSortedRawTabs(current));
   };
@@ -1716,6 +1768,8 @@ export default function HomePage() {
   const [branchSearch, setBranchSearch] = useState("");
   const [regionFilter, setRegionFilter] = useState("all");
   const [hoveredRegion, setHoveredRegion] = useState(null);
+  const [activeVideoUrl, setActiveVideoUrl] = useState(null);
+  const [activeVideoBranch, setActiveVideoBranch] = useState("");
   const saveTimeoutRef = useRef(null);
   const hasInitializedSaveRef = useRef(false);
   const importInputRef = useRef(null);
@@ -3671,9 +3725,12 @@ export default function HomePage() {
                                 key={`facility-branch-${row.branch}`}
                                 className="facility-branch-link"
                                 href={row.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                title={`${row.branch} 시설영상 열기`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setActiveVideoUrl(row.url);
+                                  setActiveVideoBranch(row.branch);
+                                }}
+                                title={`${row.branch} 시설영상 재생`}
                               >
                                 {row.branch}
                               </a>
@@ -4603,6 +4660,15 @@ export default function HomePage() {
             <span className="premium-footer-badge top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>▲ TOP</span>
           </div>
         </div>
+      <VideoModal
+        isOpen={activeVideoUrl !== null}
+        onClose={() => {
+          setActiveVideoUrl(null);
+          setActiveVideoBranch("");
+        }}
+        url={activeVideoUrl}
+        branchName={activeVideoBranch}
+      />
       </footer>
     </div>
   );
