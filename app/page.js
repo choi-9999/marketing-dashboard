@@ -1512,6 +1512,179 @@ export default function HomePage() {
   const [page, setPage] = useState("dashboard");
   const [rawTabs, setRawTabs] = useState(initialTabs);
 
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+
+  const showcaseSlides = useMemo(() => [
+    { name: "프렌즈", className: "card-theme-friends", desc: "지점 활성화를 위한 동반자, 247프렌즈 캠페인", id: rawTabs.find(t => t.name === "247프렌즈")?.id },
+    { name: "체험단", className: "card-theme-experience", desc: "직접 체험하고 검증하는 247체험단 홍보", id: rawTabs.find(t => t.name === "247체험단")?.id },
+    { name: "SNS 진단표", className: "card-theme-sns", desc: "블로그 및 인스타그램 지점 마케팅 정밀 진단", id: rawTabs.find(t => t.kind === SPECIAL_SOCIAL_TAB_KIND)?.id },
+    { name: "협업이벤트", className: "card-theme-collab", desc: "대형 교육 협력사와의 제휴 공동 프로모션", id: rawTabs.find(t => t.kind === SPECIAL_COLLAB_TAB_KIND)?.id },
+    { name: "지점시설영상", className: "card-theme-facility", desc: "지점 시설 및 분위기를 전달하는 고화질 영상", id: rawTabs.find(t => t.kind === SPECIAL_FACILITY_TAB_KIND)?.id },
+    { name: "멘토단 및 장학생", className: "card-theme-mentor", desc: "합격의 결실을 함께 나누는 명예로운 장학제도", id: rawTabs.find(t => t.kind === SPECIAL_MENTOR_TAB_KIND)?.id }
+  ], [rawTabs]);
+
+  const marqueeCards = useMemo(() => [
+    { name: "247프렌즈", category: "CAMPAIGN", className: "card-theme-friends", id: rawTabs.find(t => t.name === "247프렌즈")?.id },
+    { name: "247체험단", category: "MARKETING", className: "card-theme-experience", id: rawTabs.find(t => t.name === "247체험단")?.id },
+    { name: "SNS 진단표", category: "ANALYSIS", className: "card-theme-sns", id: rawTabs.find(t => t.kind === SPECIAL_SOCIAL_TAB_KIND)?.id },
+    { name: "협업이벤트", category: "COLLABORATION", className: "card-theme-collab", id: rawTabs.find(t => t.kind === SPECIAL_COLLAB_TAB_KIND)?.id },
+    { name: "지점시설영상", category: "PROMOTION", className: "card-theme-facility", id: rawTabs.find(t => t.kind === SPECIAL_FACILITY_TAB_KIND)?.id },
+    { name: "멘토단 및 장학생", category: "SCHOLARSHIP", className: "card-theme-mentor", id: rawTabs.find(t => t.kind === SPECIAL_MENTOR_TAB_KIND)?.id }
+  ], [rawTabs]);
+
+  useEffect(() => {
+    if (page === "dashboard") {
+      const timer = setInterval(() => {
+        setActiveSlideIndex((prev) => (prev + 1) % showcaseSlides.length);
+      }, 4000);
+      return () => clearInterval(timer);
+    }
+  }, [page, showcaseSlides.length]);
+
+  const prevSlide = (e) => {
+    e.stopPropagation();
+    setActiveSlideIndex((prev) => (prev - 1 + showcaseSlides.length) % showcaseSlides.length);
+  };
+  const nextSlide = (e) => {
+    e.stopPropagation();
+    setActiveSlideIndex((prev) => (prev + 1) % showcaseSlides.length);
+  };
+
+  const handleCardClick = (id) => {
+    if (id) {
+      sortMentorRowsState();
+      setDashboardTabId(id);
+      setActiveTabId(id);
+      document.getElementById("our-work-section")?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleNavMenuClick = (menuName) => {
+    if (menuName === "종합 성과") {
+      document.getElementById("stats-section")?.scrollIntoView({ behavior: "smooth" });
+    } else if (menuName === "지점 대시보드") {
+      document.getElementById("our-work-section")?.scrollIntoView({ behavior: "smooth" });
+    } else if (menuName === "명예의 전당") {
+      const tab = rawTabs.find(t => t.kind === SPECIAL_MENTOR_TAB_KIND);
+      if (tab) {
+        sortMentorRowsState();
+        setDashboardTabId(tab.id);
+        setActiveTabId(tab.id);
+        document.getElementById("our-work-section")?.scrollIntoView({ behavior: "smooth" });
+      }
+    } else if (menuName === "체험단 신청") {
+      const tab = rawTabs.find(t => t.name === "247체험단");
+      if (tab) {
+        sortMentorRowsState();
+        setDashboardTabId(tab.id);
+        setActiveTabId(tab.id);
+        document.getElementById("our-work-section")?.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      alert(`${menuName} 메뉴 준비 중입니다.`);
+    }
+  };
+
+  const globalStats = useMemo(() => {
+    // 1. 247프렌즈
+    const friendsTab = rawTabs.find(t => t.name === "247프렌즈");
+    let friendsBranchCount = 0;
+    let friendsAvgParticipants = 0;
+    if (friendsTab) {
+      const rows = friendsTab.rows || [];
+      friendsBranchCount = rows.filter(r => r.branch?.trim()).length;
+      let totalParticipants = 0;
+      rows.forEach(r => {
+        Object.values(r.eventValues || {}).forEach(v => {
+          totalParticipants += Number(v.participants) || 0;
+        });
+      });
+      friendsAvgParticipants = friendsBranchCount > 0 ? Math.round(totalParticipants / friendsBranchCount) : 0;
+    }
+
+    // 2. 247체험단
+    const experienceTab = rawTabs.find(t => t.name === "247체험단");
+    let experienceBranchCount = 0;
+    let experienceTotalParticipants = 0;
+    if (experienceTab) {
+      const rows = experienceTab.rows || [];
+      experienceBranchCount = rows.filter(r => r.branch?.trim()).length;
+      rows.forEach(r => {
+        Object.values(r.eventValues || {}).forEach(v => {
+          experienceTotalParticipants += Number(v.participants) || 0;
+        });
+      });
+    }
+
+    // 3. SNS 마케팅
+    const snsTab = rawTabs.find(t => t.kind === SPECIAL_SOCIAL_TAB_KIND);
+    let snsTotalCount = 0;
+    let snsAvgScore = "0.0";
+    if (snsTab) {
+      const rows = snsTab.socialRows || [];
+      snsTotalCount = rows.filter(r => r.branch?.trim()).length;
+      let totalScores = 0;
+      rows.forEach(r => {
+        const scores = [
+          Number(r.blogVisitScore) || 0,
+          Number(r.instagramDesignScore) || 0,
+          Number(r.instagramReactionScore) || 0,
+          Number(r.profileSetupScore) || 0,
+          Number(r.featureUsageScore) || 0,
+          Number(r.ctaScore) || 0,
+          Number(r.linkHealthScore) || 0,
+          Number(r.brandInfoScore) || 0
+        ];
+        scores.forEach(s => {
+          totalScores += s;
+        });
+      });
+      snsAvgScore = snsTotalCount > 0 ? (totalScores / (snsTotalCount * 8)).toFixed(1) : "0.0";
+    }
+
+    // 4. 협업 성과
+    const collabTab = rawTabs.find(t => t.kind === SPECIAL_COLLAB_TAB_KIND);
+    let collabEventCount = 0;
+    let collabTotalUrls = 0;
+    if (collabTab) {
+      const summary = buildCollabSummary(collabTab);
+      collabEventCount = summary.uniqueEvents;
+      collabTotalUrls = summary.totalUrls;
+    }
+
+    // 5. 시설 홍보
+    const facilityTab = rawTabs.find(t => t.kind === SPECIAL_FACILITY_TAB_KIND);
+    let facilityRatio = 0;
+    if (facilityTab) {
+      const summary = buildFacilitySummary(facilityTab);
+      facilityRatio = summary.totalBranches > 0 ? Math.round((summary.activeBranches / summary.totalBranches) * 100) : 0;
+    }
+
+    // 6. 멘토단/장학생
+    const mentorTab = rawTabs.find(t => t.kind === SPECIAL_MENTOR_TAB_KIND);
+    let mentorTotalCount = 0;
+    let mentorTotalAmount = 0;
+    if (mentorTab) {
+      const rows = mentorTab.mentorRows || [];
+      mentorTotalCount = rows.filter(r => r.name?.trim()).length;
+      mentorTotalAmount = rows.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+    }
+
+    return {
+      friendsBranchCount,
+      friendsAvgParticipants,
+      experienceBranchCount,
+      experienceTotalParticipants,
+      snsTotalCount,
+      snsAvgScore,
+      collabEventCount,
+      collabTotalUrls,
+      facilityRatio,
+      mentorTotalCount,
+      mentorTotalAmount
+    };
+  }, [rawTabs]);
+
   const sortMentorRowsState = () => {
     setRawTabs((current) => getSortedRawTabs(current));
   };
@@ -2931,56 +3104,193 @@ export default function HomePage() {
     }));
   }
 
-  return (
-    <div className="workbook">
-      <header className="sheet-topbar">
-        <div>
-          <p className="sheet-kicker">ETOOS247 MARKETING DASHBOARD</p>
-          <h1>지점 활성화 방안 대시보드</h1>
+    return (
+    <div className="dashboard-wrapper">
+      {/* 1. 상단 다크 네비바 */}
+      <nav className="premium-navbar">
+        <div 
+          className="premium-navbar-logo-container" 
+          onClick={() => {
+            sortMentorRowsState();
+            setDashboardTabId(OVERVIEW_TAB_ID);
+            setPage("dashboard");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }} 
+          style={{ cursor: "pointer" }}
+        >
+          <img src="/logo.png" className="premium-navbar-logo" alt="ETOOS ECI Logo" />
+          <span className="premium-navbar-title">이투스247 학원 | 마케팅 관리 시스템</span>
         </div>
-        <div className="topbar-meta">
-          <div className="meta-cell"><span>담당부서</span><strong>교육팀</strong></div>
-          <div className="meta-cell"><span>대시보드 기준</span><strong>{page === "dashboard" ? dashboardScopeLabel : activeTab?.name || "-"}</strong></div>
-          <div className="meta-cell"><span>{topbarCountLabel}</span><strong>{topbarCountValue}</strong></div>
-          <div className="meta-cell"><span>{topbarBranchLabel}</span><strong>{topbarBranchValue}</strong></div>
+        <ul className="premium-navbar-menu">
+          {["공지사항", "종합 성과", "명예의 전당", "지점 대시보드", "체험단 신청"].map((menu) => (
+            <li key={menu} className="premium-navbar-menu-item">
+              <a href="#" onClick={(e) => { e.preventDefault(); handleNavMenuClick(menu); }}>{menu}</a>
+            </li>
+          ))}
+        </ul>
+        <div className="premium-navbar-actions">
           <button
-            type="button"
-            className="meta-cell highlight save-state-trigger"
-            onClick={forceServerSave}
-            title="클릭해서 지금 상태를 서버에 저장"
+            className={`premium-navbar-btn ${page === "dashboard" ? "active" : ""}`}
+            onClick={() => {
+              sortMentorRowsState();
+              setPage("dashboard");
+            }}
           >
-            <span>저장 상태</span>
-            <strong>{saveState}</strong>
+            GUEST 지점 사용자
+          </button>
+          <button
+            className={`premium-navbar-btn ${page === "rawdata" ? "active" : ""}`}
+            onClick={() => {
+              sortMentorRowsState();
+              setPage("rawdata");
+            }}
+          >
+            🔒 관리자 모드
           </button>
         </div>
-      </header>
+      </nav>
 
-      <div className="page-tabs">
-        <button
-          className={`page-tab ${page === "dashboard" ? "active" : ""}`}
-          onClick={() => {
-            sortMentorRowsState();
-            setPage("dashboard");
-          }}
-        >
-          Dashboard
-        </button>
-        <button
-          className={`page-tab ${page === "rawdata" ? "active" : ""}`}
-          onClick={() => {
-            sortMentorRowsState();
-            setPage("rawdata");
-          }}
-        >
-          RAWDATA Studio
-        </button>
-      </div>
+      {page === "dashboard" ? (
+        <div className="workbook">
+          {/* 2. 히어로 타이틀 */}
+          <section className="premium-hero">
+            <h1 className="premium-hero-title">
+              ETOOS247<br />
+              <span className="outline-blue">MARKETING DASHBOARD</span>
+            </h1>
+          </section>
 
-      <main className="sheet-body">
-        {page === "dashboard" ? (
-          <>
-            <section className="sheet-panel utility-panel">
-              <div className="program-chip-row dashboard-scope-row">
+          {/* 3. 우-좌 롤링 카드 네비게이션 */}
+          <section className="marquee-section">
+            <h2 className="marquee-title">Welcome</h2>
+            <div className="marquee-container">
+              <div className="marquee-track">
+                {[...marqueeCards, ...marqueeCards].map((card, idx) => (
+                  <div
+                    key={`${card.id || card.name}-${idx}`}
+                    className={`rolling-card ${card.className}`}
+                    onClick={() => handleCardClick(card.id)}
+                  >
+                    <div className="rolling-card-info">
+                      <div className="rolling-card-category">{card.category}</div>
+                      <div className="rolling-card-title">{card.name}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* 4. 타이포그래피 구분 섹션 */}
+          <section className="typo-divider">
+            <div className="typo-divider-text">
+              WE MAKE <span className="outline-text">POSSIBLE</span>
+            </div>
+          </section>
+
+          {/* 5. 수직 상하 롤링 쇼케이스 */}
+          <section className="vertical-showcase-section">
+            <div className="vertical-showcase-container">
+              <div className="vertical-showcase-viewport">
+                <div className="vertical-showcase-track">
+                  {showcaseSlides.map((slide, index) => (
+                    <div
+                      key={`showcase-${index}`}
+                      className={`vertical-showcase-slide ${activeSlideIndex === index ? "active" : ""}`}
+                      onClick={() => {
+                        if (slide.id) {
+                          sortMentorRowsState();
+                          setDashboardTabId(slide.id);
+                          setActiveTabId(slide.id);
+                          document.getElementById("our-work-section")?.scrollIntoView({ behavior: "smooth" });
+                        }
+                      }}
+                    >
+                      <div className={`vertical-showcase-image-fallback ${slide.className}`}>
+                        <div style={{ opacity: 0.12, fontSize: "clamp(3rem, 10vw, 8rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase" }}>
+                          {slide.name}
+                        </div>
+                      </div>
+                      <div className="vertical-showcase-overlay">
+                        <h3 className="vertical-showcase-tag">
+                          <span className="blue-hash">#</span>
+                          <span className="white-text">{slide.name}</span>
+                        </h3>
+                        <p style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: "1.1rem", marginTop: "12px", maxWidth: "600px", margin: "12px 0 0" }}>
+                          {slide.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Prev/Next arrows inside viewport */}
+                <div className="vertical-showcase-arrows">
+                  <button className="vertical-showcase-arrow" onClick={prevSlide}>↑</button>
+                  <button className="vertical-showcase-arrow" onClick={nextSlide}>↓</button>
+                </div>
+              </div>
+
+              {/* Dot Indicators on the right */}
+              <div className="vertical-showcase-dots">
+                {showcaseSlides.map((_, idx) => (
+                  <button
+                    key={`dot-${idx}`}
+                    className={`vertical-showcase-dot ${activeSlideIndex === idx ? "active" : ""}`}
+                    onClick={() => setActiveSlideIndex(idx)}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* 6. 통계 매핑 시각화 */}
+          <section id="stats-section" className="stats-section">
+            <div className="stats-header-row">
+              <h2 className="stats-title">
+                <span className="blue-slash">/</span>WHAT WE DO
+              </h2>
+            </div>
+            <div className="stats-grid">
+              <div className="stats-cell">
+                <div className="stats-cell-label">247프렌즈</div>
+                <div className="stats-cell-value">{globalStats.friendsBranchCount}개 지점</div>
+                <div className="stats-cell-desc">프렌즈 참여 지점 수<br />(평균 {globalStats.friendsAvgParticipants}명 참석)</div>
+              </div>
+              <div className="stats-cell">
+                <div className="stats-cell-label">247체험단</div>
+                <div className="stats-cell-value">{globalStats.experienceTotalParticipants}명</div>
+                <div className="stats-cell-desc">체험단 총 등록 인원 수<br />({globalStats.experienceBranchCount}개 지점 활성화)</div>
+              </div>
+              <div className="stats-cell">
+                <div className="stats-cell-label">SNS 마케팅</div>
+                <div className="stats-cell-value">{globalStats.snsAvgScore}점 / 5.0</div>
+                <div className="stats-cell-desc">지점 SNS 평균 진단 점수<br />(블로그 및 인스타 채널 종합)</div>
+              </div>
+              <div className="stats-cell">
+                <div className="stats-cell-label">협업 제휴</div>
+                <div className="stats-cell-value">{globalStats.collabTotalUrls}개 URL</div>
+                <div className="stats-cell-desc">협업 이벤트 URL 총 등록 수<br />(진행 제휴 이벤트 {globalStats.collabEventCount}종)</div>
+              </div>
+              <div className="stats-cell">
+                <div className="stats-cell-label">시설 홍보</div>
+                <div className="stats-cell-value">{globalStats.facilityRatio}%</div>
+                <div className="stats-cell-desc">지점 시설영상 업로드 완료 비율<br />(연결 대상 지점 기준)</div>
+              </div>
+              <div className="stats-cell">
+                <div className="stats-cell-label">멘토 및 장학</div>
+                <div className="stats-cell-value">{(globalStats.mentorTotalAmount / 10000).toLocaleString()}만원</div>
+                <div className="stats-cell-desc">선발 장학생 지급액 합계<br />(총 {globalStats.mentorTotalCount}명 선발 완료)</div>
+              </div>
+            </div>
+          </section>
+
+          {/* 7. 상세 대시보드 영역 (OUR WORK) */}
+          <main id="our-work-section" className="sheet-body" style={{ marginTop: "40px", borderRadius: "16px", border: "1px solid rgba(0,59,255,0.1)", boxShadow: "0 10px 30px rgba(0,0,0,0.03)" }}>
+            
+            {/* Quick Toggle in OUR WORK */}
+            <section className="sheet-panel utility-panel" style={{ border: "none", marginBottom: "20px" }}>
+              <div className="program-chip-row dashboard-scope-row" style={{ padding: 0 }}>
                 <button
                   className={`program-chip ${isOverviewDashboard ? "active" : ""}`}
                   onClick={() => setDashboardTabId(OVERVIEW_TAB_ID)}
@@ -3003,7 +3313,11 @@ export default function HomePage() {
               </div>
             </section>
 
-            {isOverviewDashboard ? (
+            <h2 className="active-tab-details-title" style={{ margin: "20px 0 30px" }}>
+              <span className="blue-slash">/</span>OUR WORK ({isOverviewDashboard ? "전체 현황" : selectedDashboardTab?.name})
+            </h2>
+
+                        {isOverviewDashboard ? (
               <>
                   <section className="sheet-grid kpi-grid">
                   <article className="sheet-panel score-panel compact-score-panel">
@@ -3777,308 +4091,362 @@ export default function HomePage() {
                 </section>
               </>
             )}
-          </>
-        ) : (
-          <>
-            <section className="sheet-panel utility-panel">
-                <div className="utility-row">
-                  <button className="reset-button" onClick={addRawTab}>+ 탭 추가</button>
-                  <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>현재 탭 삭제</button>
-                  <button className="reset-button" onClick={addRow}>
-                    {activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND ? "+ 진단 행 추가" : activeTab?.kind === SPECIAL_COLLAB_TAB_KIND ? "+ URL 행 추가" : activeTab?.kind === SPECIAL_FACILITY_TAB_KIND ? "+ 영상 행 추가" : activeTab?.kind === SPECIAL_MENTOR_TAB_KIND ? "+ 학생 추가" : "+ 지점 행 추가"}
-                  </button>
-                  {activeTab?.kind !== SPECIAL_SOCIAL_TAB_KIND && activeTab?.kind !== SPECIAL_FACILITY_TAB_KIND && activeTab?.kind !== SPECIAL_MENTOR_TAB_KIND ? <button className="reset-button" onClick={addEvent}>+ 이벤트 추가</button> : null}
-                  <button className="reset-button import-align-button" onClick={() => importInputRef.current?.click()}>엑셀 불러오기</button>
+          </main>
+        </div>
+            ) : (
+        <div className="workbook" style={{ marginTop: "40px" }}>
+          <section className="sheet-panel premium-studio-panel">
+            <div className="panel-title-row premium-studio-header">
+              <h2>RAWDATA Studio</h2>
+              <span className="note-text">
+                {activeTab.kind === SPECIAL_SOCIAL_TAB_KIND
+                  ? "SNS 채널 진단표 전용 입력 형식입니다."
+                  : activeTab.kind === SPECIAL_COLLAB_TAB_KIND
+                  ? "지점별 협업 URL 등록 전용 입력 형식입니다."
+                  : activeTab.kind === SPECIAL_FACILITY_TAB_KIND
+                  ? "지점 시설영상 URL 전용 입력 형식입니다."
+                  : activeTab.kind === SPECIAL_MENTOR_TAB_KIND
+                  ? "멘토단 및 장학생 인적사항 관리 전용 입력 형식입니다."
+                  : "`지역`, `지점`은 고정이고 이벤트만 확장됩니다."}
+              </span>
+            </div>
+            <div className="editor-toolbar">
+              <div className="editor-name-block">
+                <div className="editor-meta">탭 이름</div>
                 <input
-                  ref={importInputRef}
-                  type="file"
-                  accept=".xlsx,.xlsm,.xls"
-                  style={{ display: "none" }}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      if (activeTab?.kind === SPECIAL_SOCIAL_TAB_KIND) {
-                        await importSnsWorkbook(file);
-                      } else if (activeTab?.kind === SPECIAL_COLLAB_TAB_KIND) {
-                        await importCollabWorkbook(file);
-                      } else if (activeTab?.kind === SPECIAL_FACILITY_TAB_KIND) {
-                        await importFacilityWorkbook(file);
-                      } else if (activeTab?.kind === SPECIAL_MENTOR_TAB_KIND) {
-                        await importMentorWorkbook(file);
-                      } else {
-                        await importDefaultWorkbook(file);
-                      }
-                    }
-                    e.target.value = "";
-                  }}
+                  className="tab-name-input"
+                  value={activeTab.name}
+                  onChange={(e) => updateTabName(e.target.value)}
                 />
               </div>
-              <div className="program-chip-row">
-                {rawTabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    className={`program-chip raw-tab-chip ${activeTab?.id === tab.id ? "active" : ""}`}
-                    onClick={() => {
-                      sortMentorRowsState();
-                      setActiveTabId(tab.id);
-                    }}
-                  >
-                    {tab.name}
+              {!isSpecialTabKind(activeTab.kind) ? (
+                <div className="editor-actions">
+                  <button className="reset-button" onClick={removeActiveTab} disabled={rawTabs.length === 1}>
+                    탭 삭제
                   </button>
-                ))}
-              </div>
-            </section>
-
-              {activeTab ? (
-                <section className="sheet-panel">
-                <div className="panel-title-row"><h2>RAWDATA Studio</h2><span className="note-text">{activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? "SNS 채널 진단표 전용 입력 형식입니다." : activeTab.kind === SPECIAL_COLLAB_TAB_KIND ? "지점별 협업 URL 등록 전용 입력 형식입니다." : activeTab.kind === SPECIAL_FACILITY_TAB_KIND ? "지점 시설영상 URL 전용 입력 형식입니다." : activeTab.kind === SPECIAL_MENTOR_TAB_KIND ? "멘토단 및 장학생 인적사항 관리 전용 입력 형식입니다." : "`지역`, `지점`은 고정이고 이벤트만 확장됩니다."}</span></div>
-                <div className="editor-toolbar">
-                  <div className="editor-name-block">
-                    <div className="editor-meta">탭 이름</div>
-                    <input className="tab-name-input" value={activeTab.name} onChange={(e) => updateTabName(e.target.value)} />
-                  </div>
-                  {!isSpecialTabKind(activeTab.kind) ? (
-                    <button className="mini-button" onClick={() => setAreEventChipsExpanded((current) => !current)}>
-                      {areEventChipsExpanded ? "이벤트명 접기" : "이벤트명 펼치기"}
-                    </button>
-                  ) : null}
+                  <button className="reset-button" onClick={addRawTab}>
+                    새 탭 추가
+                  </button>
                 </div>
-                {!isSpecialTabKind(activeTab.kind) ? (
-                  <>
-                    <div className={`event-chip-list ${areEventChipsExpanded ? "" : "collapsed"}`}>
-                      {activeTab.events.length > 0 ? activeTab.events.map((event) => (
-                        <div className="event-chip" key={event.id}>
-                          <input
-                            className="event-name-input"
-                            value={event.name}
-                            onChange={(e) => updateEventName(event.id, e.target.value)}
-                            aria-label="이벤트명"
-                          />
-                          <button className="mini-button" onClick={() => removeEvent(event.id)}>삭제</button>
-                        </div>
-                      )) : <p className="empty-copy">아직 이벤트가 없습니다. `이벤트 추가` 버튼으로 시작할 수 있어요.</p>}
-                    </div>
-                    <div className="table-shell">
-                      <table className="excel-table editor-table">
-                        <thead>
-                          <tr>
-                            <th rowSpan={2}>지역</th>
-                            <th rowSpan={2}>지점</th>
-                            {activeTab.events.map((event) => (
-                              <th key={event.id} colSpan={2}>
-                                <div className="event-header-cell">
-                                  <strong>{event.name}</strong>
-                                  <span>참여여부 / 참석인원</span>
-                                </div>
-                              </th>
-                            ))}
-                            <th rowSpan={2}>행 삭제</th>
-                          </tr>
-                          <tr>
-                            {activeTab.events.flatMap((event) => ([
-                              <th key={`${event.id}-status`}>참여여부</th>,
-                              <th key={`${event.id}-participants`}>참석인원</th>
-                            ]))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {activeTab.rows.map((row, rowIndex) => (
-                            <tr key={row.id}>
-                              <td><input value={row.region} onChange={(e) => updateBaseCell(rowIndex, "region", e.target.value)} /></td>
-                              <td><input value={row.branch} onChange={(e) => updateBaseCell(rowIndex, "branch", e.target.value)} /></td>
-                              {activeTab.events.flatMap((event) => {
-                                const eventValue = row.eventValues?.[event.id] || { status: "X", participants: "0" };
-                                return [
-                                  <td key={`${row.id}-${event.id}-status`}>
-                                    <select value={eventValue.status} onChange={(e) => updateEventCell(rowIndex, event.id, "status", e.target.value)}>
-                                      <option value="O">O</option>
-                                      <option value="X">X</option>
-                                    </select>
-                                  </td>,
-                                  <td key={`${row.id}-${event.id}-participants`}>
-                                    <input type="number" min="0" value={eventValue.participants} onChange={(e) => updateEventCell(rowIndex, event.id, "participants", e.target.value)} />
-                                  </td>
-                                ];
-                              })}
-                              <td><button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button></td>
-                            </tr>
+              ) : null}
+            </div>
+
+            <div className="utility-row">
+              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                <span className="utility-badge navy">RAWDATA 편집기</span>
+                <span className="utility-badge yellow">
+                  {activeTab.kind === SPECIAL_SOCIAL_TAB_KIND
+                    ? "지점별 SNS 계정 및 점수 진단"
+                    : activeTab.kind === SPECIAL_COLLAB_TAB_KIND
+                    ? "지점별 홈페이지/블로그/인스타 협업 링크"
+                    : activeTab.kind === SPECIAL_FACILITY_TAB_KIND
+                    ? "지점별 시설 동영상 URL"
+                    : activeTab.kind === SPECIAL_MENTOR_TAB_KIND
+                    ? "멘토단 여부 선택 및 장학 정보"
+                    : "지점별 이벤트 참여여부 및 인원수"}
+                </span>
+              </div>
+              <div className="editor-actions" style={{ marginLeft: "auto", display: "flex", gap: "10px" }}>
+                <button
+                  className="mini-button highlight"
+                  onClick={triggerImportFile}
+                  title="엑셀 파일을 가져와 현재 데이터를 교체합니다."
+                >
+                  엑셀 불러오기
+                </button>
+                {activeTab.kind !== SPECIAL_SOCIAL_TAB_KIND &&
+                activeTab.kind !== SPECIAL_COLLAB_TAB_KIND &&
+                activeTab.kind !== SPECIAL_FACILITY_TAB_KIND &&
+                activeTab.kind !== SPECIAL_MENTOR_TAB_KIND ? (
+                  <button
+                    className="mini-button"
+                    onClick={() => exportToExcel(activeTab)}
+                    title="현재 데이터를 엑셀 파일로 다운로드합니다."
+                  >
+                    엑셀 내보내기
+                  </button>
+                ) : null}
+                <button
+                  className="mini-button"
+                  onClick={
+                    activeTab.kind === SPECIAL_SOCIAL_TAB_KIND
+                      ? addSocialRow
+                      : activeTab.kind === SPECIAL_COLLAB_TAB_KIND
+                      ? addCollabRow
+                      : activeTab.kind === SPECIAL_FACILITY_TAB_KIND
+                      ? addFacilityRow
+                      : activeTab.kind === SPECIAL_MENTOR_TAB_KIND
+                      ? addMentorRow
+                      : () => addRow(activeTab.events.map((e) => e.id))
+                  }
+                >
+                  {activeTab.kind === SPECIAL_SOCIAL_TAB_KIND
+                    ? "+ 진단 행 추가"
+                    : activeTab.kind === SPECIAL_COLLAB_TAB_KIND
+                    ? "+ URL 행 추가"
+                    : activeTab.kind === SPECIAL_FACILITY_TAB_KIND
+                    ? "+ 영상 행 추가"
+                    : activeTab.kind === SPECIAL_MENTOR_TAB_KIND
+                    ? "+ 학생 추가"
+                    : "+ 지점 행 추가"}
+                </button>
+                {activeTab.kind !== SPECIAL_SOCIAL_TAB_KIND &&
+                activeTab.kind !== SPECIAL_FACILITY_TAB_KIND &&
+                activeTab.kind !== SPECIAL_MENTOR_TAB_KIND ? (
+                  <button className="reset-button" onClick={addEvent}>
+                    + 이벤트 추가
+                  </button>
+                ) : null}
+              </div>
+              <input
+                type="file"
+                ref={importInputRef}
+                style={{ display: "none" }}
+                accept=".xlsx, .xls"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (activeTab.kind === SPECIAL_SOCIAL_TAB_KIND) {
+                      await importSocialWorkbook(file);
+                    } else if (activeTab.kind === SPECIAL_COLLAB_TAB_KIND) {
+                      await importCollabWorkbook(file);
+                    } else if (activeTab.kind === SPECIAL_FACILITY_TAB_KIND) {
+                      await importFacilityWorkbook(file);
+                    } else if (activeTab.kind === SPECIAL_MENTOR_TAB_KIND) {
+                      await importMentorWorkbook(file);
+                    } else {
+                      await importDefaultWorkbook(file);
+                    }
+                  }
+                  e.target.value = "";
+                }}
+              />
+            </div>
+            <div className="program-chip-row">
+              {rawTabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`program-chip raw-tab-chip ${activeTab?.id === tab.id ? "active" : ""}`}
+                  onClick={() => {
+                    sortMentorRowsState();
+                    setActiveTabId(tab.id);
+                  }}
+                >
+                  {tab.name}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {activeTab ? (
+            <section className="sheet-panel" style={{ marginTop: "14px", border: "1px solid rgba(0, 59, 255, 0.15)", borderRadius: "16px", overflow: "hidden" }}>
+              {activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? (
+                <div className="table-shell special-input-shell">
+                  <table className="excel-table special-input-table">
+                    <thead>
+                      <tr>
+                        <th className="special-head special-identity" style={{ width: "130px" }}>지점</th>
+                        {specialSocialColumns
+                          .filter((c) => c.key !== "branch")
+                          .map((col) => (
+                            <th key={col.key} className="special-head special-sns-head" style={{ width: "120px" }}>
+                              {col.label}
+                            </th>
                           ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </>
-                ) : activeTab.kind === SPECIAL_SOCIAL_TAB_KIND ? (
-                  <div className="table-shell special-input-shell">
-                    <table className="excel-table special-input-table">
-                      <thead>
-                        <tr>
-                          {specialSocialColumns.map((column) => (
-                            <th key={column.key} className={`special-head special-${column.group}`}>{column.label}</th>
-                          ))}
-                          <th className="special-head special-memo">행 삭제</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(activeTab.socialRows || []).map((row, rowIndex) => (
-                          <tr key={row.id}>
-                            {specialSocialColumns.map((column) => (
-                              <td key={`${row.id}-${column.key}`} className={`special-cell special-${column.group}`}>
+                        <th className="special-head special-memo" style={{ width: "80px" }}>행 삭제</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(activeTab.socialRows || []).map((row, rowIndex) => (
+                        <tr key={row.id}>
+                          <td className="special-cell special-identity">
+                            <input
+                              type="text"
+                              value={row.branch ?? ""}
+                              onChange={(e) => updateSocialCell(rowIndex, "branch", e.target.value)}
+                              placeholder="지점"
+                            />
+                          </td>
+                          {specialSocialColumns
+                            .filter((c) => c.key !== "branch")
+                            .map((col) => (
+                              <td key={col.key} className="special-cell">
                                 <input
-                                  type={column.type === "number" ? "number" : column.type}
-                                  min={column.type === "number" ? "0" : undefined}
-                                  value={row[column.key] ?? ""}
-                                  onChange={(e) => updateSpecialCell(rowIndex, column.key, e.target.value)}
-                                  placeholder={column.label}
+                                  type={col.type === "number" ? "number" : col.type === "date" ? "date" : "text"}
+                                  min={col.type === "number" ? "0" : undefined}
+                                  max={col.key.includes("Score") && col.key.includes("Visit") ? "5" : col.key.includes("Score") && col.key.includes("Reaction") ? "5" : col.key.includes("Score") && col.key.includes("Design") ? "5" : col.key.includes("Score") ? "3" : undefined}
+                                  value={row[col.key] ?? ""}
+                                  onChange={(e) => updateSocialCell(rowIndex, col.key, e.target.value)}
+                                  placeholder={col.label}
                                 />
                               </td>
                             ))}
-                            <td className="special-cell special-memo"><button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : activeTab.kind === SPECIAL_FACILITY_TAB_KIND ? (
-                  <div className="table-shell special-input-shell">
-                    <table className="excel-table special-input-table">
-                      <thead>
-                        <tr>
-                          <th className="special-head special-identity">지역</th>
-                          <th className="special-head special-identity">지점</th>
-                          <th className="special-head special-growth">시설영상 URL</th>
-                          <th className="special-head special-memo">행 삭제</th>
+                          <td className="special-cell special-memo" style={{ textAlign: "center" }}>
+                            <button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button>
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {(activeTab.facilityRows || []).map((row, rowIndex) => (
-                          <tr key={row.id}>
-                            <td className="special-cell special-identity">
-                              <input type="text" value={row.region ?? ""} onChange={(e) => updateFacilityCell(rowIndex, "region", e.target.value)} placeholder="지역" />
-                            </td>
-                            <td className="special-cell special-identity">
-                              <input type="text" value={row.branch ?? ""} onChange={(e) => updateFacilityCell(rowIndex, "branch", e.target.value)} placeholder="지점" />
-                            </td>
-                            <td className="special-cell special-growth">
-                              <input type="url" value={row.url ?? ""} onChange={(e) => updateFacilityCell(rowIndex, "url", e.target.value)} placeholder="시설영상 URL" />
-                            </td>
-                            <td className="special-cell special-memo"><button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : activeTab.kind === SPECIAL_MENTOR_TAB_KIND ? (
-                  <div className="table-shell special-input-shell">
-                    <table className="excel-table special-input-table">
-                      <thead>
-                        <tr>
-                          <th className="special-head special-identity" style={{ width: "80px", textAlign: "center" }}>멘토여부</th>
-                          <th className="special-head special-identity" style={{ width: "90px" }}>연도</th>
-                          <th className="special-head special-identity" style={{ width: "120px" }}>이름</th>
-                          <th className="special-head special-growth" style={{ width: "160px" }}>합격 대학</th>
-                          <th className="special-head special-growth" style={{ width: "140px" }}>학과</th>
-                          <th className="special-head special-identity" style={{ width: "130px" }}>지점</th>
-                          <th className="special-head special-blog" style={{ width: "110px" }}>장학 그룹</th>
-                          <th className="special-head special-blog-score" style={{ width: "130px" }}>장학 금액</th>
-                          <th className="special-head special-memo">비고</th>
-                          <th className="special-head special-memo" style={{ width: "80px" }}>행 삭제</th>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : activeTab.kind === SPECIAL_FACILITY_TAB_KIND ? (
+                <div className="table-shell special-input-shell">
+                  <table className="excel-table special-input-table">
+                    <thead>
+                      <tr>
+                        <th className="special-head special-identity" style={{ width: "100px" }}>지역</th>
+                        <th className="special-head special-identity" style={{ width: "130px" }}>지점</th>
+                        <th className="special-head special-growth">시설영상 URL</th>
+                        <th className="special-head special-memo" style={{ width: "80px" }}>행 삭제</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(activeTab.facilityRows || []).map((row, rowIndex) => (
+                        <tr key={row.id}>
+                          <td className="special-cell special-identity">
+                            <input
+                              type="text"
+                              value={row.region ?? ""}
+                              onChange={(e) => updateFacilityCell(rowIndex, "region", e.target.value)}
+                              placeholder="지역"
+                            />
+                          </td>
+                          <td className="special-cell special-identity">
+                            <input
+                              type="text"
+                              value={row.branch ?? ""}
+                              onChange={(e) => updateFacilityCell(rowIndex, "branch", e.target.value)}
+                              placeholder="지점"
+                            />
+                          </td>
+                          <td className="special-cell special-growth">
+                            <input
+                              type="url"
+                              value={row.url ?? ""}
+                              onChange={(e) => updateFacilityCell(rowIndex, "url", e.target.value)}
+                              placeholder="시설영상 URL"
+                            />
+                          </td>
+                          <td className="special-cell special-memo" style={{ textAlign: "center" }}>
+                            <button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button>
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {(activeTab.mentorRows || []).map((row, rowIndex) => (
-                          <tr key={row.id}>
-                            <td className="special-cell special-identity" style={{ textAlign: "center" }}>
-                              <input
-                                type="checkbox"
-                                checked={row.isMentor || false}
-                                onChange={(e) => updateMentorCell(rowIndex, "isMentor", e.target.checked)}
-                                style={{ width: "20px", height: "20px", cursor: "pointer" }}
-                              />
-                            </td>
-                            <td className="special-cell special-identity">
-                              <input
-                                type="text"
-                                value={row.year ?? ""}
-                                onChange={(e) => updateMentorCell(rowIndex, "year", e.target.value)}
-                                placeholder="연도"
-                              />
-                            </td>
-                            <td className="special-cell special-identity">
-                              <input
-                                type="text"
-                                value={row.name ?? ""}
-                                onChange={(e) => updateMentorCell(rowIndex, "name", e.target.value)}
-                                placeholder="이름"
-                              />
-                            </td>
-                            <td className="special-cell special-growth">
-                              <input
-                                type="text"
-                                value={row.university ?? ""}
-                                onChange={(e) => updateMentorCell(rowIndex, "university", e.target.value)}
-                                placeholder="합격 대학"
-                              />
-                            </td>
-                            <td className="special-cell special-growth">
-                              <input
-                                type="text"
-                                value={row.department ?? ""}
-                                onChange={(e) => updateMentorCell(rowIndex, "department", e.target.value)}
-                                placeholder="학과"
-                              />
-                            </td>
-                            <td className="special-cell special-identity">
-                              <select
-                                value={row.branch ?? ""}
-                                onChange={(e) => updateMentorCell(rowIndex, "branch", e.target.value)}
-                                style={{ width: "100%", height: "100%", border: "none", background: "transparent", color: "var(--text-color)", outline: "none" }}
-                              >
-                                <option value="" style={{ background: "var(--panel-bg)" }}>지점 선택</option>
-                                {allBranches.map((branch) => (
-                                  <option key={branch} value={branch} style={{ background: "var(--panel-bg)" }}>{branch}</option>
-                                ))}
-                              </select>
-                            </td>
-                            <td className="special-cell special-blog">
-                              <input
-                                type="text"
-                                value={row.group ?? ""}
-                                onChange={(e) => updateMentorCell(rowIndex, "group", e.target.value)}
-                                placeholder="예: 1그룹"
-                              />
-                            </td>
-                            <td className="special-cell special-blog-score">
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.amount ?? ""}
-                                onChange={(e) => updateMentorCell(rowIndex, "amount", e.target.value)}
-                                placeholder="장학 금액"
-                              />
-                            </td>
-                            <td className="special-cell special-memo">
-                              <input
-                                type="text"
-                                value={row.memo ?? ""}
-                                onChange={(e) => updateMentorCell(rowIndex, "memo", e.target.value)}
-                                placeholder="비고"
-                              />
-                            </td>
-                            <td className="special-cell special-memo" style={{ textAlign: "center" }}>
-                              <button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  ) : (
-                    <div className="table-shell special-input-shell">
-                      {(() => {
-                        const collabColumns = activeTab.collabColumns || defaultCollabColumns;
-                        const collabEventGroups = groupCollabColumns(collabColumns);
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : activeTab.kind === SPECIAL_MENTOR_TAB_KIND ? (
+                <div className="table-shell special-input-shell">
+                  <table className="excel-table special-input-table">
+                    <thead>
+                      <tr>
+                        <th className="special-head special-identity" style={{ width: "80px", textAlign: "center" }}>멘토여부</th>
+                        <th className="special-head special-identity" style={{ width: "90px" }}>연도</th>
+                        <th className="special-head special-identity" style={{ width: "120px" }}>이름</th>
+                        <th className="special-head special-growth" style={{ width: "160px" }}>합격 대학</th>
+                        <th className="special-head special-growth" style={{ width: "140px" }}>학과</th>
+                        <th className="special-head special-identity" style={{ width: "130px" }}>지점</th>
+                        <th className="special-head special-blog" style={{ width: "110px" }}>장학 그룹</th>
+                        <th className="special-head special-blog-score" style={{ width: "130px" }}>장학 금액</th>
+                        <th className="special-head special-memo">비고</th>
+                        <th className="special-head special-memo" style={{ width: "80px" }}>행 삭제</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(activeTab.mentorRows || []).map((row, rowIndex) => (
+                        <tr key={row.id}>
+                          <td className="special-cell special-identity" style={{ textAlign: "center" }}>
+                            <input
+                              type="checkbox"
+                              checked={row.isMentor || false}
+                              onChange={(e) => updateMentorCell(rowIndex, "isMentor", e.target.checked)}
+                              style={{ width: "20px", height: "20px", cursor: "pointer" }}
+                            />
+                          </td>
+                          <td className="special-cell special-identity">
+                            <input
+                              type="text"
+                              value={row.year ?? ""}
+                              onChange={(e) => updateMentorCell(rowIndex, "year", e.target.value)}
+                              placeholder="연도"
+                            />
+                          </td>
+                          <td className="special-cell special-identity">
+                            <input
+                              type="text"
+                              value={row.name ?? ""}
+                              onChange={(e) => updateMentorCell(rowIndex, "name", e.target.value)}
+                              placeholder="이름"
+                            />
+                          </td>
+                          <td className="special-cell special-growth">
+                            <input
+                              type="text"
+                              value={row.university ?? ""}
+                              onChange={(e) => updateMentorCell(rowIndex, "university", e.target.value)}
+                              placeholder="합격 대학"
+                            />
+                          </td>
+                          <td className="special-cell special-growth">
+                            <input
+                              type="text"
+                              value={row.department ?? ""}
+                              onChange={(e) => updateMentorCell(rowIndex, "department", e.target.value)}
+                              placeholder="학과"
+                            />
+                          </td>
+                          <td className="special-cell special-identity">
+                            <select
+                              value={row.branch ?? ""}
+                              onChange={(e) => updateMentorCell(rowIndex, "branch", e.target.value)}
+                              style={{ width: "100%", height: "100%", border: "none", background: "transparent", color: "var(--text-color)", outline: "none" }}
+                            >
+                              <option value="" style={{ background: "var(--panel-bg)" }}>지점 선택</option>
+                              {allBranches.map((branch) => (
+                                <option key={branch} value={branch} style={{ background: "var(--panel-bg)" }}>{branch}</option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="special-cell special-blog">
+                            <input
+                              type="text"
+                              value={row.group ?? ""}
+                              onChange={(e) => updateMentorCell(rowIndex, "group", e.target.value)}
+                              placeholder="예: 1그룹"
+                            />
+                          </td>
+                          <td className="special-cell special-blog-score">
+                            <input
+                              type="number"
+                              min="0"
+                              value={row.amount ?? ""}
+                              onChange={(e) => updateMentorCell(rowIndex, "amount", e.target.value)}
+                              placeholder="장학 금액"
+                            />
+                          </td>
+                          <td className="special-cell special-memo">
+                            <input
+                              type="text"
+                              value={row.memo ?? ""}
+                              onChange={(e) => updateMentorCell(rowIndex, "memo", e.target.value)}
+                              placeholder="비고"
+                            />
+                          </td>
+                          <td className="special-cell special-memo" style={{ textAlign: "center" }}>
+                            <button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="table-shell special-input-shell">
+                  {(() => {
+                    const collabColumns = activeTab.collabColumns || defaultCollabColumns;
+                    const collabEventGroups = groupCollabColumns(collabColumns);
 
-                        return (
+                    return (
                       <table className="excel-table special-input-table">
                         <thead>
                           <tr>
@@ -4149,21 +4517,45 @@ export default function HomePage() {
                                   </td>
                                 ))
                               )}
-                              <td className="special-cell special-memo"><button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button></td>
+                              <td className="special-cell special-memo">
+                                <button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
-                        );
-                      })()}
-                    </div>
-                  )}
-                </section>
-            ) : null}
-          </>
-        )}
-      </main>
-      <footer className="sheet-footer">Copyright ⓒ ETOOS ECI Co.,Ltd. All rights Reserved.</footer>
+                    );
+                  })()}
+                </div>
+              )}
+            </section>
+          ) : null}
+        </div>
+      )}
+
+      {/* 8. 최하단 ETOOS247 시그니처 푸터 */}
+      <footer className="premium-footer">
+        <div className="premium-footer-top">
+          <h2 className="premium-footer-title">/LET'S CONNECT US.</h2>
+          <div className="premium-footer-buttons">
+            <a href="#" className="premium-footer-btn" onClick={(e) => { e.preventDefault(); alert("준비 중인 채널입니다."); }}>CONTACT US</a>
+            <a href="#" className="premium-footer-btn" onClick={(e) => { e.preventDefault(); alert("준비 중인 채널입니다."); }}>BROCHURE</a>
+          </div>
+          <p className="premium-footer-copy">
+            이투스ECI 주식회사 | 서울특별시 서초구 남부순환로 2547, 3층 (서초동 1354-3)<br />
+            COPYRIGHT ⓒ ETOOS ECI Co.,Ltd. ALL RIGHTS RESERVED.
+          </p>
+        </div>
+        <div className="premium-footer-signature-container">
+          <div className="premium-footer-signature">ETOOS247</div>
+          <div className="premium-footer-badges">
+            <span className="premium-footer-badge yellow">이투스ECI | 서울특별시 서초구 남부순환로 2547, 3층</span>
+            <span className="premium-footer-badge yellow">대표번호: 1599-2470</span>
+            <span className="premium-footer-badge blue">WWW.ETOOS247.CO.KR</span>
+            <span className="premium-footer-badge top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>▲ TOP</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
