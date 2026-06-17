@@ -2377,7 +2377,7 @@ select:focus {
 }
 
 .rolling-card-wrapper {
-  flex: 0 0 190px;
+  flex: 0 0 210px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -2385,7 +2385,7 @@ select:focus {
 }
 .rolling-card {
   width: 100%;
-  height: 275px;
+  height: 300px;
   border-radius: 18px;
   overflow: hidden;
   position: relative;
