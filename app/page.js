@@ -3281,8 +3281,26 @@ export default function HomePage() {
                     className="rolling-card-wrapper"
                     onClick={() => handleCardClick(card.id)}
                   >
-                    <div className={`rolling-card ${card.className}`}>
-                      <div className="rolling-card-icon-container">
+                    <div className={`rolling-card ${card.className}`} style={card.className === "card-theme-sns" ? { position: "relative", overflow: "hidden" } : {}}>
+                      {card.className === "card-theme-sns" && (
+                        <img
+                          src="/sns-card-bg.png"
+                          alt="SNS Icons"
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            objectPosition: "center",
+                            borderRadius: "inherit",
+                            opacity: 1,
+                            zIndex: 0,
+                            pointerEvents: "none",
+                          }}
+                        />
+                      )}
+                      <div className="rolling-card-icon-container" style={card.className === "card-theme-sns" ? { position: "relative", zIndex: 1 } : {}}>
                         {card.className === "card-theme-friends" && (
                           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -3296,13 +3314,6 @@ export default function HomePage() {
                             <path d="M11 5L6 9H2v6h4l5 4V5z" />
                             <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
                             <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                          </svg>
-                        )}
-                        {card.className === "card-theme-sns" && (
-                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="18" y1="20" x2="18" y2="10" />
-                            <line x1="12" y1="20" x2="12" y2="4" />
-                            <line x1="6" y1="20" x2="6" y2="14" />
                           </svg>
                         )}
                         {card.className === "card-theme-collab" && (
