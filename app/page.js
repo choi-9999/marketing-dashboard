@@ -552,10 +552,23 @@ function buildFacilitySummary(tab) {
 }
 
 function migrateLegacyTab(tab) {
-  if (tab?.kind === SPECIAL_SOCIAL_TAB_KIND) {
+  if (!tab) return tab;
+  let name = tab.name || "";
+  if (name === "프렌즈") name = "247프렌즈";
+  if (name === "체험단") name = "247체험단";
+  if (name === "합격자취합") name = "합격자 취합";
+  if (!name) {
+    if (tab.kind === SPECIAL_SOCIAL_TAB_KIND) name = "SNS 진단표";
+    else if (tab.kind === SPECIAL_COLLAB_TAB_KIND) name = "협업이벤트";
+    else if (tab.kind === SPECIAL_FACILITY_TAB_KIND) name = "지점시설영상";
+    else if (tab.kind === SPECIAL_MENTOR_TAB_KIND) name = "멘토단 및 장학생";
+    else name = "이름 없는 탭";
+  }
+
+  if (tab.kind === SPECIAL_SOCIAL_TAB_KIND) {
     return {
       id: tab.id || createId("tab"),
-      name: tab.name || "SNS 진단표",
+      name,
       kind: SPECIAL_SOCIAL_TAB_KIND,
       events: [],
       rows: [],
@@ -565,11 +578,11 @@ function migrateLegacyTab(tab) {
     };
   }
 
-  if (tab?.kind === SPECIAL_COLLAB_TAB_KIND) {
+  if (tab.kind === SPECIAL_COLLAB_TAB_KIND) {
     const collabColumns = normalizeCollabColumns(tab.collabColumns || defaultCollabColumns);
     return {
       id: tab.id || createId("tab"),
-      name: tab.name || "협업이벤트",
+      name,
       kind: SPECIAL_COLLAB_TAB_KIND,
       events: [],
       rows: [],
@@ -586,10 +599,10 @@ function migrateLegacyTab(tab) {
     };
   }
 
-  if (tab?.kind === SPECIAL_FACILITY_TAB_KIND) {
+  if (tab.kind === SPECIAL_FACILITY_TAB_KIND) {
     return {
       id: tab.id || createId("tab"),
-      name: tab.name || "지점시설영상",
+      name,
       kind: SPECIAL_FACILITY_TAB_KIND,
       events: [],
       rows: [],
@@ -605,7 +618,7 @@ function migrateLegacyTab(tab) {
     };
   }
 
-  if (tab?.kind === SPECIAL_MENTOR_TAB_KIND) {
+  if (tab.kind === SPECIAL_MENTOR_TAB_KIND) {
     const sortedMentorRows = (Array.isArray(tab.mentorRows) ? tab.mentorRows : [])
       .map((row, index) => createSpecialMentorRow({ ...row, id: row?.id || createId(`mentor-row-${index}`) }))
       .sort((a, b) => {
@@ -616,7 +629,7 @@ function migrateLegacyTab(tab) {
       });
     return {
       id: tab.id || createId("tab"),
-      name: tab.name || "멘토단 및 장학생",
+      name,
       kind: SPECIAL_MENTOR_TAB_KIND,
       events: [],
       rows: [],
@@ -643,7 +656,7 @@ function migrateLegacyTab(tab) {
 
     return {
       id: tab.id || createId("tab"),
-      name: tab.name || "이름 없는 탭",
+      name,
       kind: tab.kind || "default",
       events,
       rows
@@ -678,7 +691,7 @@ function migrateLegacyTab(tab) {
 
     return {
       id: createId(`event-${index}`),
-      name: label || (statusColumns.length === 1 ? tab.name || "기본 이벤트" : `이벤트 ${index + 1}`),
+      name: label || (statusColumns.length === 1 ? name || "기본 이벤트" : `이벤트 ${index + 1}`),
       statusIndex: item.index,
       participantIndex: participantMatch?.index ?? -1
     };
@@ -697,7 +710,7 @@ function migrateLegacyTab(tab) {
     eventDefinitions = [
       {
         id: createId("event-default"),
-        name: tab.name || "기본 이벤트",
+        name: name || "기본 이벤트",
         statusIndex: -1,
         participantIndex: -1
       }
@@ -731,7 +744,7 @@ function migrateLegacyTab(tab) {
 
   return {
     id: tab.id || createId("tab"),
-    name: tab.name || "이름 없는 탭",
+    name,
     kind: "default",
     events: migratedEvents,
     rows: migratedRows
@@ -1581,8 +1594,8 @@ export default function HomePage() {
     { name: "SNS 진단표", category: "ANALYSIS", className: "card-theme-sns", id: rawTabs.find(t => t.kind === SPECIAL_SOCIAL_TAB_KIND)?.id },
     { name: "협업이벤트", category: "COLLABORATION", className: "card-theme-collab", id: rawTabs.find(t => t.kind === SPECIAL_COLLAB_TAB_KIND)?.id },
     { name: "지점시설영상", category: "PROMOTION", className: "card-theme-facility", id: rawTabs.find(t => t.kind === SPECIAL_FACILITY_TAB_KIND)?.id },
-    { name: "합격자 취합", category: "RESULTS", className: "card-theme-pass", id: undefined },
-    { name: "언론보도", category: "NEWS", className: "card-theme-news", id: undefined },
+    { name: "합격자 취합", category: "RESULTS", className: "card-theme-pass", id: rawTabs.find(t => t.name === "합격자 취합")?.id },
+    { name: "언론보도", category: "NEWS", className: "card-theme-news", id: rawTabs.find(t => t.name === "언론보도")?.id },
     { name: "멘토단 및 장학생", category: "SCHOLARSHIP", className: "card-theme-mentor", id: rawTabs.find(t => t.kind === SPECIAL_MENTOR_TAB_KIND)?.id }
   ], [rawTabs]);
 
@@ -4652,7 +4665,7 @@ export default function HomePage() {
                     </tbody>
                   </table>
                 </div>
-              ) : (
+              ) : activeTab.kind === SPECIAL_COLLAB_TAB_KIND ? (
                 <div className="table-shell special-input-shell">
                   {(() => {
                     const collabColumns = activeTab.collabColumns || defaultCollabColumns;
@@ -4738,6 +4751,98 @@ export default function HomePage() {
                       </table>
                     );
                   })()}
+                </div>
+              ) : (
+                <div className="table-shell special-input-shell">
+                  <table className="excel-table special-input-table">
+                    <thead>
+                      <tr>
+                        <th className="special-head special-identity" rowSpan={2} style={{ width: "100px" }}>지역</th>
+                        <th className="special-head special-identity" rowSpan={2} style={{ width: "130px" }}>지점</th>
+                        {(activeTab.events || []).map((event) => (
+                          <th key={event.id} colSpan={2} className="special-head" style={{ textAlign: "center" }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                              <input
+                                className="event-name-input"
+                                value={event.name}
+                                onChange={(e) => updateEventName(event.id, e.target.value)}
+                                style={{ width: "90px", textAlign: "center", background: "transparent", border: "none", color: "inherit", fontWeight: "bold", outline: "none" }}
+                              />
+                              <button
+                                className="mini-button remove-event-btn"
+                                onClick={() => removeEvent(event.id)}
+                                style={{ padding: "2px 4px", fontSize: "0.8rem", cursor: "pointer", background: "transparent", color: "#ef4444", border: "none" }}
+                                title="이벤트 삭제"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          </th>
+                        ))}
+                        <th className="special-head special-memo" rowSpan={2} style={{ width: "80px" }}>행 삭제</th>
+                      </tr>
+                      <tr>
+                        {(activeTab.events || []).map((event) => (
+                          <React.Fragment key={`sub-${event.id}`}>
+                            <th className="special-head" style={{ width: "90px", textAlign: "center" }}>참여여부</th>
+                            <th className="special-head" style={{ width: "90px", textAlign: "center" }}>참여인원</th>
+                          </React.Fragment>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(activeTab.rows || []).map((row, rowIndex) => (
+                        <tr key={row.id}>
+                          <td className="special-cell special-identity">
+                            <input
+                              type="text"
+                              value={row.region ?? ""}
+                              onChange={(e) => updateBaseCell(rowIndex, "region", e.target.value)}
+                              placeholder="지역"
+                            />
+                          </td>
+                          <td className="special-cell special-identity">
+                            <input
+                              type="text"
+                              value={row.branch ?? ""}
+                              onChange={(e) => updateBaseCell(rowIndex, "branch", e.target.value)}
+                              placeholder="지점"
+                            />
+                          </td>
+                          {(activeTab.events || []).map((event) => {
+                            const val = row.eventValues?.[event.id] || { status: "X", participants: "0" };
+                            return (
+                              <React.Fragment key={`${row.id}-${event.id}`}>
+                                <td className="special-cell" style={{ textAlign: "center" }}>
+                                  <select
+                                    value={val.status === "O" ? "O" : "X"}
+                                    onChange={(e) => updateEventCell(rowIndex, event.id, "status", e.target.value)}
+                                    style={{ width: "100%", height: "100%", border: "none", background: "transparent", color: "var(--text-color)", outline: "none", textAlignLast: "center" }}
+                                  >
+                                    <option value="O">O</option>
+                                    <option value="X">X</option>
+                                  </select>
+                                </td>
+                                <td className="special-cell">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    value={val.participants ?? "0"}
+                                    onChange={(e) => updateEventCell(rowIndex, event.id, "participants", e.target.value)}
+                                    placeholder="0"
+                                    style={{ textAlign: "right" }}
+                                  />
+                                </td>
+                              </React.Fragment>
+                            );
+                          })}
+                          <td className="special-cell special-memo" style={{ textAlign: "center" }}>
+                            <button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </section>
