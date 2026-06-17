@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
 
 :root {
-  --bg: #eef1f5;
+  --bg: #ffffff;
   --sheet: #ffffff;
   --grid: #c7cfdd;
   --grid-strong: #95a2b8;
@@ -20,7 +20,7 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
-  background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.04) 0%, rgba(236, 72, 153, 0.04) 90%), var(--bg);
+  background: #ffffff;
   color: var(--text);
   font-family: 'Outfit', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
 }
@@ -1282,7 +1282,7 @@ input, select {
 
 /* 2026 refresh: layered blue report UI */
 :root {
-  --bg: #f8fafc;
+  --bg: #ffffff;
   --sheet: rgba(255, 255, 255, 0.85);
   --grid: #e2e8f0;
   --grid-strong: #cbd5e1;
@@ -1297,11 +1297,7 @@ input, select {
 }
 
 body {
-  background:
-    radial-gradient(circle at top left, rgba(108, 147, 226, 0.20), transparent 28%),
-    radial-gradient(circle at top right, rgba(35, 74, 145, 0.10), transparent 24%),
-    linear-gradient(180deg, rgba(38, 69, 122, 0.04), transparent 260px),
-    var(--bg);
+  background: #ffffff;
   min-height: 100vh;
 }
 
@@ -2285,25 +2281,61 @@ select:focus {
 
 /* Premium Hero */
 .premium-hero {
-  padding: 80px 40px 40px;
+  padding: 120px 40px 60px;
   background: #ffffff;
   text-align: left;
   font-family: 'Outfit', 'Pretendard', sans-serif;
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.hero-dot-decorator {
+  position: absolute;
+  top: 75px;
+  right: 60px;
+  width: 14px;
+  height: 14px;
+  background-color: var(--primary-blue);
+  border-radius: 50%;
+}
+.premium-hero-kicker {
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--primary-blue);
+  margin-bottom: 16px;
 }
 .premium-hero-title {
-  font-size: clamp(2.2rem, 5vw, 4.8rem);
-  font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   margin: 0;
-  color: var(--text-dark);
+}
+.premium-hero-title-line-1 {
+  font-size: clamp(3.5rem, 8vw, 7.5rem);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--primary-blue);
   text-transform: uppercase;
 }
-.premium-hero-title span.outline-blue {
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--primary-blue);
+.premium-hero-title-line-2 {
+  font-size: clamp(3.5rem, 8vw, 7.5rem);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--primary-blue);
+  text-transform: uppercase;
+  margin-left: 32%;
+}
+@media (max-width: 768px) {
+  .premium-hero-title-line-2 {
+    margin-left: 12%;
+  }
 }
 
 /* Marquee Cards */

@@ -3193,9 +3193,11 @@ export default function HomePage() {
         <div className="workbook">
           {/* 2. 히어로 타이틀 */}
           <section className="premium-hero">
+            <div className="hero-dot-decorator"></div>
+            <div className="premium-hero-kicker">ETOOS247</div>
             <h1 className="premium-hero-title">
-              ETOOS247<br />
-              <span className="outline-blue">MARKETING DASHBOARD</span>
+              <span className="premium-hero-title-line-1">MARKETING</span>
+              <span className="premium-hero-title-line-2">DASHBOARD.</span>
             </h1>
           </section>
 
