@@ -4149,7 +4149,7 @@ export default function HomePage() {
               <div className="editor-actions" style={{ marginLeft: "auto", display: "flex", gap: "10px" }}>
                 <button
                   className="mini-button highlight"
-                  onClick={triggerImportFile}
+                  onClick={() => importInputRef.current?.click()}
                   title="엑셀 파일을 가져와 현재 데이터를 교체합니다."
                 >
                   엑셀 불러오기
