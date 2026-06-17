@@ -1560,7 +1560,15 @@ export default function HomePage() {
   };
 
   const handleNavMenuClick = (menuName) => {
-    if (menuName === "지점 대시보드") {
+    if (menuName === "전체 현황") {
+      sortMentorRowsState();
+      setDashboardTabId(OVERVIEW_TAB_ID);
+      setPage("dashboard");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (menuName === "RAWDATASTUDIO") {
+      sortMentorRowsState();
+      setPage("rawdata");
+    } else if (menuName === "지점 대시보드") {
       document.getElementById("our-work-section")?.scrollIntoView({ behavior: "smooth" });
     } else if (menuName === "명예의 전당") {
       const tab = rawTabs.find(t => t.kind === SPECIAL_MENTOR_TAB_KIND);
@@ -3156,33 +3164,40 @@ export default function HomePage() {
           style={{ cursor: "pointer" }}
         >
           <img src="/logo.png" className="premium-navbar-logo" alt="ETOOS ECI Logo" />
-          <span className="premium-navbar-title">이투스247 학원 | 마케팅 관리 시스템</span>
+          <span className="premium-navbar-title">마케팅 대시보드</span>
         </div>
         <ul className="premium-navbar-menu">
-          {["공지사항", "명예의 전당", "지점 대시보드", "체험단 신청"].map((menu) => (
+          {["전체 현황", "RAWDATASTUDIO"].map((menu) => (
             <li key={menu} className="premium-navbar-menu-item">
-              <a href="#" onClick={(e) => { e.preventDefault(); handleNavMenuClick(menu); }}>{menu}</a>
+              <a 
+                href="#" 
+                onClick={(e) => { e.preventDefault(); handleNavMenuClick(menu); }}
+                style={{ 
+                  color: (menu === "전체 현황" && page === "dashboard") || (menu === "RAWDATASTUDIO" && page === "rawdata") 
+                    ? "#ffffff" 
+                    : "rgba(255, 255, 255, 0.7)",
+                  fontWeight: (menu === "전체 현황" && page === "dashboard") || (menu === "RAWDATASTUDIO" && page === "rawdata")
+                    ? "700"
+                    : "500"
+                }}
+              >
+                {menu}
+              </a>
             </li>
           ))}
         </ul>
-        <div className="premium-navbar-actions">
+        <div className="premium-navbar-actions" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {saveState && (
+            <span style={{ fontSize: "0.85rem", opacity: 0.85, color: "rgba(255, 255, 255, 0.8)", fontFamily: "'Outfit', sans-serif" }}>
+              {saveState}
+            </span>
+          )}
           <button
-            className={`premium-navbar-btn ${page === "dashboard" ? "active" : ""}`}
-            onClick={() => {
-              sortMentorRowsState();
-              setPage("dashboard");
-            }}
+            className="premium-navbar-btn active"
+            onClick={forceServerSave}
+            style={{ display: "flex", alignItems: "center", gap: "6px" }}
           >
-            GUEST 지점 사용자
-          </button>
-          <button
-            className={`premium-navbar-btn ${page === "rawdata" ? "active" : ""}`}
-            onClick={() => {
-              sortMentorRowsState();
-              setPage("rawdata");
-            }}
-          >
-            🔒 관리자 모드
+            💾 저장
           </button>
         </div>
       </nav>
