@@ -2341,19 +2341,19 @@ select:focus {
 /* Marquee Cards */
 .marquee-section {
   background: #ffffff;
-  padding: 20px 0 60px;
+  padding: 80px 0 60px;
   overflow: hidden;
   position: relative;
   width: 100%;
 }
 .marquee-title {
   font-family: 'Outfit', 'Pretendard', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 3rem;
+  font-weight: 800;
   color: var(--primary-blue);
-  margin: 0 0 24px 40px;
+  margin: 0 0 48px 40px;
   text-transform: uppercase;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 .marquee-container {
   display: flex;
@@ -2363,7 +2363,7 @@ select:focus {
 }
 .marquee-track {
   display: flex;
-  gap: 24px;
+  gap: 40px;
   width: max-content;
   animation: roll-horizontal 35s linear infinite;
 }
@@ -2375,90 +2375,52 @@ select:focus {
   100% { transform: translateX(-50%); }
 }
 
-.rolling-card {
-  flex: 0 0 280px;
-  height: 280px;
-  border-radius: 20px;
-  overflow: hidden;
-  position: relative;
-  cursor: pointer;
+.rolling-card-wrapper {
+  flex: 0 0 190px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 24px;
-  color: #ffffff;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  gap: 14px;
+  cursor: pointer;
+}
+.rolling-card {
+  width: 100%;
+  height: 275px;
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-blue);
+  box-shadow: 0 8px 24px rgba(0, 59, 255, 0.06);
+  border: 1px solid rgba(0, 59, 255, 0.05);
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
 }
-.rolling-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 59, 255, 0.15);
-  border-color: var(--primary-blue);
+.rolling-card-wrapper:hover .rolling-card {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 32px rgba(0, 59, 255, 0.18);
 }
-.rolling-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.85) 100%);
-  z-index: 1;
+.rolling-card-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: transform 0.3s ease;
 }
-
-/* Card Themes */
-.card-theme-friends {
-  background-color: var(--primary-blue);
+.rolling-card-wrapper:hover .rolling-card-icon-container {
+  transform: scale(1.1);
 }
-.card-theme-friends::after {
-  content: "Friends";
-  position: absolute;
-  top: 40px;
-  left: 40px;
-  font-size: 4rem;
-  font-weight: 800;
-  color: rgba(255,255,255,0.06);
-  font-family: 'Outfit', sans-serif;
-}
-.card-theme-experience {
-  background: radial-gradient(circle at 80% 20%, #fef08a 0%, #ca8a04 100%);
-}
-.card-theme-experience::after {
-  content: "20";
-  position: absolute;
-  top: 40px;
-  left: 40px;
-  font-size: 6rem;
-  font-weight: 800;
-  color: rgba(255,255,255,0.15);
-  font-family: 'Outfit', sans-serif;
-}
-.card-theme-sns {
-  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
-}
-.card-theme-collab {
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-}
-.card-theme-facility {
-  background: linear-gradient(135deg, #0d9488 0%, #115e59 100%);
-}
-.card-theme-mentor {
-  background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
-}
-
-.rolling-card-info {
-  position: relative;
-  z-index: 2;
-}
-.rolling-card-category {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  opacity: 0.8;
-  margin-bottom: 4px;
-}
-.rolling-card-title {
-  font-size: 1.4rem;
+.rolling-card-label {
+  font-family: 'Outfit', 'Pretendard', sans-serif;
+  font-size: 1.05rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  color: var(--primary-blue);
+  text-align: left;
+  padding-left: 2px;
+  transition: color 0.3s ease;
+}
+.rolling-card-wrapper:hover .rolling-card-label {
+  color: #002ecc;
 }
 
 /* Typography Divider */

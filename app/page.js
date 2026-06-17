@@ -3203,18 +3203,61 @@ export default function HomePage() {
 
           {/* 3. 우-좌 롤링 카드 네비게이션 */}
           <section className="marquee-section">
-            <h2 className="marquee-title">Welcome</h2>
+            <h2 className="marquee-title">WHAT WE DO</h2>
             <div className="marquee-container">
               <div className="marquee-track">
                 {[...marqueeCards, ...marqueeCards].map((card, idx) => (
                   <div
                     key={`${card.id || card.name}-${idx}`}
-                    className={`rolling-card ${card.className}`}
+                    className="rolling-card-wrapper"
                     onClick={() => handleCardClick(card.id)}
                   >
-                    <div className="rolling-card-info">
-                      <div className="rolling-card-category">{card.category}</div>
-                      <div className="rolling-card-title">{card.name}</div>
+                    <div className={`rolling-card ${card.className}`}>
+                      <div className="rolling-card-icon-container">
+                        {card.className === "card-theme-friends" && (
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                          </svg>
+                        )}
+                        {card.className === "card-theme-experience" && (
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                          </svg>
+                        )}
+                        {card.className === "card-theme-sns" && (
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10" />
+                            <line x1="12" y1="20" x2="12" y2="4" />
+                            <line x1="6" y1="20" x2="6" y2="14" />
+                          </svg>
+                        )}
+                        {card.className === "card-theme-collab" && (
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                          </svg>
+                        )}
+                        {card.className === "card-theme-facility" && (
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="23 7 16 12 23 17 23 7" />
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                          </svg>
+                        )}
+                        {card.className === "card-theme-mentor" && (
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                            <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    <div className="rolling-card-label">
+                      {card.name}
                     </div>
                   </div>
                 ))}
