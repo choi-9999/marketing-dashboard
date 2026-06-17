@@ -3398,7 +3398,11 @@ export default function HomePage() {
           </section>
 
           {/* 7. 상세 대시보드 영역 (OUR WORK) */}
-          <main id="our-work-section" className="sheet-body" style={{ marginTop: "40px", borderRadius: "16px", border: "1px solid rgba(0,59,255,0.1)", boxShadow: "0 10px 30px rgba(0,0,0,0.03)" }}>
+          <div id="our-work-section" style={{ marginTop: "60px" }}>
+            <h2 className="active-tab-details-title" style={{ margin: "0 0 24px 0", fontSize: "2.4rem", fontWeight: "900", color: "#1c2433" }}>
+              <span className="blue-slash" style={{ color: "var(--primary-blue, #003bff)", marginRight: "8px" }}>/</span>OUR WORK ({isOverviewDashboard ? "전체 현황" : selectedDashboardTab?.name})
+            </h2>
+            <main className="sheet-body" style={{ borderRadius: "16px", border: "1px solid rgba(0,59,255,0.1)", boxShadow: "0 10px 30px rgba(0,0,0,0.03)" }}>
             
             {/* Quick Toggle in OUR WORK */}
             <section className="sheet-panel utility-panel" style={{ border: "none", marginBottom: "20px" }}>
@@ -3425,9 +3429,7 @@ export default function HomePage() {
               </div>
             </section>
 
-            <h2 className="active-tab-details-title" style={{ margin: "20px 0 30px" }}>
-              <span className="blue-slash">/</span>OUR WORK ({isOverviewDashboard ? "전체 현황" : selectedDashboardTab?.name})
-            </h2>
+
 
                         {isOverviewDashboard ? (
               <>
@@ -4207,6 +4209,7 @@ export default function HomePage() {
               </>
             )}
           </main>
+          </div>
         </div>
             ) : (
         <div className="workbook" style={{ marginTop: "40px" }}>
