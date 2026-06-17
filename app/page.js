@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, Fragment } from "react";
 import * as XLSX from "xlsx";
 
 const OVERVIEW_TAB_ID = "__overall__";
@@ -4783,10 +4783,10 @@ export default function HomePage() {
                       </tr>
                       <tr>
                         {(activeTab.events || []).map((event) => (
-                          <React.Fragment key={`sub-${event.id}`}>
+                          <Fragment key={`sub-${event.id}`}>
                             <th className="special-head" style={{ width: "90px", textAlign: "center" }}>참여여부</th>
                             <th className="special-head" style={{ width: "90px", textAlign: "center" }}>참여인원</th>
-                          </React.Fragment>
+                          </Fragment>
                         ))}
                       </tr>
                     </thead>
@@ -4812,7 +4812,7 @@ export default function HomePage() {
                           {(activeTab.events || []).map((event) => {
                             const val = row.eventValues?.[event.id] || { status: "X", participants: "0" };
                             return (
-                              <React.Fragment key={`${row.id}-${event.id}`}>
+                              <Fragment key={`${row.id}-${event.id}`}>
                                 <td className="special-cell" style={{ textAlign: "center" }}>
                                   <select
                                     value={val.status === "O" ? "O" : "X"}
@@ -4833,7 +4833,7 @@ export default function HomePage() {
                                     style={{ textAlign: "right" }}
                                   />
                                 </td>
-                              </React.Fragment>
+                              </Fragment>
                             );
                           })}
                           <td className="special-cell special-memo" style={{ textAlign: "center" }}>
