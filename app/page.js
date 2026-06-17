@@ -1564,7 +1564,9 @@ export default function HomePage() {
       sortMentorRowsState();
       setDashboardTabId(OVERVIEW_TAB_ID);
       setPage("dashboard");
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        document.getElementById("our-work-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     } else if (menuName === "RAWDATASTUDIO") {
       sortMentorRowsState();
       setPage("rawdata");
