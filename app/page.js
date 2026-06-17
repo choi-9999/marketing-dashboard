@@ -1581,6 +1581,8 @@ export default function HomePage() {
     { name: "SNS 진단표", category: "ANALYSIS", className: "card-theme-sns", id: rawTabs.find(t => t.kind === SPECIAL_SOCIAL_TAB_KIND)?.id },
     { name: "협업이벤트", category: "COLLABORATION", className: "card-theme-collab", id: rawTabs.find(t => t.kind === SPECIAL_COLLAB_TAB_KIND)?.id },
     { name: "지점시설영상", category: "PROMOTION", className: "card-theme-facility", id: rawTabs.find(t => t.kind === SPECIAL_FACILITY_TAB_KIND)?.id },
+    { name: "합격자 취합", category: "RESULTS", className: "card-theme-pass", id: undefined },
+    { name: "언론보도", category: "NEWS", className: "card-theme-news", id: undefined },
     { name: "멘토단 및 장학생", category: "SCHOLARSHIP", className: "card-theme-mentor", id: rawTabs.find(t => t.kind === SPECIAL_MENTOR_TAB_KIND)?.id }
   ], [rawTabs]);
 
@@ -3372,41 +3374,60 @@ export default function HomePage() {
                           }}
                         />
                       )}
-                      <div className="rolling-card-icon-container" style={{ position: "relative", zIndex: 1 }}>
-                        {card.className === "card-theme-friends" && (
-                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                          </svg>
-                        )}
-                        {card.className === "card-theme-experience" && (
-                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                          </svg>
-                        )}
-                        {card.className === "card-theme-collab" && (
-                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                          </svg>
-                        )}
-                        {card.className === "card-theme-facility" && (
-                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="23 7 16 12 23 17 23 7" />
-                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-                          </svg>
-                        )}
-                        {card.className === "card-theme-mentor" && (
-                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                            <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
-                          </svg>
-                        )}
-                      </div>
+                      {card.className === "card-theme-pass" && (
+                        <img
+                          src="/pass-card-bg.jpg"
+                          alt="합격자 취합 배경"
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            objectPosition: "center",
+                            borderRadius: "inherit",
+                            opacity: 1,
+                            zIndex: 0,
+                            pointerEvents: "none",
+                          }}
+                        />
+                      )}
+                      {card.className === "card-theme-news" && (
+                        <img
+                          src="/news-card-bg.jpg"
+                          alt="언론보도 배경"
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            objectPosition: "center",
+                            borderRadius: "inherit",
+                            opacity: 1,
+                            zIndex: 0,
+                            pointerEvents: "none",
+                          }}
+                        />
+                      )}
+                      {card.className === "card-theme-mentor" && (
+                        <img
+                          src="/mentor-card-bg.jpg"
+                          alt="멘토단 및 장학생 배경"
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            objectPosition: "center",
+                            borderRadius: "inherit",
+                            opacity: 1,
+                            zIndex: 0,
+                            pointerEvents: "none",
+                          }}
+                        />
+                      )}
                     </div>
                     <div className="rolling-card-label">
                       {card.name}

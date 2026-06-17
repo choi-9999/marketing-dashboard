@@ -2360,6 +2360,7 @@ select:focus {
   overflow: hidden;
   width: 100%;
   position: relative;
+  padding: 16px 0;
 }
 .marquee-track {
   display: flex;
@@ -2401,19 +2402,7 @@ select:focus {
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
   border-color: #94a3b8;
 }
-.card-theme-mentor {
-  background: linear-gradient(135deg, #0f172a, #1e293b) !important;
-}
-.rolling-card-icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  transition: transform 0.3s ease;
-}
-.rolling-card-wrapper:hover .rolling-card-icon-container {
-  transform: scale(1.1);
-}
+
 .rolling-card-label {
   font-family: 'Outfit', 'Pretendard', sans-serif;
   font-size: 1.05rem;
