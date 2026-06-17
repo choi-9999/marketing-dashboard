@@ -3712,7 +3712,7 @@ export default function HomePage() {
                 </section>
 
                 <section className="sheet-panel">
-                  <div className="panel-title-row"><h2>권역별 시설영상 현황</h2><span className="note-text">지점명을 누르면 시설영상 URL이 새 탭에서 열립니다.</span></div>
+                  <div className="panel-title-row"><h2>권역별 시설영상 현황</h2><span className="note-text">지점명을 누르면 영상이 대시보드 내 팝업으로 재생됩니다.</span></div>
                   <div className="facility-region-board">
                     {facilityRegionGroups.length > 0 ? facilityRegionGroups.map((group) => (
                       <section className="facility-region-card" key={`facility-region-${group.region}`}>
