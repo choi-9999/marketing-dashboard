@@ -1560,9 +1560,7 @@ export default function HomePage() {
   };
 
   const handleNavMenuClick = (menuName) => {
-    if (menuName === "종합 성과") {
-      document.getElementById("stats-section")?.scrollIntoView({ behavior: "smooth" });
-    } else if (menuName === "지점 대시보드") {
+    if (menuName === "지점 대시보드") {
       document.getElementById("our-work-section")?.scrollIntoView({ behavior: "smooth" });
     } else if (menuName === "명예의 전당") {
       const tab = rawTabs.find(t => t.kind === SPECIAL_MENTOR_TAB_KIND);
@@ -3161,7 +3159,7 @@ export default function HomePage() {
           <span className="premium-navbar-title">이투스247 학원 | 마케팅 관리 시스템</span>
         </div>
         <ul className="premium-navbar-menu">
-          {["공지사항", "종합 성과", "명예의 전당", "지점 대시보드", "체험단 신청"].map((menu) => (
+          {["공지사항", "명예의 전당", "지점 대시보드", "체험단 신청"].map((menu) => (
             <li key={menu} className="premium-navbar-menu-item">
               <a href="#" onClick={(e) => { e.preventDefault(); handleNavMenuClick(menu); }}>{menu}</a>
             </li>
@@ -3324,47 +3322,6 @@ export default function HomePage() {
                     onClick={() => setActiveSlideIndex(idx)}
                   />
                 ))}
-              </div>
-            </div>
-          </section>
-
-          {/* 6. 통계 매핑 시각화 */}
-          <section id="stats-section" className="stats-section">
-            <div className="stats-header-row">
-              <h2 className="stats-title">
-                <span className="blue-slash">/</span>WHAT WE DO
-              </h2>
-            </div>
-            <div className="stats-grid">
-              <div className="stats-cell">
-                <div className="stats-cell-label">247프렌즈</div>
-                <div className="stats-cell-value">{globalStats.friendsBranchCount}개 지점</div>
-                <div className="stats-cell-desc">프렌즈 참여 지점 수<br />(평균 {globalStats.friendsAvgParticipants}명 참석)</div>
-              </div>
-              <div className="stats-cell">
-                <div className="stats-cell-label">247체험단</div>
-                <div className="stats-cell-value">{globalStats.experienceTotalParticipants}명</div>
-                <div className="stats-cell-desc">체험단 총 등록 인원 수<br />({globalStats.experienceBranchCount}개 지점 활성화)</div>
-              </div>
-              <div className="stats-cell">
-                <div className="stats-cell-label">SNS 마케팅</div>
-                <div className="stats-cell-value">{globalStats.snsAvgScore}점 / 5.0</div>
-                <div className="stats-cell-desc">지점 SNS 평균 진단 점수<br />(블로그 및 인스타 채널 종합)</div>
-              </div>
-              <div className="stats-cell">
-                <div className="stats-cell-label">협업 제휴</div>
-                <div className="stats-cell-value">{globalStats.collabTotalUrls}개 URL</div>
-                <div className="stats-cell-desc">협업 이벤트 URL 총 등록 수<br />(진행 제휴 이벤트 {globalStats.collabEventCount}종)</div>
-              </div>
-              <div className="stats-cell">
-                <div className="stats-cell-label">시설 홍보</div>
-                <div className="stats-cell-value">{globalStats.facilityRatio}%</div>
-                <div className="stats-cell-desc">지점 시설영상 업로드 완료 비율<br />(연결 대상 지점 기준)</div>
-              </div>
-              <div className="stats-cell">
-                <div className="stats-cell-label">멘토 및 장학</div>
-                <div className="stats-cell-value">{(globalStats.mentorTotalAmount / 10000).toLocaleString()}만원</div>
-                <div className="stats-cell-desc">선발 장학생 지급액 합계<br />(총 {globalStats.mentorTotalCount}명 선발 완료)</div>
               </div>
             </div>
           </section>
