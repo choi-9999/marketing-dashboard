@@ -2392,13 +2392,17 @@ select:focus {
   align-items: center;
   justify-content: center;
   background-color: var(--primary-blue);
-  box-shadow: 0 8px 24px rgba(0, 59, 255, 0.06);
-  border: 1px solid rgba(0, 59, 255, 0.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  border: 1px solid #cbd5e1;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
 }
 .rolling-card-wrapper:hover .rolling-card {
   transform: translateY(-8px);
-  box-shadow: 0 16px 32px rgba(0, 59, 255, 0.18);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
+  border-color: #94a3b8;
+}
+.card-theme-mentor {
+  background: linear-gradient(135deg, #0f172a, #1e293b) !important;
 }
 .rolling-card-icon-container {
   display: flex;
