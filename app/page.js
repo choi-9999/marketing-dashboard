@@ -2879,6 +2879,45 @@ export default function HomePage() {
     });
   }
 
+  const exportToExcel = (tab) => {
+    try {
+      let data = [];
+      if (tab.kind === SPECIAL_SOCIAL_TAB_KIND) {
+        data = (tab.socialRows || []).map(r => {
+          const { id, ...rest } = r;
+          return rest;
+        });
+      } else if (tab.kind === SPECIAL_FACILITY_TAB_KIND) {
+        data = (tab.facilityRows || []).map(r => {
+          const { id, ...rest } = r;
+          return rest;
+        });
+      } else if (tab.kind === SPECIAL_MENTOR_TAB_KIND) {
+        data = (tab.mentorRows || []).map(r => {
+          const { id, ...rest } = r;
+          return rest;
+        });
+      } else if (tab.kind === SPECIAL_COLLAB_TAB_KIND) {
+        data = (tab.collabRows || []).map(r => r.values);
+      } else {
+        data = (tab.rows || []).map(r => {
+          const rowObj = { "지역": r.region, "지점": r.branch };
+          tab.events.forEach(e => {
+            rowObj[e.name] = r.eventValues?.[e.id]?.participants || "";
+          });
+          return rowObj;
+        });
+      }
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, tab.name || "Sheet1");
+      XLSX.writeFile(workbook, `${tab.name || "export"}.xlsx`);
+    } catch (err) {
+      console.error(err);
+      alert("엑셀 내보내기 중 오류가 발생했습니다.");
+    }
+  };
+
   function removeRow(rowIndex) {
     updateActiveTab((tab) => {
       if (tab.kind === SPECIAL_SOCIAL_TAB_KIND) {
@@ -4168,17 +4207,7 @@ export default function HomePage() {
                 ) : null}
                 <button
                   className="mini-button"
-                  onClick={
-                    activeTab.kind === SPECIAL_SOCIAL_TAB_KIND
-                      ? addSocialRow
-                      : activeTab.kind === SPECIAL_COLLAB_TAB_KIND
-                      ? addCollabRow
-                      : activeTab.kind === SPECIAL_FACILITY_TAB_KIND
-                      ? addFacilityRow
-                      : activeTab.kind === SPECIAL_MENTOR_TAB_KIND
-                      ? addMentorRow
-                      : () => addRow(activeTab.events.map((e) => e.id))
-                  }
+                  onClick={addRow}
                 >
                   {activeTab.kind === SPECIAL_SOCIAL_TAB_KIND
                     ? "+ 진단 행 추가"
