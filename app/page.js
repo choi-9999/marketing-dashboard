@@ -1580,13 +1580,35 @@ export default function HomePage() {
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   const showcaseSlides = useMemo(() => [
-    { name: "프렌즈", className: "card-theme-friends", desc: "지점 활성화를 위한 동반자, 247프렌즈 캠페인", id: rawTabs.find(t => t.name === "247프렌즈")?.id },
-    { name: "체험단", className: "card-theme-experience", desc: "직접 체험하고 검증하는 247체험단 홍보", id: rawTabs.find(t => t.name === "247체험단")?.id },
-    { name: "SNS 진단표", className: "card-theme-sns", desc: "블로그 및 인스타그램 지점 마케팅 정밀 진단", id: rawTabs.find(t => t.kind === SPECIAL_SOCIAL_TAB_KIND)?.id },
-    { name: "협업이벤트", className: "card-theme-collab", desc: "대형 교육 협력사와의 제휴 공동 프로모션", id: rawTabs.find(t => t.kind === SPECIAL_COLLAB_TAB_KIND)?.id },
-    { name: "지점시설영상", className: "card-theme-facility", desc: "지점 시설 및 분위기를 전달하는 고화질 영상", id: rawTabs.find(t => t.kind === SPECIAL_FACILITY_TAB_KIND)?.id },
-    { name: "멘토단 및 장학생", className: "card-theme-mentor", desc: "합격의 결실을 함께 나누는 명예로운 장학제도", id: rawTabs.find(t => t.kind === SPECIAL_MENTOR_TAB_KIND)?.id }
-  ], [rawTabs]);
+    {
+      name: "체험단",
+      className: "card-theme-experience",
+      desc: "전국 지점의 블로그 체험단 모집 현황 및 지점 마케팅 성과를 투명하게 분석하고 관리하는 시스템",
+      url: "https://etoos247-experience-info.vercel.app/",
+      imgSrc: "/showcase-experience.png"
+    },
+    {
+      name: "합격자 취합",
+      className: "card-theme-pass",
+      desc: "전국 지점에서 배출된 이투스247학원의 합격생 데이터를 실시간으로 취합하고 편리하게 증빙하는 공간",
+      url: "https://admit-collector.vercel.app/",
+      imgSrc: "/showcase-pass.png"
+    },
+    {
+      name: "YOUTUBE",
+      className: "card-theme-youtube",
+      desc: "합격 성공 스토리, 입시 정보 및 이투스247학원의 생생한 현장 소식을 전하는 본사 공식 유튜브 채널",
+      url: "https://www.youtube.com/@etoos247",
+      imgSrc: "/showcase-youtube.png"
+    },
+    {
+      name: "INSTAGRAM",
+      className: "card-theme-instagram",
+      desc: "이투스247학원의 생생한 학원 일상과 최신 마케팅 소식, 이벤트를 공유하는 본사 공식 인스타그램",
+      url: "https://www.instagram.com/etoos247_official/",
+      imgSrc: "/showcase-instagram.png"
+    }
+  ], []);
 
   const marqueeCards = useMemo(() => [
     { name: "247프렌즈", category: "CAMPAIGN", className: "card-theme-friends", id: rawTabs.find(t => t.name === "247프렌즈")?.id },
@@ -3468,25 +3490,38 @@ export default function HomePage() {
                       key={`showcase-${index}`}
                       className={`vertical-showcase-slide ${activeSlideIndex === index ? "active" : ""}`}
                       onClick={() => {
-                        if (slide.id) {
-                          sortMentorRowsState();
-                          setDashboardTabId(slide.id);
-                          setActiveTabId(slide.id);
-                          document.getElementById("our-work-section")?.scrollIntoView({ behavior: "smooth" });
+                        if (slide.url) {
+                          window.open(slide.url, "_blank");
                         }
                       }}
                     >
-                      <div className={`vertical-showcase-image-fallback ${slide.className}`}>
-                        <div style={{ opacity: 0.12, fontSize: "clamp(3rem, 10vw, 8rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase" }}>
+                      <div className={`vertical-showcase-image-fallback ${slide.className}`} style={{ position: "relative", overflow: "hidden", width: "100%", height: "100%" }}>
+                        {slide.imgSrc && (
+                          <img
+                            src={slide.imgSrc}
+                            alt={slide.name}
+                            style={{
+                              position: "absolute",
+                              inset: 0,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              objectPosition: "center",
+                              pointerEvents: "none"
+                            }}
+                          />
+                        )}
+                        <div style={{ position: "absolute", inset: 0, background: "rgba(0, 0, 0, 0.4)", zIndex: 1 }} />
+                        <div style={{ opacity: 0.12, fontSize: "clamp(3rem, 10vw, 8rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", zIndex: 2, position: "relative" }}>
                           {slide.name}
                         </div>
                       </div>
-                      <div className="vertical-showcase-overlay">
+                      <div className="vertical-showcase-overlay" style={{ zIndex: 3 }}>
                         <h3 className="vertical-showcase-tag">
                           <span className="blue-hash">#</span>
                           <span className="white-text">{slide.name}</span>
                         </h3>
-                        <p style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: "1.1rem", marginTop: "12px", maxWidth: "600px", margin: "12px 0 0" }}>
+                        <p style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: "1.1rem", marginTop: "12px", maxWidth: "600px", margin: "12px 0 0" }}>
                           {slide.desc}
                         </p>
                       </div>
