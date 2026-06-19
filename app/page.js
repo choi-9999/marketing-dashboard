@@ -3555,7 +3555,7 @@ export default function HomePage() {
             
             {/* Quick Toggle in OUR WORK */}
             <section className="sheet-panel utility-panel" style={{ border: "none", marginBottom: "20px" }}>
-              <div className="program-chip-row dashboard-scope-row" style={{ padding: 0 }}>
+              <div className="program-chip-row dashboard-scope-row" style={{ padding: "8px 12px" }}>
                 <button
                   className={`program-chip ${isOverviewDashboard ? "active" : ""}`}
                   onClick={() => setDashboardTabId(OVERVIEW_TAB_ID)}
