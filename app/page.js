@@ -3512,9 +3512,6 @@ export default function HomePage() {
                           />
                         )}
                         <div style={{ position: "absolute", inset: 0, background: "rgba(0, 0, 0, 0.4)", zIndex: 1 }} />
-                        <div style={{ opacity: 0.12, fontSize: "clamp(3rem, 10vw, 8rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", zIndex: 2, position: "relative" }}>
-                          {slide.name}
-                        </div>
                       </div>
                       <div className="vertical-showcase-overlay" style={{ zIndex: 3 }}>
                         <h3 className="vertical-showcase-tag">
