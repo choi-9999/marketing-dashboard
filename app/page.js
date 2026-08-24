@@ -3838,10 +3838,8 @@ export default function HomePage() {
 
       const encodedClientId = encodeURIComponent(naverClientId);
       const sdkCandidates = [
-        `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodedClientId}&submodules=geocoder`,
-        `https://openapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodedClientId}&submodules=geocoder`,
-        `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${encodedClientId}&submodules=geocoder`,
-        `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${encodedClientId}&submodules=geocoder`
+        `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${encodedClientId}&submodules=geocoder`,
+        `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${encodedClientId}&submodules=geocoder`
       ];
 
       const existingNaverScript = document.getElementById("naver-map-js");
