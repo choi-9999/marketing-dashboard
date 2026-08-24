@@ -10,15 +10,22 @@ export async function GET(request) {
     return NextResponse.json({ success: false, error: "query is required" }, { status: 400 });
   }
 
-  const clientId = process.env.NAVER_MAP_CLIENT_ID || process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
-  const clientSecret = process.env.NAVER_MAP_CLIENT_SECRET || process.env.NAVER_CLOUD_CLIENT_SECRET;
+  const clientId =
+    process.env.NAVER_MAPS_CLIENT_ID ||
+    process.env.NAVER_MAP_CLIENT_ID ||
+    process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID ||
+    process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
+  const clientSecret =
+    process.env.NAVER_MAPS_CLIENT_SECRET ||
+    process.env.NAVER_MAP_CLIENT_SECRET ||
+    process.env.NAVER_CLOUD_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
     return NextResponse.json(
       {
         success: false,
         error: "NAVER map geocoding credentials are missing",
-        requiredEnv: ["NEXT_PUBLIC_NAVER_CLIENT_ID", "NAVER_MAP_CLIENT_SECRET"]
+        requiredEnv: ["NEXT_PUBLIC_NAVER_MAP_CLIENT_ID", "NAVER_MAPS_CLIENT_SECRET"]
       },
       { status: 500 }
     );

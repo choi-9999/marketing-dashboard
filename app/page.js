@@ -3529,7 +3529,7 @@ export default function HomePage() {
 
     let isMounted = true;
     let sdkWaitTimer = null;
-    const naverClientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
+    const naverClientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
     const isNaverMapEnabled = naverClientId && naverClientId !== "YOUR_NAVER_CLIENT_ID" && naverClientId.trim() !== "";
 
     const resolveNaverBranchCoords = async (branchName) => {
