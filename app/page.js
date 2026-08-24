@@ -3014,6 +3014,21 @@ function CustomDialogModal({ modal, onClose }) {
 
 export default function HomePage() {
   const [page, setPage] = useState("dashboard");
+
+  useEffect(() => {
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+
+    const scrollToTop = () => window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    scrollToTop();
+    const animationFrame = window.requestAnimationFrame(scrollToTop);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
+
   const [rawTabs, setRawTabs] = useState(initialTabs);
   const rawTabsRef = useRef(rawTabs);
   useEffect(() => {
