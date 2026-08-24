@@ -4090,18 +4090,18 @@ export default function HomePage() {
           if (!ignore && normalizedTabs.length > 0) {
             setRawTabs(normalizedTabs);
             setActiveTabId(parsed.activeTabId || normalizedTabs[0].id);
-            setDashboardTabId(parsed.dashboardTabId || OVERVIEW_TAB_ID);
-            setPage(parsed.page === "rawdata" ? "rawdata" : "dashboard");
+            setDashboardTabId(OVERVIEW_TAB_ID);
+            setPage("dashboard");
             setSaveState(
               parsed.storageMode === "shared-kv"
                 ? `공유 서버 데이터 복원됨${restoredAt ? ` · ${restoredAt}` : ""}`
                 : "서버 데이터 복원됨"
             );
             window.localStorage.setItem(BROWSER_SAVE_KEY, JSON.stringify({
-              page: parsed.page,
+              page: "dashboard",
               rawTabs: parsed.rawTabs,
               activeTabId: parsed.activeTabId,
-              dashboardTabId: parsed.dashboardTabId
+              dashboardTabId: OVERVIEW_TAB_ID
             }));
             return;
           }
@@ -4120,8 +4120,8 @@ export default function HomePage() {
         if (!ignore && normalizedTabs.length > 0) {
           setRawTabs(normalizedTabs);
           setActiveTabId(parsed.activeTabId || normalizedTabs[0].id);
-          setDashboardTabId(parsed.dashboardTabId || OVERVIEW_TAB_ID);
-          setPage(parsed.page === "rawdata" ? "rawdata" : "dashboard");
+          setDashboardTabId(OVERVIEW_TAB_ID);
+          setPage("dashboard");
           setSaveState("브라우저 저장본 복원됨");
           return;
         }
