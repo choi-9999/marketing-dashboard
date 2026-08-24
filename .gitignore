@@ -6,3 +6,10 @@ dashboard-preview.png
 
 .vercel
 .env*
+.gemini
+scratch
+scripts
+*.broken*
+*.reconstructed*
+*.recovered
+*.intermediate*
