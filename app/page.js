@@ -7444,7 +7444,17 @@ export default function HomePage() {
                                           </p>
                                         )}
                                       </div>
-                                      <div style={{ marginTop: "14px", display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+                                      <div style={{ marginTop: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#64748b", fontSize: "0.75rem", fontWeight: "700" }}>
+                                          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }} title="공감 수">
+                                            <span aria-hidden="true">♥</span>
+                                            <span>공감 {post.likesCollected === false ? "-" : (post.likes ?? 0)}</span>
+                                          </span>
+                                          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }} title="댓글 수">
+                                            <span aria-hidden="true">💬</span>
+                                            <span>댓글 {post.commentsCollected === false ? "-" : (post.comments ?? 0)}</span>
+                                          </span>
+                                        </div>
                                         <span style={{ fontSize: "0.75rem", color: "#2563eb", fontWeight: "700", display: "flex", alignItems: "center", gap: "2px" }}>
                                           원문 보기 ➔
                                         </span>

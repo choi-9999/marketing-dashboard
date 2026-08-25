@@ -398,8 +398,9 @@ export async function GET(request) {
       throw new Error("No items found in RSS feed.");
     }
 
-    // Inspect recent 5 posts through NAVER's comment and sympathy JSON requests.
-    const targetPosts = fullParsedPosts.slice(0, 5);
+    // Collect reactions for every post displayed in the dashboard (up to 9).
+    // The reaction score itself continues to use only the latest 5 posts.
+    const targetPosts = items;
     let c2Plus = 0;
     let c1Plus = 0;
     let likesCount = 0;
@@ -447,7 +448,9 @@ export async function GET(request) {
       })
     );
 
-    reactionDetails.forEach((r) => {
+    const scoreReactionDetails = reactionDetails.slice(0, 5);
+
+    scoreReactionDetails.forEach((r) => {
       if (r.comments >= 2) c2Plus++;
       if (r.comments >= 1) c1Plus++;
       if (r.likes >= 1) likesCount++;
@@ -468,18 +471,28 @@ export async function GET(request) {
 
     const commentsCollectedCount = reactionDetails.filter((item) => item.commentsCollected).length;
     const likesCollectedCount = reactionDetails.filter((item) => item.likesCollected).length;
+    const promotionsWithReactions = items.map((post, idx) => {
+      const reaction = reactionDetails[idx];
+      return {
+        ...post,
+        comments: reaction?.comments ?? 0,
+        likes: reaction?.likes ?? 0,
+        commentsCollected: reaction?.commentsCollected ?? false,
+        likesCollected: reaction?.likesCollected ?? false
+      };
+    });
 
     return Response.json({
       success: true,
       blogId,
       source: "naver-rss",
-      promotions: items,
+      promotions: promotionsWithReactions,
       blogStats: {
         recent30d,
         lastPosted: lastPostedDate,
         reactionScore,
         reactionDetail: {
-          evaluatedCount: targetPosts.length,
+          evaluatedCount: scoreReactionDetails.length,
           postsWith2PlusComments: c2Plus,
           postsWithComments: c1Plus,
           postsWithLikes: likesCount,
