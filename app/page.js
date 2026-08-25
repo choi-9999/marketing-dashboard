@@ -22,6 +22,25 @@ const getInstagramDisplayCaption = (rawCaption) => {
     .trim();
 };
 
+const getInstagramShortcode = (url) => {
+  const shortcode = String(url || "").match(/\/(?:p|reel|tv)\/([^/?#]+)/i)?.[1] || "";
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  return shortcode && Array.from(shortcode).every((char) => alphabet.includes(char)) ? shortcode : "";
+};
+
+const compareInstagramMediaRecency = (a, b) => {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  const aCode = getInstagramShortcode(a.url);
+  const bCode = getInstagramShortcode(b.url);
+  if (!aCode || !bCode || aCode === bCode) return 0;
+  if (aCode.length !== bCode.length) return bCode.length > aCode.length ? 1 : -1;
+  for (let index = 0; index < aCode.length; index += 1) {
+    const difference = alphabet.indexOf(bCode[index]) - alphabet.indexOf(aCode[index]);
+    if (difference) return difference > 0 ? 1 : -1;
+  }
+  return 0;
+};
+
 const createId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 const createEvent = (name) => ({
@@ -7681,8 +7700,10 @@ export default function HomePage() {
                           const posts = [...(collection?.posts || [])]
                             .sort((a, b) => {
                               if (a.publishedAt && b.publishedAt && a.publishedAt !== b.publishedAt) return b.publishedAt.localeCompare(a.publishedAt);
-                              if (a.publishedAt && !b.publishedAt) return -1;
-                              if (!a.publishedAt && b.publishedAt) return 1;
+                              const mediaOrder = compareInstagramMediaRecency(a, b);
+                              if (mediaOrder) return mediaOrder;
+                              // The collector preserves the Instagram profile's
+                              // newest-first order for posts without a date.
                               return 0;
                             })
                             .slice(0, 12);

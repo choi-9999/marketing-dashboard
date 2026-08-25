@@ -101,6 +101,25 @@ function cleanCount(value) {
   return Number.isFinite(number) && number >= 0 ? Math.round(number) : null;
 }
 
+function getInstagramShortcode(url) {
+  const shortcode = String(url || "").match(/\/(?:p|reel|tv)\/([^/?#]+)/i)?.[1] || "";
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  return shortcode && Array.from(shortcode).every((char) => alphabet.includes(char)) ? shortcode : "";
+}
+
+function compareInstagramMediaRecency(a, b) {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  const aCode = getInstagramShortcode(a.url);
+  const bCode = getInstagramShortcode(b.url);
+  if (!aCode || !bCode || aCode === bCode) return 0;
+  if (aCode.length !== bCode.length) return bCode.length > aCode.length ? 1 : -1;
+  for (let index = 0; index < aCode.length; index += 1) {
+    const difference = alphabet.indexOf(bCode[index]) - alphabet.indexOf(aCode[index]);
+    if (difference) return difference > 0 ? 1 : -1;
+  }
+  return 0;
+}
+
 function sortPostsByPublishedAt(posts) {
   return posts
     .map((post, sourceIndex) => ({ ...post, sourceIndex }))
@@ -108,8 +127,10 @@ function sortPostsByPublishedAt(posts) {
       if (a.publishedAt && b.publishedAt && a.publishedAt !== b.publishedAt) {
         return b.publishedAt.localeCompare(a.publishedAt);
       }
-      if (a.publishedAt && !b.publishedAt) return -1;
-      if (!a.publishedAt && b.publishedAt) return 1;
+      const mediaOrder = compareInstagramMediaRecency(a, b);
+      if (mediaOrder) return mediaOrder;
+      // Preserve Instagram's newest-first profile order when either post has
+      // no date, rather than moving undated reels below every dated post.
       return a.sourceIndex - b.sourceIndex;
     })
     .map(({ sourceIndex, ...post }) => post);
@@ -141,7 +162,7 @@ function summarizeActivity(posts) {
 
   return {
     recent30d: datedPosts.filter((post) => post.publishedAt >= cutoff && post.publishedAt <= koreaToday).length,
-    lastPosted: datedPosts[0]?.publishedAt || "",
+    lastPosted: posts[0]?.publishedAt || "",
     recentSixLikeAverage,
     reactionScore
   };

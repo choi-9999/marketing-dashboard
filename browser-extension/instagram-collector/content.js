@@ -47,10 +47,15 @@
   };
 
   const extractDate = (altText) => {
-    const englishDate = String(altText || "").match(/\b([A-Za-z]+ \d{1,2}, \d{4})\b/i);
+    const englishDate = String(altText || "").match(/\b([A-Za-z]+) (\d{1,2}), (\d{4})\b/i);
     if (englishDate) {
-      const date = new Date(englishDate[1]);
-      if (!Number.isNaN(date.getTime())) return date.toISOString().slice(0, 10);
+      const monthIndex = [
+        "january", "february", "march", "april", "may", "june",
+        "july", "august", "september", "october", "november", "december"
+      ].indexOf(englishDate[1].toLowerCase());
+      if (monthIndex >= 0) {
+        return `${englishDate[3]}-${String(monthIndex + 1).padStart(2, "0")}-${englishDate[2].padStart(2, "0")}`;
+      }
     }
     const koreanDate = String(altText || "").match(/(20\d{2})년\s*(\d{1,2})월\s*(\d{1,2})일/);
     if (koreanDate) {
@@ -68,14 +73,35 @@
     return Number.isFinite(number) ? Math.round(number) : null;
   };
 
+  const getShortcode = (url) => {
+    const shortcode = String(url || "").match(/\/(?:p|reel|tv)\/([^/?#]+)/i)?.[1] || "";
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    return shortcode && Array.from(shortcode).every((char) => alphabet.includes(char)) ? shortcode : "";
+  };
+
+  const compareMediaRecency = (a, b) => {
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    const aCode = getShortcode(a.url);
+    const bCode = getShortcode(b.url);
+    if (!aCode || !bCode || aCode === bCode) return 0;
+    if (aCode.length !== bCode.length) return bCode.length > aCode.length ? 1 : -1;
+    for (let index = 0; index < aCode.length; index += 1) {
+      const difference = alphabet.indexOf(bCode[index]) - alphabet.indexOf(aCode[index]);
+      if (difference) return difference > 0 ? 1 : -1;
+    }
+    return 0;
+  };
+
   const sortByPublishedAt = (posts) => posts
     .map((post, sourceIndex) => ({ ...post, sourceIndex }))
     .sort((a, b) => {
       if (a.publishedAt && b.publishedAt && a.publishedAt !== b.publishedAt) {
         return b.publishedAt.localeCompare(a.publishedAt);
       }
-      if (a.publishedAt && !b.publishedAt) return -1;
-      if (!a.publishedAt && b.publishedAt) return 1;
+      const mediaOrder = compareMediaRecency(a, b);
+      if (mediaOrder) return mediaOrder;
+      // Instagram profile grids are already newest-first. If either date could
+      // not be enriched, keep that source order instead of pushing reels down.
       return a.sourceIndex - b.sourceIndex;
     })
     .map(({ sourceIndex, ...post }) => post);
@@ -120,26 +146,40 @@
 
   async function enrichPost(post) {
     try {
-      const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 10000);
-      const response = await fetch(post.url, {
-        credentials: "include",
-        cache: "no-store",
-        signal: controller.signal
-      });
-      window.clearTimeout(timeout);
-      if (!response.ok) return post;
+      let documentCopy = null;
+      for (const credentials of ["omit", "include"]) {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 10000);
+        try {
+          const response = await fetch(post.url, {
+            credentials,
+            cache: "no-store",
+            signal: controller.signal
+          });
+          if (!response.ok) continue;
+          const html = await response.text();
+          const candidate = new DOMParser().parseFromString(html, "text/html");
+          const hasMetadata = candidate.querySelector('meta[property="og:description"], meta[property="article:published_time"]');
+          if (hasMetadata) {
+            documentCopy = candidate;
+            break;
+          }
+        } finally {
+          window.clearTimeout(timeout);
+        }
+      }
+      if (!documentCopy) return post;
 
-      const html = await response.text();
-      const documentCopy = new DOMParser().parseFromString(html, "text/html");
       const description = documentCopy.querySelector('meta[property="og:description"]')?.content || "";
       const publishedMeta = documentCopy.querySelector('meta[property="article:published_time"]')?.content || "";
       const englishEngagement = description.match(/([\d,.]+(?:\s?[KMB])?)\s+likes?,\s+([\d,.]+(?:\s?[KMB])?)\s+comments?/i);
       const koreanEngagement = description.match(/좋아요\s*([\d,.]+(?:\s?[천만])?)개?.*?댓글\s*([\d,.]+(?:\s?[천만])?)개?/i);
       const engagement = englishEngagement || koreanEngagement;
+      const descriptionCaption = description.match(/:\s*"([\s\S]*?)"\.?\s*$/)?.[1]?.trim() || "";
 
       return {
         ...post,
+        caption: descriptionCaption || post.caption,
         publishedAt: publishedMeta ? publishedMeta.slice(0, 10) : extractDate(description) || post.publishedAt,
         likes: engagement ? parseCompactCount(engagement[1]) : null,
         comments: engagement ? parseCompactCount(engagement[2]) : null
@@ -204,9 +244,11 @@
       const cutoff = cutoffDate.toISOString().slice(0, 10);
       const datedPosts = enrichedPosts.filter((post) => post.publishedAt);
       const oldestPublishedAt = datedPosts.at(-1)?.publishedAt || "";
+      const latestWindowHasDates = enrichedPosts.slice(0, Math.min(12, enrichedPosts.length))
+        .every((post) => Boolean(post.publishedAt));
       const isLoggedOut = Boolean(document.querySelector('a[href*="/accounts/login"], form[action*="/accounts/login"]')) ||
         Array.from(document.querySelectorAll("button")).some((button) => ["로그인", "log in"].includes(button.textContent.trim().toLowerCase()));
-      const coverageComplete = !isLoggedOut && Boolean(oldestPublishedAt) && oldestPublishedAt < cutoff;
+      const coverageComplete = !isLoggedOut && latestWindowHasDates && Boolean(oldestPublishedAt) && oldestPublishedAt < cutoff;
       const result = await sendCollection(enrichedPosts, coverageComplete);
       badge.style.background = "rgba(5, 150, 105, 0.96)";
       badge.textContent = coverageComplete
