@@ -2128,9 +2128,11 @@ function formatStatusTimestamp(value) {
 
 function SnsMetricEditorModal({ isOpen, onClose, branchName, socialRow, onSave, onAutoSyncBlog, isSyncing }) {
   const [formData, setFormData] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
-    if (socialRow) {
+    if (isOpen && socialRow) {
       setFormData({
         blogUrl: socialRow.blogUrl || "",
         instagramUrl: socialRow.instagramUrl || "",
@@ -2148,8 +2150,10 @@ function SnsMetricEditorModal({ isOpen, onClose, branchName, socialRow, onSave, 
         brandInfoScore: socialRow.brandInfoScore ?? 0,
         memo: socialRow.memo || ""
       });
+      setIsSaving(false);
+      setSaveError("");
     }
-  }, [socialRow, isOpen]);
+  }, [branchName, isOpen]);
 
   if (!isOpen) return null;
 
@@ -2157,13 +2161,21 @@ function SnsMetricEditorModal({ isOpen, onClose, branchName, socialRow, onSave, 
     setFormData(prev => ({ ...prev, [key]: val }));
   };
 
-  const handleSave = () => {
-    onSave(branchName, formData);
-    onClose();
+  const handleSave = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    setSaveError("");
+    const result = await onSave(branchName, formData);
+    if (result?.ok) {
+      onClose();
+      return;
+    }
+    setSaveError(result?.error || "서버 저장을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    setIsSaving(false);
   };
 
   return (
-    <div className="video-modal-backdrop" onClick={onClose} style={{ zIndex: 10000 }}>
+    <div className="video-modal-backdrop" onClick={() => { if (!isSaving) onClose(); }} style={{ zIndex: 10000 }}>
       <div 
         className="video-modal-container" 
         onClick={(e) => e.stopPropagation()} 
@@ -2178,7 +2190,8 @@ function SnsMetricEditorModal({ isOpen, onClose, branchName, socialRow, onSave, 
           </div>
           <button 
             className="video-modal-close-btn" 
-            onClick={onClose} 
+            onClick={() => { if (!isSaving) onClose(); }}
+            disabled={isSaving}
             style={{ background: "#f1f5f9", border: "none", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", fontSize: "1rem", color: "#64748b" }}
           >
             ✕
@@ -2396,8 +2409,14 @@ function SnsMetricEditorModal({ isOpen, onClose, branchName, socialRow, onSave, 
         </div>
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "24px", paddingTop: "16px", borderTop: "1px solid #e2e8f0" }}>
+          {saveError && (
+            <div role="alert" style={{ marginRight: "auto", alignSelf: "center", color: "#dc2626", fontSize: "0.78rem", fontWeight: "700" }}>
+              {saveError}
+            </div>
+          )}
           <button
             onClick={onClose}
+            disabled={isSaving}
             style={{
               padding: "10px 20px",
               background: "#f1f5f9",
@@ -2406,13 +2425,15 @@ function SnsMetricEditorModal({ isOpen, onClose, branchName, socialRow, onSave, 
               borderRadius: "10px",
               fontSize: "0.88rem",
               fontWeight: "700",
-              cursor: "pointer"
+              cursor: isSaving ? "not-allowed" : "pointer",
+              opacity: isSaving ? 0.6 : 1
             }}
           >
             취소
           </button>
           <button
             onClick={handleSave}
+            disabled={isSaving}
             style={{
               padding: "10px 24px",
               background: "#2563eb",
@@ -2421,11 +2442,12 @@ function SnsMetricEditorModal({ isOpen, onClose, branchName, socialRow, onSave, 
               borderRadius: "10px",
               fontSize: "0.88rem",
               fontWeight: "800",
-              cursor: "pointer",
+              cursor: isSaving ? "wait" : "pointer",
+              opacity: isSaving ? 0.75 : 1,
               boxShadow: "0 4px 6px -1px rgba(37, 99, 235, 0.2)"
             }}
           >
-            저장 및 점수 최신화
+            {isSaving ? "저장 및 검증 중..." : "저장 및 점수 최신화"}
           </button>
         </div>
       </div>
@@ -3495,41 +3517,55 @@ export default function HomePage() {
     }
   }, [instagramCollections, loadInstagramCollection]);
 
-  const handleSaveSnsMetrics = (targetBranch, updatedFields) => {
-    setRawTabs(prevTabs => {
-      const nextTabs = prevTabs.map(tab => {
-        if (tab.kind !== SPECIAL_SOCIAL_TAB_KIND) return tab;
-        const newRows = (tab.socialRows || []).map(r => {
-          if (r.branch.trim() !== targetBranch.trim()) return r;
-          return {
-            ...r,
-            ...updatedFields
-          };
-        });
-        return {
-          ...tab,
-          socialRows: newRows
-        };
+  const handleSaveSnsMetrics = async (targetBranch, updatedFields) => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
+    }
+
+    const nextTabs = rawTabsRef.current.map(tab => {
+      if (tab.kind !== SPECIAL_SOCIAL_TAB_KIND) return tab;
+      const newRows = (tab.socialRows || []).map(r => {
+        if (r.branch.trim() !== targetBranch.trim()) return r;
+        return { ...r, ...updatedFields };
       });
-      const payload = { page, rawTabs: nextTabs, activeTabId, dashboardTabId };
+      return { ...tab, socialRows: newRows };
+    });
+    const payload = { page, rawTabs: nextTabs, activeTabId, dashboardTabId };
+
+    rawTabsRef.current = nextTabs;
+    setRawTabs(nextTabs);
+
+    try {
       window.localStorage.setItem(BROWSER_SAVE_KEY, JSON.stringify(payload));
       setSaveState("SNS 지표 서버 저장 중...");
-      fetch("/api/rawtabs", {
+      const saveResponse = await fetch("/api/rawtabs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
         cache: "no-store"
-      })
-        .then((response) => {
-          if (!response.ok) throw new Error("SNS metrics save failed");
-          setSaveState("SNS 지표 저장 완료");
-        })
-        .catch((error) => {
-          console.error("Failed to save SNS metrics.", error);
-          setSaveState("SNS 지표 저장 실패");
-        });
-      return nextTabs;
-    });
+      });
+      const saveResult = await saveResponse.json().catch(() => null);
+      if (!saveResponse.ok) throw new Error(saveResult?.error || "SNS metrics save failed");
+
+      const verifyResponse = await fetch("/api/rawtabs", { cache: "no-store" });
+      const verifyResult = await verifyResponse.json().catch(() => null);
+      const verifiedRow = verifyResult?.rawTabs
+        ?.find((tab) => tab.kind === SPECIAL_SOCIAL_TAB_KIND)
+        ?.socialRows?.find((row) => row.branch.trim() === targetBranch.trim());
+      const isVerified = verifyResponse.ok && verifiedRow && Object.entries(updatedFields).every(
+        ([key, value]) => String(verifiedRow[key] ?? "") === String(value ?? "")
+      );
+      if (!isVerified) throw new Error("saved data verification failed");
+
+      const savedAt = formatStatusTimestamp(verifyResult.updatedAt || saveResult?.updatedAt);
+      setSaveState(`SNS 지표 저장 완료${savedAt ? ` · ${savedAt}` : ""}`);
+      return { ok: true };
+    } catch (error) {
+      console.error("Failed to save SNS metrics.", error);
+      setSaveState("SNS 지표 저장 실패");
+      return { ok: false, error: "저장에 실패했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요." };
+    }
   };
 
   const [batchSyncProgress, setBatchSyncProgress] = useState(null);
