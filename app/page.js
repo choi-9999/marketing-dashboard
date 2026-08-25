@@ -424,6 +424,7 @@ function normalizeBranchKey(branch) {
 }
 
 const branchCoordinateMap = {
+  "본사": [37.4842509, 127.029114],
   "목동": [37.5255, 126.8640],
   "도봉": [37.6688, 127.0470],
   "인천송도": [37.3850, 126.6540],
@@ -454,6 +455,7 @@ const branchCoordinateMap = {
 };
 
 const branchAddressMap = {
+  "본사": "서울특별시 서초구 남부순환로 2547",
   "대치": "서울특별시 강남구 역삼로 432 1층(대치동 910-2)",
   "강북": "서울특별시 노원구 노원로236 8층 (하계동 256-8)",
   "노량진": "서울특별시 동작구 노량진로 104 리더스타워 4층 (노량진동 41-9)",
@@ -3417,6 +3419,14 @@ export default function HomePage() {
       .filter(Boolean);
     return [...new Set(list)].sort();
   }, [rawTabs]);
+  const snsAnalysisBranches = useMemo(() => {
+    const socialBranches = rawTabs
+      .find((tab) => tab.kind === SPECIAL_SOCIAL_TAB_KIND)
+      ?.socialRows?.map((row) => row.branch.trim())
+      .filter(Boolean) || [];
+    return [...new Set([...allBranches, ...socialBranches])].sort();
+  }, [allBranches, rawTabs]);
+  const analysisBranches = page === "sns" ? snsAnalysisBranches : allBranches;
   const [selectedCollabBranch, setSelectedCollabBranch] = useState(null);
   const [selectedCollabEvent, setSelectedCollabEvent] = useState(null);
   const [selectedOverviewBranch, setSelectedOverviewBranch] = useState(null);
@@ -7175,7 +7185,7 @@ export default function HomePage() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            const matchedBranch = allBranches.find(b => b.toLowerCase() === searchQuery.toLowerCase().trim());
+                            const matchedBranch = analysisBranches.find(b => b.toLowerCase() === searchQuery.toLowerCase().trim());
                             if (matchedBranch) {
                               setSelectedBranch(matchedBranch);
                               setSearchQuery(matchedBranch);
@@ -7202,7 +7212,7 @@ export default function HomePage() {
                     {/* Autocomplete Dropdown list */}
                     {searchQuery && searchQuery !== selectedBranch && (
                       (() => {
-                        const filtered = allBranches.filter(b => b.toLowerCase().includes(searchQuery.toLowerCase()));
+                        const filtered = analysisBranches.filter(b => b.toLowerCase().includes(searchQuery.toLowerCase()));
                         return filtered.length > 0 ? (
                           <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "16px", marginTop: "8px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)", maxHeight: "250px", overflowY: "auto", zIndex: 9999 }}>
                             {filtered.map(b => (
@@ -7217,7 +7227,7 @@ export default function HomePage() {
                                 onMouseEnter={(e) => e.target.style.background = "#f8fafc"}
                                 onMouseLeave={(e) => e.target.style.background = "transparent"}
                               >
-                                📍 {b} 지점
+                                📍 {b === "본사" ? "본사" : `${b} 지점`}
                               </div>
                             ))}
                           </div>
@@ -7239,7 +7249,7 @@ export default function HomePage() {
                         {/* 0. 지점명 SNS 분석 보고서 헤더 */}
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
                           <h2 className="marquee-title" style={{ margin: 0 }}>
-                            {selectedBranch}점 {page === "competitors" ? "경쟁사 비교 보고서" : "SNS 분석 보고서"}
+                            {selectedBranch === "본사" ? "본사" : `${selectedBranch}점`} {page === "competitors" ? "경쟁사 비교 보고서" : "SNS 분석 보고서"}
                           </h2>
                           <div
                             style={{ position: "relative" }}
@@ -9088,7 +9098,7 @@ export default function HomePage() {
                       {/* Suggested chips list */}
                       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "10px", maxWidth: "650px", margin: "0 auto" }}>
                         {(page === "sns" 
-                          ? ["분당정자", "강북", "다산", "목동", "광명", "김포", "부산대", "대구달서", "인천송도", "대전둔산"]
+                          ? ["본사", "분당정자", "강북", "다산", "목동", "광명", "김포", "부산대", "대구달서", "인천송도", "대전둔산"]
                           : ["목동", "인천송도", "도봉", "대전둔산", "일산서구", "강남", "분당정자", "부산대", "대구수성", "광주동구"]
                         ).map(b => (
                           <button
