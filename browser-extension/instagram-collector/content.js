@@ -1,4 +1,7 @@
 (() => {
+  const INSTAGRAM_EPOCH_MS = 1314220021721n;
+  const INSTAGRAM_TIMESTAMP_SHIFT = 23n;
+  const KOREA_OFFSET_MS = 9 * 60 * 60 * 1000;
   const params = new URLSearchParams(window.location.hash.slice(1));
   const token = params.get("etoos247_collect");
   const dashboardOrigin = params.get("etoos247_origin");
@@ -79,6 +82,29 @@
     return shortcode && Array.from(shortcode).every((char) => alphabet.includes(char)) ? shortcode : "";
   };
 
+  const getPublishedDateFromInstagramUrl = (url) => {
+    const shortcode = getShortcode(url);
+    if (!shortcode) return "";
+
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    try {
+      let mediaId = 0n;
+      for (const char of shortcode) {
+        const value = alphabet.indexOf(char);
+        if (value < 0) return "";
+        mediaId = mediaId * 64n + BigInt(value);
+      }
+
+      const timestampMs = Number((mediaId >> INSTAGRAM_TIMESTAMP_SHIFT) + INSTAGRAM_EPOCH_MS);
+      const earliestInstagramDate = Date.UTC(2010, 0, 1);
+      const latestReasonableDate = Date.now() + 7 * 24 * 60 * 60 * 1000;
+      if (!Number.isFinite(timestampMs) || timestampMs < earliestInstagramDate || timestampMs > latestReasonableDate) return "";
+      return new Date(timestampMs + KOREA_OFFSET_MS).toISOString().slice(0, 10);
+    } catch {
+      return "";
+    }
+  };
+
   const compareMediaRecency = (a, b) => {
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
     const aCode = getShortcode(a.url);
@@ -137,7 +163,7 @@
         url,
         thumbnailUrl: image.currentSrc || image.src,
         caption,
-        publishedAt: extractDate(rawCaption),
+        publishedAt: getPublishedDateFromInstagramUrl(url) || extractDate(rawCaption),
         type: url.includes("/reel/") ? "reel" : carouselIcon ? "carousel" : "image"
       });
       return posts;
@@ -180,7 +206,7 @@
       return {
         ...post,
         caption: descriptionCaption || post.caption,
-        publishedAt: publishedMeta ? publishedMeta.slice(0, 10) : extractDate(description) || post.publishedAt,
+        publishedAt: getPublishedDateFromInstagramUrl(post.url) || (publishedMeta ? publishedMeta.slice(0, 10) : "") || post.publishedAt || extractDate(description),
         likes: engagement ? parseCompactCount(engagement[1]) : null,
         comments: engagement ? parseCompactCount(engagement[2]) : null
       };

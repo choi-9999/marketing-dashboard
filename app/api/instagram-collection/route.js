@@ -9,6 +9,9 @@ export const revalidate = 0;
 const TOKEN_TTL_SECONDS = 5 * 60;
 const CACHE_TTL_SECONDS = 30 * 24 * 60 * 60;
 const MAX_POSTS = 60;
+const INSTAGRAM_EPOCH_MS = 1314220021721n;
+const INSTAGRAM_TIMESTAMP_SHIFT = 23n;
+const KOREA_OFFSET_MS = 9 * 60 * 60 * 1000;
 const localCachePath = path.join(process.cwd(), "data", "instagramPosts.json");
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -107,6 +110,29 @@ function getInstagramShortcode(url) {
   return shortcode && Array.from(shortcode).every((char) => alphabet.includes(char)) ? shortcode : "";
 }
 
+function getPublishedDateFromInstagramUrl(url) {
+  const shortcode = getInstagramShortcode(url);
+  if (!shortcode) return "";
+
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  try {
+    let mediaId = 0n;
+    for (const char of shortcode) {
+      const value = alphabet.indexOf(char);
+      if (value < 0) return "";
+      mediaId = mediaId * 64n + BigInt(value);
+    }
+
+    const timestampMs = Number((mediaId >> INSTAGRAM_TIMESTAMP_SHIFT) + INSTAGRAM_EPOCH_MS);
+    const earliestInstagramDate = Date.UTC(2010, 0, 1);
+    const latestReasonableDate = Date.now() + 7 * 24 * 60 * 60 * 1000;
+    if (!Number.isFinite(timestampMs) || timestampMs < earliestInstagramDate || timestampMs > latestReasonableDate) return "";
+    return new Date(timestampMs + KOREA_OFFSET_MS).toISOString().slice(0, 10);
+  } catch {
+    return "";
+  }
+}
+
 function compareInstagramMediaRecency(a, b) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   const aCode = getInstagramShortcode(a.url);
@@ -184,7 +210,7 @@ function sanitizePosts(posts) {
       url,
       thumbnailUrl,
       caption: cleanText(post?.caption, 500),
-      publishedAt: cleanPublishedAt(post?.publishedAt),
+      publishedAt: getPublishedDateFromInstagramUrl(url) || cleanPublishedAt(post?.publishedAt),
       likes: cleanCount(post?.likes),
       comments: cleanCount(post?.comments),
       type: ["reel", "carousel", "image"].includes(post?.type) ? post.type : "image"
@@ -192,6 +218,16 @@ function sanitizePosts(posts) {
     return result;
   }, []);
   return sortPostsByPublishedAt(sanitized);
+}
+
+function normalizeCollection(collection) {
+  if (!collection) return null;
+  const posts = sanitizePosts(collection.posts);
+  return {
+    ...collection,
+    posts,
+    ...summarizeActivity(posts)
+  };
 }
 
 async function readLocalCache() {
@@ -238,7 +274,7 @@ export async function GET(request) {
   try {
     const collection = await readCollection(branch);
     return Response.json(
-      { ok: true, collection: collection || null },
+      { ok: true, collection: normalizeCollection(collection) },
       { headers: corsHeaders }
     );
   } catch (error) {
