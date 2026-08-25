@@ -4304,6 +4304,7 @@ export default function HomePage() {
               activeTabId: parsed.activeTabId,
               dashboardTabId: OVERVIEW_TAB_ID
             }));
+            setIsHydrated(true);
             return;
           }
         }
@@ -5566,7 +5567,7 @@ export default function HomePage() {
     }));
   }
 
-  function updateSpecialCell(rowIndex, field, value) {
+  function updateSocialCell(rowIndex, field, value) {
     updateActiveTab((tab) => ({
       ...tab,
       socialRows: (tab.socialRows || []).map((row, index) => {
