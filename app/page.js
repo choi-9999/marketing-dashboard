@@ -10,6 +10,18 @@ const SPECIAL_FACILITY_TAB_KIND = "special-facility";
 const SPECIAL_MENTOR_TAB_KIND = "special-mentor";
 const BROWSER_SAVE_KEY = "branch-activation-dashboard-state";
 
+const getInstagramDisplayCaption = (rawCaption) => {
+  const caption = String(rawCaption || "").replace(/\s+/g, " ").trim();
+  const marker = "may be an image of text that says";
+  const markerIndex = caption.toLowerCase().indexOf(marker);
+  if (markerIndex < 0) return caption;
+  return caption
+    .slice(markerIndex + marker.length)
+    .replace(/^[\s:："'“”‘’]+/, "")
+    .replace(/[\s"'“”‘’]+$/, "")
+    .trim();
+};
+
 const createId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 const createEvent = (name) => ({
@@ -4399,9 +4411,14 @@ export default function HomePage() {
     if (collection.coverageComplete === true && Number.isFinite(collection.recent30d)) {
       updatedFields.instagramRecentPosts = collection.recent30d;
     }
+    if (Number.isFinite(collection.reactionScore)) {
+      updatedFields.instagramReactionScore = collection.reactionScore;
+    }
     const isRecentCountSame = updatedFields.instagramRecentPosts === undefined ||
       Number(currentRow.instagramRecentPosts || 0) === updatedFields.instagramRecentPosts;
-    if (isRecentCountSame && currentRow.instagramLastPosted === updatedFields.instagramLastPosted) return;
+    const isReactionScoreSame = updatedFields.instagramReactionScore === undefined ||
+      Number(currentRow.instagramReactionScore || 0) === updatedFields.instagramReactionScore;
+    if (isRecentCountSame && isReactionScoreSame && currentRow.instagramLastPosted === updatedFields.instagramLastPosted) return;
 
     handleSaveSnsMetrics(selectedBranch, updatedFields);
   }, [instagramCollections, selectedBranch]);
@@ -7688,14 +7705,16 @@ export default function HomePage() {
 
                               {posts.length > 0 ? (
                                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: "4px", overflow: "hidden", borderRadius: "16px", background: "#e2e8f0", border: "1px solid #e2e8f0" }}>
-                                  {posts.map((post, postIndex) => (
+                                  {posts.map((post, postIndex) => {
+                                    const displayCaption = getInstagramDisplayCaption(post.caption) || "Instagram 게시물";
+                                    return (
                                     <a
                                       key={`${post.url}-${postIndex}`}
                                       href={post.url}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      aria-label={`${selectedBranch} Instagram 게시물 열기${post.caption ? `: ${post.caption}` : ""}`}
-                                      title={post.caption || "Instagram 게시물 열기"}
+                                      aria-label={`${selectedBranch} Instagram 게시물 열기: ${displayCaption}`}
+                                      title={displayCaption}
                                       style={{
                                         position: "relative",
                                         display: "block",
@@ -7710,7 +7729,7 @@ export default function HomePage() {
                                       {post.thumbnailUrl && (
                                         <img
                                           src={post.thumbnailUrl}
-                                          alt={post.caption || `${selectedBranch} Instagram 게시물 썸네일`}
+                                          alt={displayCaption || `${selectedBranch} Instagram 게시물 썸네일`}
                                           loading="lazy"
                                           onError={(event) => { event.currentTarget.style.display = "none"; }}
                                           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform .25s ease" }}
@@ -7723,7 +7742,7 @@ export default function HomePage() {
                                       </span>
                                       <div style={{ position: "absolute", inset: "auto 0 0", padding: "36px 12px 12px", background: "linear-gradient(transparent, rgba(15,23,42,.82))" }}>
                                         <div style={{ fontSize: "0.76rem", fontWeight: "800", lineHeight: 1.35, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textShadow: "0 1px 2px rgba(0,0,0,.4)" }}>
-                                          {post.caption || "Instagram 게시물"}
+                                          {displayCaption}
                                         </div>
                                         <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "9px", fontSize: "0.68rem", fontWeight: "800", opacity: 0.92 }}>
                                           <span>📅 {post.publishedAt || "게시일 확인 불가"}</span>
@@ -7732,7 +7751,8 @@ export default function HomePage() {
                                         </div>
                                       </div>
                                     </a>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               ) : (
                                 <div style={{ textAlign: "center", padding: "42px 20px", background: "linear-gradient(135deg, #fff1f2 0%, #faf5ff 100%)", borderRadius: "16px", border: "1px dashed #f9a8d4" }}>

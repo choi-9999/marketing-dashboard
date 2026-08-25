@@ -121,10 +121,29 @@ function summarizeActivity(posts) {
   cutoffDate.setUTCDate(cutoffDate.getUTCDate() - 29);
   const cutoff = cutoffDate.toISOString().slice(0, 10);
   const datedPosts = posts.filter((post) => post.publishedAt);
+  const recentSixPosts = posts.slice(0, 6);
+  const hasCompleteRecentSixLikes = recentSixPosts.length === 6 &&
+    recentSixPosts.every((post) => Number.isFinite(post.likes));
+  const recentSixLikeAverage = hasCompleteRecentSixLikes
+    ? Number((recentSixPosts.reduce((sum, post) => sum + post.likes, 0) / 6).toFixed(1))
+    : null;
+  const reactionScore = recentSixLikeAverage === null
+    ? null
+    : recentSixLikeAverage >= 80
+      ? 5
+      : recentSixLikeAverage >= 40
+        ? 4
+        : recentSixLikeAverage >= 20
+          ? 3
+          : recentSixLikeAverage >= 10
+            ? 2
+            : 1;
 
   return {
     recent30d: datedPosts.filter((post) => post.publishedAt >= cutoff && post.publishedAt <= koreaToday).length,
-    lastPosted: datedPosts[0]?.publishedAt || ""
+    lastPosted: datedPosts[0]?.publishedAt || "",
+    recentSixLikeAverage,
+    reactionScore
   };
 }
 

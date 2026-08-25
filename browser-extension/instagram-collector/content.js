@@ -80,6 +80,18 @@
     })
     .map(({ sourceIndex, ...post }) => post);
 
+  const extractImageTextCaption = (rawCaption) => {
+    const caption = String(rawCaption || "").replace(/\s+/g, " ").trim();
+    const marker = "may be an image of text that says";
+    const markerIndex = caption.toLowerCase().indexOf(marker);
+    if (markerIndex < 0) return caption;
+    return caption
+      .slice(markerIndex + marker.length)
+      .replace(/^[\s:："'“”‘’]+/, "")
+      .replace(/[\s"'“”‘’]+$/, "")
+      .trim();
+  };
+
   function collectPosts() {
     const links = Array.from(document.querySelectorAll('main a[href*="/p/"], main a[href*="/reel/"]'));
     const seen = new Set();
@@ -92,13 +104,14 @@
       if (!image?.src) return posts;
       seen.add(url);
 
-      const caption = (image.alt || link.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
+      const rawCaption = (image.alt || link.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
+      const caption = extractImageTextCaption(rawCaption);
       const carouselIcon = link.querySelector('svg[aria-label*="Carousel"], svg[aria-label*="슬라이드"], svg[aria-label*="여러"]');
       posts.push({
         url,
         thumbnailUrl: image.currentSrc || image.src,
         caption,
-        publishedAt: extractDate(caption),
+        publishedAt: extractDate(rawCaption),
         type: url.includes("/reel/") ? "reel" : carouselIcon ? "carousel" : "image"
       });
       return posts;
