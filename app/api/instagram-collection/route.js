@@ -245,6 +245,7 @@ export async function POST(request) {
         username: tokenPayload.username,
         posts,
         ...summarizeActivity(posts),
+        coverageComplete: body.coverageComplete === true,
         collectedAt: new Date().toISOString()
       };
       await writeCollection(tokenPayload.branch, collection);

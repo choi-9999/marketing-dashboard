@@ -3393,9 +3393,12 @@ export default function HomePage() {
       if (data.collection) {
         setInstagramCollections((current) => ({ ...current, [branch]: data.collection }));
         if (!options.silent) {
+          const statusMessage = data.collection.coverageComplete
+            ? `최근 30일 ${data.collection.recent30d}개 · 최신 게시물 ${Math.min(data.collection.posts.length, 12)}개 수집됨`
+            : `최신 게시물 ${Math.min(data.collection.posts.length, 12)}개 수집됨 · 로그인 시 30일 지표 갱신`;
           setInstagramCollectionStatus((current) => ({
             ...current,
-            [branch]: { phase: "ready", message: `최신 게시물 ${data.collection.posts.length}개 수집됨` }
+            [branch]: { phase: "ready", message: statusMessage }
           }));
         }
       }
@@ -3452,9 +3455,12 @@ export default function HomePage() {
         await new Promise((resolve) => window.setTimeout(resolve, 2000));
         const collection = await loadInstagramCollection(branch, { silent: true });
         if (collection?.collectedAt && collection.collectedAt !== previousCollectedAt) {
+          const statusMessage = collection.coverageComplete
+            ? `최근 30일 ${collection.recent30d}개 · 최신 게시물 ${Math.min(collection.posts.length, 12)}개 수집 완료`
+            : `게시물 수집 완료 · Instagram 로그인 시 30일 지표도 갱신됩니다.`;
           setInstagramCollectionStatus((current) => ({
             ...current,
-            [branch]: { phase: "ready", message: `최신 게시물 ${collection.posts.length}개 수집 완료` }
+            [branch]: { phase: "ready", message: statusMessage }
           }));
           return;
         }
@@ -4384,20 +4390,20 @@ export default function HomePage() {
   useEffect(() => {
     if (!selectedBranch) return;
     const collection = instagramCollections[selectedBranch];
-    if (!collection || !Number.isFinite(collection.recent30d) || !collection.lastPosted) return;
+    if (!collection?.lastPosted) return;
 
     const socialTab = rawTabsRef.current.find((tab) => tab.kind === SPECIAL_SOCIAL_TAB_KIND);
     const currentRow = socialTab?.socialRows?.find((row) => row.branch.trim() === selectedBranch.trim());
     if (!currentRow) return;
-    if (
-      Number(currentRow.instagramRecentPosts || 0) === collection.recent30d &&
-      currentRow.instagramLastPosted === collection.lastPosted
-    ) return;
+    const updatedFields = { instagramLastPosted: collection.lastPosted };
+    if (collection.coverageComplete === true && Number.isFinite(collection.recent30d)) {
+      updatedFields.instagramRecentPosts = collection.recent30d;
+    }
+    const isRecentCountSame = updatedFields.instagramRecentPosts === undefined ||
+      Number(currentRow.instagramRecentPosts || 0) === updatedFields.instagramRecentPosts;
+    if (isRecentCountSame && currentRow.instagramLastPosted === updatedFields.instagramLastPosted) return;
 
-    handleSaveSnsMetrics(selectedBranch, {
-      instagramRecentPosts: collection.recent30d,
-      instagramLastPosted: collection.lastPosted
-    });
+    handleSaveSnsMetrics(selectedBranch, updatedFields);
   }, [instagramCollections, selectedBranch]);
 
   // Auto-crawl and Adviser useEffect
@@ -7639,7 +7645,9 @@ export default function HomePage() {
                                   </h2>
                                   <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "4px", fontWeight: "500" }}>
                                     {selectedBranch} 공식 Instagram 최신순 {posts.length}개 표시
-                                    {Number.isFinite(collection?.recent30d) && ` · 최근 30일 ${collection.recent30d}개`}
+                                    {collection?.coverageComplete && Number.isFinite(collection?.recent30d)
+                                      ? ` · 최근 30일 ${collection.recent30d}개`
+                                      : collection ? " · 로그인 후 30일 지표 갱신" : ""}
                                     {collection?.collectedAt && ` · ${new Date(collection.collectedAt).toLocaleString("ko-KR")} 기준`}
                                   </div>
                                 </div>

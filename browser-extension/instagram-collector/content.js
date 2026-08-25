@@ -148,11 +148,11 @@
     return sortByPublishedAt(posts.map((post) => enrichedByUrl.get(post.url) || post));
   }
 
-  async function sendCollection(posts) {
+  async function sendCollection(posts, coverageComplete) {
     const response = await fetch(`${dashboardOrigin}/api/instagram-collection`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "complete", token, posts })
+      body: JSON.stringify({ action: "complete", token, posts, coverageComplete })
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || "대시보드 저장 실패");
@@ -185,9 +185,20 @@
 
     try {
       const enrichedPosts = await enrichLatestPosts(posts);
-      const result = await sendCollection(enrichedPosts);
+      const koreaToday = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      const cutoffDate = new Date(`${koreaToday}T00:00:00.000Z`);
+      cutoffDate.setUTCDate(cutoffDate.getUTCDate() - 29);
+      const cutoff = cutoffDate.toISOString().slice(0, 10);
+      const datedPosts = enrichedPosts.filter((post) => post.publishedAt);
+      const oldestPublishedAt = datedPosts.at(-1)?.publishedAt || "";
+      const isLoggedOut = Boolean(document.querySelector('a[href*="/accounts/login"], form[action*="/accounts/login"]')) ||
+        Array.from(document.querySelectorAll("button")).some((button) => ["로그인", "log in"].includes(button.textContent.trim().toLowerCase()));
+      const coverageComplete = !isLoggedOut && Boolean(oldestPublishedAt) && oldestPublishedAt < cutoff;
+      const result = await sendCollection(enrichedPosts, coverageComplete);
       badge.style.background = "rgba(5, 150, 105, 0.96)";
-      badge.textContent = `수집 완료: ${result.collection.recent30d}개(최근 30일), 최신 ${Math.min(enrichedPosts.length, 12)}개 반응 수 반영`;
+      badge.textContent = coverageComplete
+        ? `수집 완료: ${result.collection.recent30d}개(최근 30일), 최신 ${Math.min(enrichedPosts.length, 12)}개 반응 수 반영`
+        : `게시물 ${enrichedPosts.length}개 수집 완료 · 로그인하면 30일 지표도 자동 최신화됩니다.`;
       window.setTimeout(() => badge.remove(), 6000);
     } catch (error) {
       badge.style.background = "rgba(220, 38, 38, 0.96)";
