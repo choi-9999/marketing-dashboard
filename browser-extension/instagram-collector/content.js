@@ -47,7 +47,7 @@
   };
 
   const extractDate = (altText) => {
-    const englishDate = String(altText || "").match(/\bon ([A-Za-z]+ \d{1,2}, \d{4})\b/i);
+    const englishDate = String(altText || "").match(/\b([A-Za-z]+ \d{1,2}, \d{4})\b/i);
     if (englishDate) {
       const date = new Date(englishDate[1]);
       if (!Number.isNaN(date.getTime())) return date.toISOString().slice(0, 10);
@@ -59,11 +59,32 @@
     return "";
   };
 
+  const parseCompactCount = (rawValue) => {
+    const normalized = String(rawValue || "").replace(/,/g, "").replace(/\s+/g, "").toLowerCase();
+    const match = normalized.match(/([\d.]+)(천|만|k|m|b)?/i);
+    if (!match) return null;
+    const multipliers = { "천": 1000, "만": 10000, k: 1000, m: 1000000, b: 1000000000 };
+    const number = Number(match[1]) * (multipliers[match[2]?.toLowerCase()] || 1);
+    return Number.isFinite(number) ? Math.round(number) : null;
+  };
+
+  const sortByPublishedAt = (posts) => posts
+    .map((post, sourceIndex) => ({ ...post, sourceIndex }))
+    .sort((a, b) => {
+      if (a.publishedAt && b.publishedAt && a.publishedAt !== b.publishedAt) {
+        return b.publishedAt.localeCompare(a.publishedAt);
+      }
+      if (a.publishedAt && !b.publishedAt) return -1;
+      if (!a.publishedAt && b.publishedAt) return 1;
+      return a.sourceIndex - b.sourceIndex;
+    })
+    .map(({ sourceIndex, ...post }) => post);
+
   function collectPosts() {
-    const links = Array.from(document.querySelectorAll('a[href*="/p/"], a[href*="/reel/"]'));
+    const links = Array.from(document.querySelectorAll('main a[href*="/p/"], main a[href*="/reel/"]'));
     const seen = new Set();
     return links.reduce((posts, link) => {
-      if (posts.length >= 12) return posts;
+      if (posts.length >= 60) return posts;
       const url = normalizeUrl(link.href);
       if (!url || seen.has(url)) return posts;
 
@@ -84,6 +105,49 @@
     }, []);
   }
 
+  async function enrichPost(post) {
+    try {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 10000);
+      const response = await fetch(post.url, {
+        credentials: "include",
+        cache: "no-store",
+        signal: controller.signal
+      });
+      window.clearTimeout(timeout);
+      if (!response.ok) return post;
+
+      const html = await response.text();
+      const documentCopy = new DOMParser().parseFromString(html, "text/html");
+      const description = documentCopy.querySelector('meta[property="og:description"]')?.content || "";
+      const publishedMeta = documentCopy.querySelector('meta[property="article:published_time"]')?.content || "";
+      const englishEngagement = description.match(/([\d,.]+(?:\s?[KMB])?)\s+likes?,\s+([\d,.]+(?:\s?[KMB])?)\s+comments?/i);
+      const koreanEngagement = description.match(/좋아요\s*([\d,.]+(?:\s?[천만])?)개?.*?댓글\s*([\d,.]+(?:\s?[천만])?)개?/i);
+      const engagement = englishEngagement || koreanEngagement;
+
+      return {
+        ...post,
+        publishedAt: publishedMeta ? publishedMeta.slice(0, 10) : extractDate(description) || post.publishedAt,
+        likes: engagement ? parseCompactCount(engagement[1]) : null,
+        comments: engagement ? parseCompactCount(engagement[2]) : null
+      };
+    } catch {
+      return post;
+    }
+  }
+
+  async function enrichLatestPosts(posts) {
+    const targets = sortByPublishedAt(posts).slice(0, 12);
+    const enriched = [];
+    for (let index = 0; index < targets.length; index += 3) {
+      badge.textContent = `최신 게시물 반응 수 확인 중… (${Math.min(index + 3, targets.length)}/${targets.length})`;
+      enriched.push(...await Promise.all(targets.slice(index, index + 3).map(enrichPost)));
+      await new Promise((resolve) => window.setTimeout(resolve, 300));
+    }
+    const enrichedByUrl = new Map(enriched.map((post) => [post.url, post]));
+    return sortByPublishedAt(posts.map((post) => enrichedByUrl.get(post.url) || post));
+  }
+
   async function sendCollection(posts) {
     const response = await fetch(`${dashboardOrigin}/api/instagram-collection`, {
       method: "POST",
@@ -95,25 +159,41 @@
     return result;
   }
 
-  let attempts = 0;
-  const timer = window.setInterval(async () => {
-    attempts += 1;
-    const posts = collectPosts();
-    if (posts.length >= 3 || (posts.length > 0 && attempts >= 8)) {
-      window.clearInterval(timer);
-      try {
-        await sendCollection(posts);
-        badge.style.background = "rgba(5, 150, 105, 0.96)";
-        badge.textContent = `수집 완료: 최신 게시물 ${posts.length}개를 대시보드에 반영했습니다.`;
-        window.setTimeout(() => badge.remove(), 5000);
-      } catch (error) {
-        badge.style.background = "rgba(220, 38, 38, 0.96)";
-        badge.textContent = `수집 실패: ${error.message}`;
-      }
-    } else if (attempts >= 30) {
-      window.clearInterval(timer);
+  async function runCollection() {
+    let posts = [];
+    const collectedByUrl = new Map();
+    let previousCount = 0;
+    let stableRounds = 0;
+
+    for (let attempt = 0; attempt < 18; attempt += 1) {
+      collectPosts().forEach((post) => collectedByUrl.set(post.url, post));
+      posts = Array.from(collectedByUrl.values()).slice(0, 60);
+      badge.textContent = `최근 30일 게시물 확인 중… (${posts.length}개 발견)`;
+      stableRounds = posts.length === previousCount ? stableRounds + 1 : 0;
+      previousCount = posts.length;
+
+      if (posts.length >= 60 || (posts.length > 0 && stableRounds >= 3)) break;
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+      await new Promise((resolve) => window.setTimeout(resolve, 1100));
+    }
+
+    if (!posts.length) {
       badge.style.background = "rgba(217, 119, 6, 0.96)";
       badge.textContent = "공개 게시물을 찾지 못했습니다. 로그인 상태와 계정 공개 여부를 확인해 주세요.";
+      return;
     }
-  }, 1000);
+
+    try {
+      const enrichedPosts = await enrichLatestPosts(posts);
+      const result = await sendCollection(enrichedPosts);
+      badge.style.background = "rgba(5, 150, 105, 0.96)";
+      badge.textContent = `수집 완료: ${result.collection.recent30d}개(최근 30일), 최신 ${Math.min(enrichedPosts.length, 12)}개 반응 수 반영`;
+      window.setTimeout(() => badge.remove(), 6000);
+    } catch (error) {
+      badge.style.background = "rgba(220, 38, 38, 0.96)";
+      badge.textContent = `수집 실패: ${error.message}`;
+    }
+  }
+
+  runCollection();
 })();

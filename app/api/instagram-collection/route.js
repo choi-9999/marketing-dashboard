@@ -8,7 +8,7 @@ export const revalidate = 0;
 
 const TOKEN_TTL_SECONDS = 5 * 60;
 const CACHE_TTL_SECONDS = 30 * 24 * 60 * 60;
-const MAX_POSTS = 12;
+const MAX_POSTS = 60;
 const localCachePath = path.join(process.cwd(), "data", "instagramPosts.json");
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -90,11 +90,49 @@ function cleanHttpUrl(value, allowedHosts) {
   }
 }
 
+function cleanPublishedAt(value) {
+  const date = cleanText(value, 40).slice(0, 10);
+  return /^20\d{2}-\d{2}-\d{2}$/.test(date) ? date : "";
+}
+
+function cleanCount(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? Math.round(number) : null;
+}
+
+function sortPostsByPublishedAt(posts) {
+  return posts
+    .map((post, sourceIndex) => ({ ...post, sourceIndex }))
+    .sort((a, b) => {
+      if (a.publishedAt && b.publishedAt && a.publishedAt !== b.publishedAt) {
+        return b.publishedAt.localeCompare(a.publishedAt);
+      }
+      if (a.publishedAt && !b.publishedAt) return -1;
+      if (!a.publishedAt && b.publishedAt) return 1;
+      return a.sourceIndex - b.sourceIndex;
+    })
+    .map(({ sourceIndex, ...post }) => post);
+}
+
+function summarizeActivity(posts) {
+  const koreaToday = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const cutoffDate = new Date(`${koreaToday}T00:00:00.000Z`);
+  cutoffDate.setUTCDate(cutoffDate.getUTCDate() - 29);
+  const cutoff = cutoffDate.toISOString().slice(0, 10);
+  const datedPosts = posts.filter((post) => post.publishedAt);
+
+  return {
+    recent30d: datedPosts.filter((post) => post.publishedAt >= cutoff && post.publishedAt <= koreaToday).length,
+    lastPosted: datedPosts[0]?.publishedAt || ""
+  };
+}
+
 function sanitizePosts(posts) {
   if (!Array.isArray(posts)) return [];
 
   const seenUrls = new Set();
-  return posts.slice(0, MAX_POSTS * 2).reduce((result, post) => {
+  const sanitized = posts.slice(0, MAX_POSTS * 2).reduce((result, post) => {
     if (result.length >= MAX_POSTS) return result;
 
     const url = cleanHttpUrl(post?.url, ["instagram.com"]);
@@ -106,11 +144,14 @@ function sanitizePosts(posts) {
       url,
       thumbnailUrl,
       caption: cleanText(post?.caption, 500),
-      publishedAt: cleanText(post?.publishedAt, 40),
+      publishedAt: cleanPublishedAt(post?.publishedAt),
+      likes: cleanCount(post?.likes),
+      comments: cleanCount(post?.comments),
       type: ["reel", "carousel", "image"].includes(post?.type) ? post.type : "image"
     });
     return result;
   }, []);
+  return sortPostsByPublishedAt(sanitized);
 }
 
 async function readLocalCache() {
@@ -203,6 +244,7 @@ export async function POST(request) {
         branch: tokenPayload.branch,
         username: tokenPayload.username,
         posts,
+        ...summarizeActivity(posts),
         collectedAt: new Date().toISOString()
       };
       await writeCollection(tokenPayload.branch, collection);

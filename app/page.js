@@ -3479,7 +3479,7 @@ export default function HomePage() {
 
   const handleSaveSnsMetrics = (targetBranch, updatedFields) => {
     setRawTabs(prevTabs => {
-      return prevTabs.map(tab => {
+      const nextTabs = prevTabs.map(tab => {
         if (tab.kind !== SPECIAL_SOCIAL_TAB_KIND) return tab;
         const newRows = (tab.socialRows || []).map(r => {
           if (r.branch.trim() !== targetBranch.trim()) return r;
@@ -3493,10 +3493,25 @@ export default function HomePage() {
           socialRows: newRows
         };
       });
+      const payload = { page, rawTabs: nextTabs, activeTabId, dashboardTabId };
+      window.localStorage.setItem(BROWSER_SAVE_KEY, JSON.stringify(payload));
+      setSaveState("SNS 지표 서버 저장 중...");
+      fetch("/api/rawtabs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        cache: "no-store"
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("SNS metrics save failed");
+          setSaveState("SNS 지표 저장 완료");
+        })
+        .catch((error) => {
+          console.error("Failed to save SNS metrics.", error);
+          setSaveState("SNS 지표 저장 실패");
+        });
+      return nextTabs;
     });
-    setTimeout(() => {
-      forceServerSave();
-    }, 100);
   };
 
   const [batchSyncProgress, setBatchSyncProgress] = useState(null);
@@ -4365,6 +4380,25 @@ export default function HomePage() {
   useEffect(() => {
     if (selectedBranch) loadInstagramCollection(selectedBranch);
   }, [loadInstagramCollection, selectedBranch]);
+
+  useEffect(() => {
+    if (!selectedBranch) return;
+    const collection = instagramCollections[selectedBranch];
+    if (!collection || !Number.isFinite(collection.recent30d) || !collection.lastPosted) return;
+
+    const socialTab = rawTabsRef.current.find((tab) => tab.kind === SPECIAL_SOCIAL_TAB_KIND);
+    const currentRow = socialTab?.socialRows?.find((row) => row.branch.trim() === selectedBranch.trim());
+    if (!currentRow) return;
+    if (
+      Number(currentRow.instagramRecentPosts || 0) === collection.recent30d &&
+      currentRow.instagramLastPosted === collection.lastPosted
+    ) return;
+
+    handleSaveSnsMetrics(selectedBranch, {
+      instagramRecentPosts: collection.recent30d,
+      instagramLastPosted: collection.lastPosted
+    });
+  }, [instagramCollections, selectedBranch]);
 
   // Auto-crawl and Adviser useEffect
   useEffect(() => {
@@ -7585,7 +7619,14 @@ export default function HomePage() {
                           const branchSnsRow = socialTab?.socialRows?.find(r => r.branch.trim() === selectedBranch);
                           const instagramUrl = branchSnsRow?.instagramUrl || "";
                           const collection = instagramCollections[selectedBranch];
-                          const posts = collection?.posts || [];
+                          const posts = [...(collection?.posts || [])]
+                            .sort((a, b) => {
+                              if (a.publishedAt && b.publishedAt && a.publishedAt !== b.publishedAt) return b.publishedAt.localeCompare(a.publishedAt);
+                              if (a.publishedAt && !b.publishedAt) return -1;
+                              if (!a.publishedAt && b.publishedAt) return 1;
+                              return 0;
+                            })
+                            .slice(0, 12);
                           const status = instagramCollectionStatus[selectedBranch];
                           const isCollecting = ["starting", "waiting"].includes(status?.phase);
 
@@ -7597,7 +7638,8 @@ export default function HomePage() {
                                     /LATEST INSTAGRAM POSTS
                                   </h2>
                                   <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "4px", fontWeight: "500" }}>
-                                    {selectedBranch} 공식 Instagram의 최신 공개 게시물 ({posts.length}개 수집됨)
+                                    {selectedBranch} 공식 Instagram 최신순 {posts.length}개 표시
+                                    {Number.isFinite(collection?.recent30d) && ` · 최근 30일 ${collection.recent30d}개`}
                                     {collection?.collectedAt && ` · ${new Date(collection.collectedAt).toLocaleString("ko-KR")} 기준`}
                                   </div>
                                 </div>
@@ -7675,7 +7717,11 @@ export default function HomePage() {
                                         <div style={{ fontSize: "0.76rem", fontWeight: "800", lineHeight: 1.35, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textShadow: "0 1px 2px rgba(0,0,0,.4)" }}>
                                           {post.caption || "Instagram 게시물"}
                                         </div>
-                                        {post.publishedAt && <div style={{ marginTop: "4px", fontSize: "0.68rem", opacity: 0.82 }}>{post.publishedAt}</div>}
+                                        <div style={{ marginTop: "6px", display: "flex", alignItems: "center", gap: "9px", fontSize: "0.68rem", fontWeight: "800", opacity: 0.92 }}>
+                                          <span>📅 {post.publishedAt || "게시일 확인 불가"}</span>
+                                          <span>♥ {post.likes === null || post.likes === undefined ? "-" : Number(post.likes).toLocaleString("ko-KR")}</span>
+                                          <span>💬 {post.comments === null || post.comments === undefined ? "-" : Number(post.comments).toLocaleString("ko-KR")}</span>
+                                        </div>
                                       </div>
                                     </a>
                                   ))}
