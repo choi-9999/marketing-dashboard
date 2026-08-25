@@ -1,6 +1,174 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+const NAVER_DESKTOP_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+const NAVER_MOBILE_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1";
+
+function toFiniteNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+}
+
+function firstFiniteNumber(values) {
+  for (const value of values) {
+    const parsed = toFiniteNumber(value);
+    if (parsed !== null) return parsed;
+  }
+  return null;
+}
+
+function getPostLogNo(postUrl) {
+  const pathMatch = String(postUrl || "").match(/\/([0-9]{6,})/);
+  if (pathMatch) return pathMatch[1];
+
+  try {
+    return new URL(postUrl).searchParams.get("logNo");
+  } catch {
+    return null;
+  }
+}
+
+function getCommentContext(html, logNo) {
+  const normalizedHtml = String(html || "")
+    .replace(/&quot;/g, '"')
+    .replace(/&#34;/g, '"')
+    .replace(/&#39;|&#x27;/g, "'");
+  const objectIdMatch = normalizedHtml.match(new RegExp(`(\\d+)_201_${logNo}`));
+
+  if (objectIdMatch) {
+    return {
+      objectId: objectIdMatch[0],
+      groupId: objectIdMatch[1]
+    };
+  }
+
+  const groupIdMatch = normalizedHtml.match(
+    /["']?(?:blogNo|userNo|groupId)["']?\s*[:=]\s*["']?(\d+)/i
+  );
+  if (!groupIdMatch) return null;
+
+  return {
+    objectId: `${groupIdMatch[1]}_201_${logNo}`,
+    groupId: groupIdMatch[1]
+  };
+}
+
+function getCommentCount(payload) {
+  const result = payload?.result || payload;
+  const count = result?.count;
+  const directCount = firstFiniteNumber([
+    count?.exposeCount,
+    count?.total,
+    count?.totalCount,
+    count?.commentCount,
+    result?.exposeCount,
+    result?.totalCount,
+    result?.commentCount,
+    payload?.totalCount,
+    payload?.commentCount
+  ]);
+  if (directCount !== null) return directCount;
+
+  const rootCount = toFiniteNumber(count?.comment);
+  const replyCount = toFiniteNumber(count?.reply);
+  if (rootCount !== null || replyCount !== null) {
+    return (rootCount || 0) + (replyCount || 0);
+  }
+
+  const commentList = result?.commentList || payload?.commentList;
+  return Array.isArray(commentList) ? commentList.length : null;
+}
+
+function getSympathyCount(payload) {
+  const result = payload?.result || payload;
+  const directCount = firstFiniteNumber([
+    payload?.totalCount,
+    payload?.sympathyCount,
+    payload?.count,
+    result?.totalCount,
+    result?.sympathyCount,
+    result?.count
+  ]);
+  if (directCount !== null) return directCount;
+
+  const userLists = [
+    payload?.sympathyUsers,
+    payload?.contents,
+    payload?.items,
+    result?.sympathyUsers,
+    result?.contents,
+    result?.items,
+    payload
+  ];
+  const list = userLists.find(Array.isArray);
+  return list ? list.length : null;
+}
+
+async function fetchCommentCount({ objectId, groupId, referer }) {
+  const url = new URL("https://apis.naver.com/commentBox/cbox/web_naver_list_json.json");
+  const params = {
+    ticket: "blog",
+    templateId: "default",
+    pool: "blogid",
+    _cv: "",
+    lang: "ko",
+    pageType: "default",
+    country: "",
+    objectId,
+    categoryId: "",
+    pageSize: "50",
+    indexSize: "10",
+    groupId,
+    listType: "OBJECT",
+    page: "1",
+    initialize: "true",
+    followSize: "5",
+    userType: "",
+    useAltSort: "true",
+    replyPageSize: "10",
+    showReply: "true"
+  };
+  Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
+
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      Referer: referer,
+      "User-Agent": NAVER_DESKTOP_USER_AGENT
+    },
+    cache: "no-store",
+    signal: AbortSignal.timeout(5000)
+  });
+  if (!response.ok) throw new Error(`Comment API returned ${response.status}`);
+
+  const payload = await response.json();
+  const count = getCommentCount(payload);
+  if (count === null) throw new Error("Comment count was not present in the response");
+  return count;
+}
+
+async function fetchSympathyCount({ blogId, logNo, referer }) {
+  const url = new URL(`https://blog.naver.com/api/blogs/${encodeURIComponent(blogId)}/posts/${encodeURIComponent(logNo)}/sympathy-users`);
+  url.searchParams.set("itemCount", "60");
+  url.searchParams.set("timeStamp", String(Date.now()));
+
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      Referer: referer,
+      "User-Agent": NAVER_DESKTOP_USER_AGENT
+    },
+    cache: "no-store",
+    signal: AbortSignal.timeout(5000)
+  });
+  if (!response.ok) throw new Error(`Sympathy API returned ${response.status}`);
+
+  const payload = await response.json();
+  const count = getSympathyCount(payload);
+  if (count === null) throw new Error("Sympathy count was not present in the response");
+  return count;
+}
+
 function getNaverBlogId(url) {
   if (!url) return null;
   const cleanUrl = String(url).trim();
@@ -230,7 +398,7 @@ export async function GET(request) {
       throw new Error("No items found in RSS feed.");
     }
 
-    // Inspect recent 5 posts for reactions (comments and likes)
+    // Inspect recent 5 posts through NAVER's comment and sympathy JSON requests.
     const targetPosts = fullParsedPosts.slice(0, 5);
     let c2Plus = 0;
     let c1Plus = 0;
@@ -238,41 +406,43 @@ export async function GET(request) {
 
     const reactionDetails = await Promise.all(
       targetPosts.map(async (p, idx) => {
-        let logNo = null;
-        const logMatch = p.url.match(/\/([0-9]{6,})/);
-        if (logMatch) logNo = logMatch[1];
-        else {
-          try {
-            const u = new URL(p.url);
-            logNo = u.searchParams.get("logNo");
-          } catch (e) {}
+        const logNo = getPostLogNo(p.url);
+        if (!logNo) {
+          return { idx, comments: 0, likes: 0, commentsCollected: false, likesCollected: false, title: p.title };
         }
-
-        if (!logNo) return { idx, comments: 0, likes: 0 };
 
         try {
           const postUrl = `https://m.blog.naver.com/PostView.naver?blogId=${blogId}&logNo=${logNo}`;
           const pRes = await fetch(postUrl, {
             headers: {
-              "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
+              "User-Agent": NAVER_MOBILE_USER_AGENT
             },
-            signal: AbortSignal.timeout(2500)
+            cache: "no-store",
+            signal: AbortSignal.timeout(5000)
           });
+          if (!pRes.ok) throw new Error(`Post page returned ${pRes.status}`);
           const html = await pRes.text();
+          const commentContext = getCommentContext(html, logNo);
+          const referer = `https://blog.naver.com/${blogId}/${logNo}`;
 
-          // Extract comments
-          let comments = 0;
-          const commMatch = html.match(/_commentCount[^>]*>([0-9]+)</i) || html.match(/댓글\s*<em[^>]*>([0-9]+)<\/em>/i) || html.match(/"commentCount":\s*([0-9]+)/i);
-          if (commMatch) comments = parseInt(commMatch[1], 10);
+          const [commentResult, sympathyResult] = await Promise.allSettled([
+            commentContext
+              ? fetchCommentCount({ ...commentContext, referer })
+              : Promise.reject(new Error("Comment objectId was not found")),
+            fetchSympathyCount({ blogId, logNo, referer })
+          ]);
 
-          // Extract likes
-          let likes = 0;
-          const likeMatch = html.match(/_sympathyCount[^>]*>([0-9]+)</i) || html.match(/_likeCount[^>]*>([0-9]+)</i) || html.match(/공감\s*<em[^>]*>([0-9]+)<\/em>/i) || html.match(/"sympathyCount":\s*([0-9]+)/i) || html.match(/"likeCount":\s*([0-9]+)/i);
-          if (likeMatch) likes = parseInt(likeMatch[1], 10);
-
-          return { idx, comments, likes, title: p.title };
-        } catch (err) {
-          return { idx, comments: 0, likes: 0 };
+          return {
+            idx,
+            logNo,
+            comments: commentResult.status === "fulfilled" ? commentResult.value : 0,
+            likes: sympathyResult.status === "fulfilled" ? sympathyResult.value : 0,
+            commentsCollected: commentResult.status === "fulfilled",
+            likesCollected: sympathyResult.status === "fulfilled",
+            title: p.title
+          };
+        } catch {
+          return { idx, logNo, comments: 0, likes: 0, commentsCollected: false, likesCollected: false, title: p.title };
         }
       })
     );
@@ -292,11 +462,12 @@ export async function GET(request) {
       reactionScore = 3;
     } else if (likesCount >= 1) {
       reactionScore = 2;
-    } else if (likesCount > 0 || c1Plus > 0) {
+    } else if (c1Plus > 0) {
       reactionScore = 1;
-    } else {
-      reactionScore = fullParsedPosts.length > 0 ? 1 : 0;
     }
+
+    const commentsCollectedCount = reactionDetails.filter((item) => item.commentsCollected).length;
+    const likesCollectedCount = reactionDetails.filter((item) => item.likesCollected).length;
 
     return Response.json({
       success: true,
@@ -312,6 +483,9 @@ export async function GET(request) {
           postsWith2PlusComments: c2Plus,
           postsWithComments: c1Plus,
           postsWithLikes: likesCount,
+          commentsCollectedCount,
+          likesCollectedCount,
+          complete: commentsCollectedCount === targetPosts.length && likesCollectedCount === targetPosts.length,
           posts: reactionDetails
         }
       }
