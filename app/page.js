@@ -5084,9 +5084,9 @@ export default function HomePage() {
 
   const filteredSnsDashboardRows = useMemo(() => {
     const keyword = snsSearch.trim().toLowerCase();
-    if (!keyword) return snsDashboardRows.filter((row) => row.branch.trim());
-
-    return snsDashboardRows.filter((row) => row.branch.trim() && row.branch.toLowerCase().includes(keyword));
+    return snsDashboardRows
+      .filter((row) => row.branch.trim() && (!keyword || row.branch.toLowerCase().includes(keyword)))
+      .sort((a, b) => b.finalScore - a.finalScore || a.branch.localeCompare(b.branch, "ko"));
   }, [snsDashboardRows, snsSearch]);
 
   const snsSourceRows = useMemo(() => {
