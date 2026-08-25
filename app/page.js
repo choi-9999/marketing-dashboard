@@ -3349,6 +3349,8 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [socialData, setSocialData] = useState({ kin: [], blog: [], news: [] });
   const [activeSocialSubTab, setActiveSocialSubTab] = useState("kin");
+  const [instagramCollections, setInstagramCollections] = useState({});
+  const [instagramCollectionStatus, setInstagramCollectionStatus] = useState({});
   const [hoveredMonthIndex, setHoveredMonthIndex] = useState(null);
   const [hoveredSliceIndex, setHoveredSliceIndex] = useState(null);
   const [trendViewMode, setTrendViewMode] = useState("cards");
@@ -3378,6 +3380,102 @@ export default function HomePage() {
   const [regionFilter, setRegionFilter] = useState("all");
   const [isSnsModalOpen, setIsSnsModalOpen] = useState(false);
   const [isSnsSyncing, setIsSnsSyncing] = useState(false);
+
+  const loadInstagramCollection = useCallback(async (branch, options = {}) => {
+    if (!branch) return null;
+    try {
+      const response = await fetch(`/api/instagram-collection?branch=${encodeURIComponent(branch)}`, {
+        cache: "no-store"
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "수집 데이터를 불러오지 못했습니다.");
+
+      if (data.collection) {
+        setInstagramCollections((current) => ({ ...current, [branch]: data.collection }));
+        if (!options.silent) {
+          setInstagramCollectionStatus((current) => ({
+            ...current,
+            [branch]: { phase: "ready", message: `최신 게시물 ${data.collection.posts.length}개 수집됨` }
+          }));
+        }
+      }
+      return data.collection || null;
+    } catch (error) {
+      if (!options.silent) {
+        setInstagramCollectionStatus((current) => ({
+          ...current,
+          [branch]: { phase: "error", message: error.message }
+        }));
+      }
+      return null;
+    }
+  }, []);
+
+  const handleInstagramCollection = useCallback(async (branch, instagramUrl) => {
+    if (!instagramUrl || isMissingChannelUrl(instagramUrl)) {
+      showAlert("등록된 지점 인스타그램 URL이 없습니다.\n상단의 '📝 SNS 지표 편집' 버튼을 통해 등록하실 수 있습니다.", "채널 안내", "warning");
+      return;
+    }
+
+    const collectorWindow = window.open("about:blank", "_blank");
+    if (!collectorWindow) {
+      showAlert("Instagram 수집 창을 열 수 없습니다. 브라우저 주소창의 팝업 차단 표시에서 이 사이트의 팝업을 허용해 주세요.", "팝업 허용 필요", "warning");
+      return;
+    }
+    collectorWindow.document.title = "Instagram 게시물 수집 준비 중";
+    collectorWindow.document.body.innerHTML = '<p style="font:700 16px sans-serif;padding:24px">Instagram 수집 화면을 준비하고 있습니다…</p>';
+
+    const previousCollectedAt = instagramCollections[branch]?.collectedAt || "";
+    setInstagramCollectionStatus((current) => ({
+      ...current,
+      [branch]: { phase: "starting", message: "Instagram 수집 화면을 여는 중…" }
+    }));
+
+    try {
+      const response = await fetch("/api/instagram-collection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "start", branch, instagramUrl })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "수집을 시작하지 못했습니다.");
+
+      collectorWindow.opener = null;
+      collectorWindow.location.replace(data.collectUrl);
+
+      setInstagramCollectionStatus((current) => ({
+        ...current,
+        [branch]: { phase: "waiting", message: "Instagram에서 최신 게시물을 수집하는 중…" }
+      }));
+
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        await new Promise((resolve) => window.setTimeout(resolve, 2000));
+        const collection = await loadInstagramCollection(branch, { silent: true });
+        if (collection?.collectedAt && collection.collectedAt !== previousCollectedAt) {
+          setInstagramCollectionStatus((current) => ({
+            ...current,
+            [branch]: { phase: "ready", message: `최신 게시물 ${collection.posts.length}개 수집 완료` }
+          }));
+          return;
+        }
+      }
+
+      setInstagramCollectionStatus((current) => ({
+        ...current,
+        [branch]: {
+          phase: "timeout",
+          message: "수집 응답을 기다리고 있습니다. 확장 프로그램 설치와 Instagram 로그인 상태를 확인해 주세요."
+        }
+      }));
+    } catch (error) {
+      if (collectorWindow && !collectorWindow.closed) collectorWindow.close();
+      setInstagramCollectionStatus((current) => ({
+        ...current,
+        [branch]: { phase: "error", message: error.message }
+      }));
+      showAlert(error.message, "Instagram 수집 오류", "warning");
+    }
+  }, [instagramCollections, loadInstagramCollection]);
 
   const handleSaveSnsMetrics = (targetBranch, updatedFields) => {
     setRawTabs(prevTabs => {
@@ -4263,6 +4361,10 @@ export default function HomePage() {
   useEffect(() => {
     setSelectedChartEventId(null);
   }, [selectedBranch]);
+
+  useEffect(() => {
+    if (selectedBranch) loadInstagramCollection(selectedBranch);
+  }, [loadInstagramCollection, selectedBranch]);
 
   // Auto-crawl and Adviser useEffect
   useEffect(() => {
@@ -7266,13 +7368,7 @@ export default function HomePage() {
 
                                 {/* Card 3: 인스타그램 점수 */}
                                 <div
-                                  onClick={() => {
-                                    if (row.instagramUrl && !isMissingChannelUrl(row.instagramUrl)) {
-                                      window.open(row.instagramUrl, "_blank");
-                                    } else {
-                                      showAlert("등록된 지점 인스타그램 URL이 없습니다.\n상단의 '📝 SNS 지표 편집' 버튼을 통해 등록하실 수 있습니다.", "채널 안내", "warning");
-                                    }
-                                  }}
+                                  onClick={() => handleInstagramCollection(selectedBranch, row.instagramUrl)}
                                   style={{
                                     background: "#ffffff",
                                     border: "1px solid #e2e8f0",
@@ -7295,7 +7391,7 @@ export default function HomePage() {
                                 >
                                   <div style={{ fontSize: "0.78rem", color: "#e1306c", fontWeight: "800", marginBottom: "6px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                      인스타그램 <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>↗</span>
+                                      인스타그램 <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>수집 ↗</span>
                                     </span>
                                     <span>최근 30일 <CountUpNumber value={row.instagramRecentPosts || 0} decimals={0} />개</span>
                                   </div>
@@ -7305,6 +7401,9 @@ export default function HomePage() {
                                   </div>
                                   <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "4px" }}>
                                     디자인: {row.instagramDesignScore || 0}점 | 반응: {row.instagramReactionScore || 0}점 | 최근: {row.instagramLastPosted && !row.instagramLastPosted.startsWith("1899") ? row.instagramLastPosted : "기록없음"}
+                                  </div>
+                                  <div style={{ fontSize: "0.7rem", color: "#e1306c", marginTop: "6px", fontWeight: "700" }}>
+                                    클릭하면 계정을 열고 최신 게시물을 자동 수집합니다.
                                   </div>
                                 </div>
                               </div>
@@ -7474,6 +7573,129 @@ export default function HomePage() {
                                       ? "상단의 '📝 SNS 지표 편집' 버튼을 눌러 블로그 주소를 등록하시면 실시간 포스팅이 자동으로 연동됩니다." 
                                       : "블로그 주소는 등록되어 있으나 최근 공개 글이 없거나 크롤링 중입니다."}
                                   </p>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+
+                        {/* 3. 지점 Instagram 최신 게시물 그리드 (SNS 분석 탭 전용) */}
+                        {page === "sns" && (() => {
+                          const socialTab = rawTabs.find(t => t.kind === SPECIAL_SOCIAL_TAB_KIND);
+                          const branchSnsRow = socialTab?.socialRows?.find(r => r.branch.trim() === selectedBranch);
+                          const instagramUrl = branchSnsRow?.instagramUrl || "";
+                          const collection = instagramCollections[selectedBranch];
+                          const posts = collection?.posts || [];
+                          const status = instagramCollectionStatus[selectedBranch];
+                          const isCollecting = ["starting", "waiting"].includes(status?.phase);
+
+                          return (
+                            <div className="sheet-panel" style={{ background: "transparent", border: "none", borderRadius: 0, padding: "20px 0 28px", boxShadow: "none" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
+                                <div>
+                                  <h2 style={{ margin: 0, fontSize: "1.4rem", fontWeight: "900", color: "#e1306c", fontFamily: "'Outfit', 'Inter', sans-serif", letterSpacing: "-0.5px" }}>
+                                    /LATEST INSTAGRAM POSTS
+                                  </h2>
+                                  <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "4px", fontWeight: "500" }}>
+                                    {selectedBranch} 공식 Instagram의 최신 공개 게시물 ({posts.length}개 수집됨)
+                                    {collection?.collectedAt && ` · ${new Date(collection.collectedAt).toLocaleString("ko-KR")} 기준`}
+                                  </div>
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                                  {status?.message && (
+                                    <span style={{
+                                      fontSize: "0.76rem",
+                                      color: status.phase === "error" || status.phase === "timeout" ? "#b45309" : "#be185d",
+                                      fontWeight: "700"
+                                    }}>
+                                      {isCollecting ? "● " : ""}{status.message}
+                                    </span>
+                                  )}
+                                  {!isMissingChannelUrl(instagramUrl) && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleInstagramCollection(selectedBranch, instagramUrl)}
+                                      disabled={isCollecting}
+                                      style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "5px",
+                                        border: "1px solid #f9a8d4",
+                                        background: isCollecting ? "#fce7f3" : "#fff",
+                                        color: "#be185d",
+                                        padding: "7px 14px",
+                                        borderRadius: "10px",
+                                        fontSize: "0.8rem",
+                                        fontWeight: "800",
+                                        cursor: isCollecting ? "wait" : "pointer"
+                                      }}
+                                    >
+                                      {isCollecting ? "수집 중…" : posts.length ? "최신 게시물 다시 수집 ↗" : "Instagram 열고 수집 ↗"}
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+
+                              {posts.length > 0 ? (
+                                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: "4px", overflow: "hidden", borderRadius: "16px", background: "#e2e8f0", border: "1px solid #e2e8f0" }}>
+                                  {posts.map((post, postIndex) => (
+                                    <a
+                                      key={`${post.url}-${postIndex}`}
+                                      href={post.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      aria-label={`${selectedBranch} Instagram 게시물 열기${post.caption ? `: ${post.caption}` : ""}`}
+                                      title={post.caption || "Instagram 게시물 열기"}
+                                      style={{
+                                        position: "relative",
+                                        display: "block",
+                                        aspectRatio: "1 / 1",
+                                        minWidth: 0,
+                                        overflow: "hidden",
+                                        background: "linear-gradient(135deg, #fbcfe8 0%, #c4b5fd 52%, #fde68a 100%)",
+                                        color: "#fff",
+                                        textDecoration: "none"
+                                      }}
+                                    >
+                                      {post.thumbnailUrl && (
+                                        <img
+                                          src={post.thumbnailUrl}
+                                          alt={post.caption || `${selectedBranch} Instagram 게시물 썸네일`}
+                                          loading="lazy"
+                                          onError={(event) => { event.currentTarget.style.display = "none"; }}
+                                          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform .25s ease" }}
+                                          onMouseEnter={(event) => { event.currentTarget.style.transform = "scale(1.035)"; }}
+                                          onMouseLeave={(event) => { event.currentTarget.style.transform = "scale(1)"; }}
+                                        />
+                                      )}
+                                      <span style={{ position: "absolute", top: "10px", right: "10px", display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: "28px", height: "28px", padding: "0 7px", borderRadius: "999px", background: "rgba(15,23,42,.72)", fontSize: "0.76rem", fontWeight: "900", backdropFilter: "blur(5px)" }}>
+                                        {post.type === "reel" ? "▶ REEL" : post.type === "carousel" ? "▣" : "●"}
+                                      </span>
+                                      <div style={{ position: "absolute", inset: "auto 0 0", padding: "36px 12px 12px", background: "linear-gradient(transparent, rgba(15,23,42,.82))" }}>
+                                        <div style={{ fontSize: "0.76rem", fontWeight: "800", lineHeight: 1.35, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", textShadow: "0 1px 2px rgba(0,0,0,.4)" }}>
+                                          {post.caption || "Instagram 게시물"}
+                                        </div>
+                                        {post.publishedAt && <div style={{ marginTop: "4px", fontSize: "0.68rem", opacity: 0.82 }}>{post.publishedAt}</div>}
+                                      </div>
+                                    </a>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div style={{ textAlign: "center", padding: "42px 20px", background: "linear-gradient(135deg, #fff1f2 0%, #faf5ff 100%)", borderRadius: "16px", border: "1px dashed #f9a8d4" }}>
+                                  <span style={{ fontSize: "2rem", display: "block", marginBottom: "8px" }}>▦</span>
+                                  <div style={{ fontSize: "0.94rem", fontWeight: "800", color: "#831843", marginBottom: "6px" }}>
+                                    {isMissingChannelUrl(instagramUrl) ? "등록된 Instagram 주소가 없습니다." : "아직 수집된 Instagram 게시물이 없습니다."}
+                                  </div>
+                                  <p style={{ margin: "0 auto 14px", maxWidth: "680px", fontSize: "0.8rem", color: "#64748b", lineHeight: 1.6 }}>
+                                    {isMissingChannelUrl(instagramUrl)
+                                      ? "SNS 지표 편집에서 지점 계정 주소를 먼저 등록해 주세요."
+                                      : "최초 1회 수집 확장 프로그램을 설치한 뒤 인스타그램 점수 카드나 위 수집 버튼을 누르면, 열린 계정의 최신 게시물이 이곳에 썸네일 그리드로 표시됩니다."}
+                                  </p>
+                                  {!isMissingChannelUrl(instagramUrl) && (
+                                    <a href="/etoos247-instagram-collector.zip" download style={{ display: "inline-flex", padding: "8px 14px", borderRadius: "10px", background: "#be185d", color: "#fff", fontSize: "0.8rem", fontWeight: "800", textDecoration: "none" }}>
+                                      수집 확장 프로그램 다운로드
+                                    </a>
+                                  )}
                                 </div>
                               )}
                             </div>

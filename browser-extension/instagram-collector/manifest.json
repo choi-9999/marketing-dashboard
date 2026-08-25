@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "이투스247 Instagram 게시물 수집기",
+  "version": "1.0.0",
+  "description": "마케팅 대시보드에서 연 지점 Instagram 계정의 최신 공개 게시물을 수집합니다.",
+  "host_permissions": [
+    "https://marketing-dashboard-sable.vercel.app/*",
+    "https://*.vercel.app/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.instagram.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
