@@ -566,6 +566,13 @@ const branchCompetitorAddressMap = {
     { name: "이천아이나인독학기숙재수학원", address: "경기도 이천시 설성면 노성로259번길 39-17" },
     { name: "강남대성기숙 의대관", address: "경기도 이천시 호법면 이섭대천로527번길 25" }
   ],
+  "안성기숙": [
+    { name: "남안성비상에듀독학기숙학원", address: "경기도 안성시 삼죽면 진촌진말길 38" },
+    { name: "안성비상에듀기숙학원", address: "경기도 안성시 삼죽면 보삼로 590-9" },
+    { name: "수만휘기숙학원", address: "경기도 안성시 죽산면 장계길 114" },
+    { name: "역사적사명 기숙학원", address: "경기도 안성시 일죽면 판교길 65-9" },
+    { name: "72시간공부캠프안성캠퍼스", address: "경기도 안성시 삼죽면 보삼로 590-9" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -949,6 +956,61 @@ function getCompetitorsForBranch(branchName) {
           { title: "독학기숙 맞춤 시간표 운영", content: "개인별 인강 수강 계획 및 자습 몰입 환경 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [전문 코칭 대응] 단순 독학 관리 대비 이투스247만의 전문 담임 피드백 및 모의고사 오답 클리닉의 교육적 차별점을 제시하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("안성기숙") || cleanName.includes("안성")) {
+    return [
+      {
+        name: "남안성비상에듀독학기숙학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 93 }, theirs: { mgmt: 93, content: 88, facility: 92 } },
+        trend: "1. 남안성 독학기숙 전용 시설 리뉴얼 및 24시간 생활 루틴 통제 시스템 홍보\n2. 취약 과목 1:1 클리닉 및 스케줄링 플래너 점검 마케팅 전개",
+        promotions: [
+          { title: "남안성비상 독학기숙 생활관리 프로그램", content: "생활 루틴 전담 관리 및 취약 과목 1:1 클리닉 상시 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [콘텐츠/진단 대응] 단순 독서실형 관리 대비 이투스247만의 방대한 입시 데이터, 모의고사 라인업 및 전문 담임 코칭의 깊이를 상담 시 안내하십시오.\n2. [생활 관리 대응] 24시간 철저한 학습 시간 통제 및 숙소/면학 공간의 쾌적함을 비교 제시하십시오."
+      },
+      {
+        name: "안성비상에듀기숙학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 93 }, theirs: { mgmt: 92, content: 91, facility: 92 } },
+        trend: "1. 비상에듀 전통 기숙 시스템 기반 정규 수업 및 반수반 모집 홍보\n2. 장학 혜택 및 규칙적 생활 루틴 관리 강조",
+        promotions: [
+          { title: "안성비상 기숙 재수 성공 패키지", content: "정규 수업과 독학 관리가 결합된 맞춤형 기숙 프로그램 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [자기주도 학습 대응] 일방적 수업 중심 기숙 대비, 불필요한 수업을 줄이고 순수 자습 시간과 1:1 개인 맞춤 관리를 극대화하는 독학기숙의 효율성을 강조하십시오.\n2. [가성비/효율 대응] 고액의 재종 기숙 비용 대비 실속 있는 독학기숙의 수강료 및 장학 혜택을 부각하십시오."
+      },
+      {
+        name: "수만휘기숙학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 93 }, theirs: { mgmt: 91, content: 86, facility: 90 } },
+        trend: "1. 수만휘 커뮤니티 브랜드 인지도 기반 기숙 캠프 및 수강생 모집\n2. N수생 맞춤 생활 관리 및 멘토링 프로그램 홍보",
+        promotions: [
+          { title: "수만휘 기숙 수강료 지원 프로모션", content: "수만휘 회원 인증 및 성적 우수자 장학 혜택 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 커뮤니티형 인지도 대비 이투스 교육평가연구소의 공신력 높은 입시 데이터와 1:1 정밀 수시/정시 컨설팅을 전면에 내세우십시오."
+      },
+      {
+        name: "역사적사명 기숙학원",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 93 }, theirs: { mgmt: 90, content: 84, facility: 88 } },
+        trend: "1. 스파르타식 몰입 관리 및 엄격한 생활 지도 규율 중심 마케팅\n2. 반수생 및 재수생 단기 성적 향상 몰입반 운영",
+        promotions: [
+          { title: "역사적사명 기숙 몰입반 모집", content: "철저한 규율과 생활 통제를 통한 단기 성적 향상 몰입 프로그램", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [학습 로드맵 대응] 강압적 통제 방식 대비 학생 스스로 계획하고 실천할 수 있도록 돕는 이투스247의 과학적 학습 로드맵 코칭 시스템을 부각하십시오."
+      },
+      {
+        name: "72시간공부캠프안성캠퍼스",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 93 }, theirs: { mgmt: 89, content: 80, facility: 89 } },
+        trend: "1. 단기 집중 몰입 공부법 캠프 및 멘토 1:1 질의응답 중심 홍보\n2. 방학/반수 시즌 자기주도 학습 습관 형성 프로그램 전개",
+        promotions: [
+          { title: "72시간 몰입 공부캠프 참가자 모집", content: "단기 몰입 학습 훈련 및 멘토 피드백 프로그램 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [장기 지속성 대응] 일시적 단기 캠프와 달리 수능 당일까지 흔들림 없이 이어지는 이투스247의 1년 풀코스 담임 책임 관리 시스템을 강조하십시오."
       }
     ];
   }
@@ -9729,6 +9791,8 @@ export default function HomePage() {
                               if (clean.includes("청솔")) return "#059669"; // 청솔 에메랄드
                               if (clean.includes("탑클래스")) return "#d97706"; // 탑클래스 앰버
                               if (clean.includes("아이나인")) return "#7c3aed"; // 아이나인 바이올렛
+                              if (clean.includes("역사적사명")) return "#b45309"; // 역사적사명 브라운
+                              if (clean.includes("72시간")) return "#0891b2"; // 72시간 시안
                               return null;
                             };
 

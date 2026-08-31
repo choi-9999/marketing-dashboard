@@ -33,6 +33,18 @@ export async function GET(request) {
         comp5: Math.round(20 + Math.cos(i + 6) * 6 + i * 1) // 강남대성 / 디랩
       });
     }
+  } else if (cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(43 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(49 + Math.cos(i + 2) * 10 + i * 3), // 남안성비상독학기숙
+        comp2: Math.round(47 + Math.sin(i * 1.2 + 3) * 11 + i * 2), // 안성비상에듀기숙
+        comp3: Math.round(42 + Math.cos(i * 0.8 + 4) * 9 + i * 2), // 수만휘기숙
+        comp4: Math.round(33 + Math.sin(i + 5) * 7 + i * 1), // 역사적사명기숙
+        comp5: Math.round(28 + Math.cos(i + 6) * 6 + i * 1) // 72시간공부캠프
+      });
+    }
   } else if (cleanBranch.includes("이천기숙") || cleanBranch.includes("이천")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -80,15 +92,24 @@ export async function GET(request) {
     const periodMonths = ["2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01"];
     const monthLabels = ["1월", "2월", "3월", "4월", "5월", "6월"];
 
-    if (cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천")) {
+    if (cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
       const isDaech = cleanBranch.includes("대치");
       const isIcheon = cleanBranch.includes("이천기숙") || cleanBranch.includes("이천");
+      const isAnseong = cleanBranch.includes("안성기숙") || cleanBranch.includes("안성");
       // 6+ groups exceeds Naver API limit (max 5 per call). We make two parallel requests and normalize the scale using "ours"
       const body1 = {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isIcheon
+        keywordGroups: isAnseong
+          ? [
+              { groupName: "ours", keywords: ["이투스247 안성기숙", "이투스 안성기숙", "안성 이투스247"] },
+              { groupName: "comp1", keywords: ["남안성비상에듀독학기숙학원", "남안성비상에듀", "남안성비상"] },
+              { groupName: "comp2", keywords: ["안성비상에듀기숙학원", "안성비상에듀", "안성비상기숙"] },
+              { groupName: "comp3", keywords: ["수만휘기숙학원", "수만휘기숙", "안성 수만휘"] },
+              { groupName: "comp4", keywords: ["역사적사명 기숙학원", "역사적사명기숙", "역사적사명"] }
+            ]
+          : isIcheon
           ? [
               { groupName: "ours", keywords: ["이투스247 이천기숙", "이투스 이천기숙", "이천 이투스247"] },
               { groupName: "comp1", keywords: ["강남대성 QUETTA", "강남대성 퀘타", "대성 퀘타"] },
@@ -116,7 +137,12 @@ export async function GET(request) {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isIcheon
+        keywordGroups: isAnseong
+          ? [
+              { groupName: "ours", keywords: ["이투스247 안성기숙", "이투스 안성기숙", "안성 이투스247"] },
+              { groupName: "comp5", keywords: ["72시간공부캠프안성캠퍼스", "72시간공부캠프", "72시간캠프 안성"] }
+            ]
+          : isIcheon
           ? [
               { groupName: "ours", keywords: ["이투스247 이천기숙", "이투스 이천기숙", "이천 이투스247"] },
               { groupName: "comp5", keywords: ["이천탑클래스기숙학원", "이천탑클래스", "탑클래스 기숙학원"] },
