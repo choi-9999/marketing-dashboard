@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { kv } from "@vercel/kv";
+import { isAdminAuthenticated } from "../../lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -11,6 +12,15 @@ let writeQueue = Promise.resolve();
 const noStoreHeaders = {
   "Cache-Control": "no-store, max-age=0, must-revalidate"
 };
+
+class StateConflictError extends Error {
+  constructor(message, code, currentUpdatedAt = null) {
+    super(message);
+    this.name = "StateConflictError";
+    this.code = code;
+    this.currentUpdatedAt = currentUpdatedAt;
+  }
+}
 
 function getStorageMode() {
   if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
@@ -72,8 +82,27 @@ async function readRawTabs() {
   return null;
 }
 
-async function persistRawTabs(payload) {
+async function persistRawTabs(payload, expectedUpdatedAt) {
   const storageMode = getStorageMode();
+  const currentPayload = await readRawTabs();
+  const currentUpdatedAt = currentPayload?.updatedAt || null;
+
+  if (currentPayload && !expectedUpdatedAt) {
+    throw new StateConflictError(
+      "서버에서 복원한 데이터 버전이 없어 저장을 중단했습니다.",
+      "EXPECTED_UPDATED_AT_REQUIRED",
+      currentUpdatedAt
+    );
+  }
+
+  if (currentUpdatedAt && expectedUpdatedAt !== currentUpdatedAt) {
+    throw new StateConflictError(
+      "다른 관리자 또는 브라우저에서 데이터가 변경되었습니다.",
+      "STALE_SERVER_STATE",
+      currentUpdatedAt
+    );
+  }
+
   const nextPayload = {
     ...payload,
     updatedAt: new Date().toISOString()
@@ -125,15 +154,38 @@ export async function POST(request) {
   const storageMode = getStorageMode();
 
   try {
-    const payload = await request.json();
+    if (!(await isAdminAuthenticated())) {
+      return Response.json(
+        { error: "관리자 로그인이 필요합니다.", storageMode },
+        { status: 401, headers: noStoreHeaders }
+      );
+    }
+
+    const requestPayload = await request.json();
+    const { expectedUpdatedAt = null, ...payload } = requestPayload || {};
     writeQueue = writeQueue
       .catch(() => {})
-      .then(() => persistRawTabs(payload));
+      .then(() => persistRawTabs(payload, expectedUpdatedAt));
 
     const savedPayload = await writeQueue;
     return Response.json({ ok: true, storageMode, updatedAt: savedPayload.updatedAt }, { headers: noStoreHeaders });
   } catch (error) {
     console.error("Failed to save raw tabs data.", error);
+    if (error instanceof StateConflictError) {
+      return Response.json(
+        {
+          error: error.message,
+          code: error.code,
+          conflict: true,
+          currentUpdatedAt: error.currentUpdatedAt,
+          storageMode
+        },
+        {
+          status: error.code === "EXPECTED_UPDATED_AT_REQUIRED" ? 428 : 409,
+          headers: noStoreHeaders
+        }
+      );
+    }
     return Response.json(
       { error: "Failed to save raw tabs data.", storageMode },
       { status: storageMode === "browser-fallback" ? 503 : 500, headers: noStoreHeaders }

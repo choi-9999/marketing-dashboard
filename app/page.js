@@ -28,6 +28,27 @@ const getInstagramShortcode = (url) => {
   return shortcode && Array.from(shortcode).every((char) => alphabet.includes(char)) ? shortcode : "";
 };
 
+const getInstagramMediaTimestamp = (url) => {
+  const shortcode = getInstagramShortcode(url);
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  if (!shortcode) return 0;
+  let value = 0;
+  for (const character of shortcode.slice(0, 10)) {
+    const index = alphabet.indexOf(character);
+    if (index < 0) return 0;
+    value = value * 64 + index;
+  }
+  return value;
+};
+
+const getRepresentativeContentChannel = (url) => {
+  const normalizedUrl = String(url || "").toLowerCase();
+  if (normalizedUrl.includes("instagram.com")) return "INSTAGRAM";
+  if (normalizedUrl.includes("blog.naver.com")) return "NAVER BLOG";
+  if (normalizedUrl.includes("youtube.com") || normalizedUrl.includes("youtu.be")) return "YOUTUBE";
+  return "WEB CONTENT";
+};
+
 const compareInstagramMediaRecency = (a, b) => {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   const aCode = getInstagramShortcode(a.url);
@@ -319,7 +340,11 @@ function createRow(eventIds = [], seed = {}) {
     id: seed.id || createId("row"),
     region: seed.region || "",
     branch: seed.branch || "",
-    eventValues
+    eventValues,
+    representativeLinks: Array.from(
+      { length: 3 },
+      (_, index) => String(seed.representativeLinks?.[index] || "")
+    )
   };
 }
 
@@ -528,8 +553,6 @@ const branchCompetitorAddressMap = {
     { name: "잇올 분당수내센터", address: "경기도 성남시 분당구 황새울로258번길 40 2층" },
     { name: "잇올 분당정자센터", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
     { name: "잇올 분당이매센터", address: "경기도 성남시 분당구 판교로 476 오성빌딩 5층" },
-    { name: "잇올 용인 수지센터 1관", address: "경기도 용인시 수지구 풍덕천로 135 요진타워 5층, 6층" },
-    { name: "잇올 용인 수지센터 2관", address: "경기도 용인시 수지구 풍덕천로 145 유용빌딩 4층" },
     { name: "디랩 분당", address: "경기도 성남시 분당구 황새울로258번길 41 3층" }
   ]
 };
@@ -1275,7 +1298,8 @@ function migrateLegacyTab(tab) {
             id: row?.id || createId(`row-${index}`),
             region: row?.region || "",
             branch: row?.branch || "",
-            eventValues: row?.eventValues || {}
+            eventValues: row?.eventValues || {},
+            representativeLinks: row?.representativeLinks || []
           })
         )
       : [createRow(eventIds)];
@@ -3067,8 +3091,719 @@ function CustomDialogModal({ modal, onClose }) {
   );
 }
 
+
+
+function ReportParticipationChart({ participationRate, operationScore, nationalAverage, regionAverage, region }) {
+  const safeRate = Math.max(0, Math.min(100, Number(participationRate || 0)));
+  const chartRef = useRef(null);
+  const [isAnimated, setIsAnimated] = useState(false);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return undefined;
+
+    setIsAnimated(false);
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setIsAnimated(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      setIsAnimated(true);
+      observer.disconnect();
+    }, { threshold: 0.25 });
+
+    observer.observe(chart);
+    return () => observer.disconnect();
+  }, [safeRate, operationScore, nationalAverage, regionAverage]);
+
+  return (
+    <div className={`report-participation-chart${isAnimated ? " is-animated" : ""}`} ref={chartRef}>
+      <div className="report-participation-head">
+        <span>전체 프로그램 참여율</span>
+        <strong>{safeRate}<em>%</em></strong>
+      </div>
+      <div className="report-participation-track" style={{ "--target-width": `${safeRate}%` }}>
+        <span />
+      </div>
+      <div className="report-operation-bars">
+        <div className="report-operation-col">
+          <strong>{operationScore}<em>점</em></strong>
+          <div className="report-operation-track" style={{ "--target-height": `${Math.min(100, operationScore)}%` }}><span /></div>
+          <small>운영 점수</small>
+        </div>
+        <div className="report-operation-col">
+          <strong>{nationalAverage}<em>점</em></strong>
+          <div className="report-operation-track" style={{ "--target-height": `${Math.min(100, nationalAverage)}%` }}><span /></div>
+          <small>전국 평균</small>
+        </div>
+        <div className="report-operation-col">
+          <strong>{regionAverage}<em>점</em></strong>
+          <div className="report-operation-track" style={{ "--target-height": `${Math.min(100, regionAverage)}%` }}><span /></div>
+          <small>{region || "권역"} 평균</small>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReportProgramGauge({ value = 0 }) {
+  const gaugeRef = useRef(null);
+  const [isAnimated, setIsAnimated] = useState(false);
+  const safeValue = Math.max(0, Math.min(100, Number(value || 0)));
+
+  useEffect(() => {
+    const gauge = gaugeRef.current;
+    if (!gauge) return undefined;
+
+    setIsAnimated(false);
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setIsAnimated(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      setIsAnimated(true);
+      observer.disconnect();
+    }, { threshold: 0.25 });
+
+    observer.observe(gauge);
+    return () => observer.disconnect();
+  }, [safeValue]);
+
+  return (
+    <div
+      className={`report-program-bar${isAnimated ? " is-animated" : ""}`}
+      style={{ "--target-width": `${safeValue}%` }}
+      ref={gaugeRef}
+      aria-hidden="true"
+    >
+      <span />
+    </div>
+  );
+}
+
+function ReportSnsDonut({ blogScore = 0, instagramScore = 0, totalScore = 0, grade = "" }) {
+  const bScore = Math.max(0, Math.min(50, Number(blogScore || 0)));
+  const iScore = Math.max(0, Math.min(50, Number(instagramScore || 0)));
+  const tScore = Number(totalScore || 0);
+  const gradeLabel = grade ? (String(grade).includes("등급") ? String(grade) : `${grade}등급`) : "";
+  const circumference = 2 * Math.PI * 40;
+  const bDash = (bScore / 100) * circumference;
+  const iDash = (iScore / 100) * circumference;
+  const donutRef = useRef(null);
+  const [isAnimated, setIsAnimated] = useState(false);
+
+  useEffect(() => {
+    const donut = donutRef.current;
+    if (!donut) return undefined;
+    setIsAnimated(false);
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setIsAnimated(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      setIsAnimated(true);
+      observer.disconnect();
+    }, { threshold: 0.25 });
+
+    observer.observe(donut);
+    return () => observer.disconnect();
+  }, [bScore, iScore]);
+
+  return (
+    <div className={`report-sns-donut${isAnimated ? " is-animated" : ""}`} ref={donutRef}>
+      <div className="report-sns-donut-graphic">
+        <svg viewBox="0 0 100 100" className="report-sns-donut-svg">
+          <circle cx="50" cy="50" r="40" className="report-sns-donut-bg" />
+          <circle
+            cx="50"
+            cy="50"
+            r="40"
+            className="report-sns-donut-segment is-blog"
+            style={{
+              "--segment-value": `${bDash}`,
+              "--segment-gap": `${circumference - bDash}`,
+              strokeDashoffset: 0
+            }}
+          />
+          <circle
+            cx="50"
+            cy="50"
+            r="40"
+            className="report-sns-donut-segment is-instagram"
+            style={{
+              "--segment-value": `${iDash}`,
+              "--segment-gap": `${circumference - iDash}`,
+              strokeDashoffset: `-${bDash}`
+            }}
+          />
+        </svg>
+        <div className="report-sns-donut-center">
+          <span className="report-sns-donut-label">SNS TOTAL</span>
+          <strong className="report-sns-donut-value" tabIndex={gradeLabel ? 0 : undefined}>
+            <span className="report-sns-donut-score">{tScore.toFixed(1)}</span>
+            {gradeLabel && <span className="report-sns-donut-grade">{gradeLabel}</span>}
+          </strong>
+        </div>
+      </div>
+      <div className="report-sns-donut-legend">
+        <div><span className="dot is-blog" />블로그 {bScore.toFixed(1)}</div>
+        <div><span className="dot is-instagram" />인스타 {iScore.toFixed(1)}</div>
+      </div>
+    </div>
+  );
+}
+
+function ReportSnsChannelCard({ channel, score = 0, recentPosts = 0, lastPosted = "", url = "", tone = "blog" }) {
+  const safeScore = Math.max(0, Math.min(50, Number(score || 0)));
+  const CardTag = url ? "a" : "div";
+  const cardProps = url ? { href: url, target: "_blank", rel: "noopener noreferrer" } : {};
+  const cardRef = useRef(null);
+  const [isAnimated, setIsAnimated] = useState(false);
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return undefined;
+    setIsAnimated(false);
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setIsAnimated(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      setIsAnimated(true);
+      observer.disconnect();
+    }, { threshold: 0.25 });
+
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, [safeScore]);
+
+  return (
+    <CardTag className={`report-sns-channel-card is-${tone}${isAnimated ? " is-animated" : ""}`} ref={cardRef} {...cardProps}>
+      <span>{channel}</span>
+      <strong>{safeScore.toFixed(1)}<em>/ 50점</em></strong>
+      <div><i style={{ "--target-width": `${safeScore * 2}%` }} /></div>
+      <p>
+        <b>최근 30일 {recentPosts}개</b>
+        <small>마지막 게시일 {lastPosted || "기록 없음"}</small>
+      </p>
+    </CardTag>
+  );
+}
+
+const aiDiagnosisCache = {};
+
+function BranchMarketingReport({ report, generatedAt, mapStatus, onPrint, onFocusBranch, onFocusCompetitor, onPreviewFacilityVideo }) {
+  const [expandedAssetKey, setExpandedAssetKey] = useState(null);
+  const [currentDiagnosis, setCurrentDiagnosis] = useState(null);
+  const [isDiagnosing, setIsDiagnosing] = useState(false);
+  const branchLabel = report.branch === "본사" ? "본사" : `${report.branch}점`;
+  const reportCompetitors = getBranchCompetitorAddresses(report.branch);
+  const programLinks = {
+    "247체험단": "https://etoos247-experience-info.vercel.app/",
+    "언론보도": "https://intelligent-salk.vercel.app/",
+    "합격자취합": "https://admit-collector.vercel.app/"
+  };
+  const expandedAssetLabel = report.contentAssetCards.find((asset) => asset.key === expandedAssetKey)?.label || "";
+  const expandedAssetContents = report.featuredAssetContents?.[expandedAssetKey] || [];
+
+  useEffect(() => {
+    setExpandedAssetKey(null);
+  }, [report.branch]);
+
+  const fetchDiagnosis = useCallback(async (force = false) => {
+    if (!report?.branch) return;
+    if (!force && aiDiagnosisCache[report.branch]) return;
+
+    setIsDiagnosing(true);
+    try {
+      const res = await fetch("/api/report-diagnosis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          branch: report.branch,
+          region: report.region,
+          score: report.score,
+          grade: report.grade,
+          rank: report.rank,
+          totalRankedBranches: report.totalRankedBranches,
+          nationalAverage: report.nationalAverage,
+          regionAverage: report.regionAverage,
+          nationalOperationAverage: report.nationalOperationAverage,
+          regionOperationAverage: report.regionOperationAverage,
+          participationRate: report.participationRate,
+          programs: report.programs,
+          snsScore: report.snsScore,
+          snsGrade: report.snsGrade,
+          blogScore: report.blogScore,
+          instagramScore: report.instagramScore,
+          recentContentCount: report.recentContentCount,
+          latestBlogPosts: report.latestBlogPosts,
+          latestInstagramPosts: report.latestInstagramPosts,
+          hasFacilityVideo: report.hasFacilityVideo,
+          collabUrlCount: report.collabUrlCount,
+          mentorCount: report.mentorCount,
+          scholarshipAmount: report.scholarshipAmount,
+          contentAssetCount: report.contentAssetCount
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        aiDiagnosisCache[report.branch] = data;
+        setCurrentDiagnosis(data);
+      }
+    } catch (err) {
+      console.error("AI 진단 호출 실패:", err);
+    } finally {
+      setIsDiagnosing(false);
+    }
+  }, [report]);
+
+  useEffect(() => {
+    if (aiDiagnosisCache[report.branch]) {
+      setCurrentDiagnosis(aiDiagnosisCache[report.branch]);
+    } else {
+      fetchDiagnosis();
+    }
+  }, [report.branch, fetchDiagnosis]);
+
+  const summaryCards = [
+    {
+      label: "전국 순위",
+      value: report.rank ? `${report.rank}위` : "미집계",
+      detail: `총 ${report.totalRankedBranches}개 지점`
+    },
+    {
+      label: "종합 점수",
+      value: `${report.score}점`,
+      detail: report.grade,
+      tooltip: {
+        title: "평균 종합점수",
+        variant: "score",
+        items: [
+          `전국 평균 ${report.nationalAverage}점`,
+          `${report.region} 평균 ${report.regionAverage}점`
+        ]
+      }
+    },
+    {
+      label: "마케팅 프로그램 운영",
+      value: `${report.operationScore}점`,
+      detail: `참여율 ${report.participationRate}%`,
+      tooltip: {
+        title: "프로그램 평균 점수",
+        variant: "program",
+        items: [
+          `전국 평균 ${report.nationalOperationAverage}점`,
+          `${report.region} 평균 ${report.regionOperationAverage}점`
+        ]
+      }
+    },
+    {
+      label: "SNS 진단",
+      value: report.snsScore ? `${Number(report.snsScore).toFixed(1)}점` : "미운영",
+      detail: report.snsGrade || "등급 미부여",
+      tooltip: {
+        title: "SNS 평균 점수",
+        variant: "sns",
+        items: [
+          `전국 평균 ${report.nationalSnsAverage.toFixed(1)}점`,
+          `${report.region} 평균 ${report.regionSnsAverage.toFixed(1)}점`
+        ]
+      }
+    },
+    {
+      label: "콘텐츠 자산",
+      value: `${report.contentAssetCount}개`,
+      detail: "프렌즈 · 체험단 · 협업 · 언론"
+    }
+  ];
+
+  return (
+    <article className="branch-report" id="branch-marketing-report">
+      <div className="report-toolbar report-screen-only">
+        <div><strong>{branchLabel} 보고서</strong></div>
+        <button type="button" onClick={onPrint}>🖨️ 인쇄 / PDF 저장</button>
+      </div>
+
+      {/* Sheet 1: Cover, Overview & Location */}
+      <div className="report-print-sheet sheet-1">
+        <header className="report-cover report-print-page">
+          <div className="report-cover-copy">
+            <p className="report-eyebrow">ETOOS247 / {branchLabel.toUpperCase()}</p>
+            <h1><span>MARKETING</span><strong>REPORT.</strong></h1>
+            <p className="report-cover-branch">{branchLabel} 마케팅 종합 보고서</p>
+            <p className="report-address">{report.address || "주소 정보 미등록"}</p>
+            <div className="report-meta"><span>지역 {report.region}</span><span>생성 {generatedAt || "실시간"}</span></div>
+          </div>
+          <span className="report-cover-dot" aria-hidden="true" />
+          <div className={`report-score-hero grade-${report.grade.charAt(0).toLowerCase()}`}>
+            <span>MARKETING SCORE</span><strong>{report.score}</strong><em>/ 100점</em><b>{report.grade}</b>
+          </div>
+        </header>
+
+        <div className="report-editorial-heading report-page-break-avoid">
+          <span>REPORT OVERVIEW</span>
+          <h2>WHAT WE KNOW</h2>
+          <p>{branchLabel}의 핵심 마케팅 지표입니다.</p>
+        </div>
+        <section className="report-summary-grid report-page-break-avoid" aria-label="핵심 요약">
+          {summaryCards.map((card, index) => (
+            <div
+              className={`report-summary-card poster-${index + 1} ${card.tooltip ? "has-tooltip" : ""}`}
+              key={card.label}
+              tabIndex={card.tooltip ? 0 : undefined}
+            >
+              <em>{String(index + 1).padStart(2, "0")}</em><span>{card.label}</span><strong>{card.value}</strong><p>{card.detail}</p>
+              {card.tooltip && (
+                <div className={`report-summary-tooltip ${card.tooltip.variant}`} role="tooltip">
+                  <em aria-hidden="true">{String(index + 1).padStart(2, "0")}</em>
+                  <b>{card.tooltip.title}</b>
+                  {card.tooltip.items.map((item) => <small key={item}>{item}</small>)}
+                </div>
+              )}
+            </div>
+          ))}
+        </section>
+
+        <section className="report-section report-map-section report-print-page">
+          <div className="report-section-heading"><div><span>01</span><h2>현재 지점 위치</h2></div><p>지점의 실제 위치와 지역 정보를 확인합니다.</p></div>
+          <div className="report-map-frame" aria-label={`${branchLabel} 현재 위치 지도`}><div id="branch-report-map" /></div>
+          <div className="report-location-strip">
+            <div className="report-location-address">
+              <span>ADDRESS</span>
+              <button type="button" onClick={onFocusBranch}>{branchLabel}</button>
+              <p>{report.address || "주소 정보 미등록"}</p>
+            </div>
+            <div className="report-competitor-names">
+              <span>MAIN COMPETITORS</span>
+              <div>
+                {reportCompetitors.length
+                  ? reportCompetitors.map((competitor) => (
+                      <button type="button" key={competitor.name} onClick={() => onFocusCompetitor?.(competitor.name)}>
+                        {competitor.name}
+                      </button>
+                    ))
+                  : <strong>등록된 주요 경쟁사가 없습니다.</strong>}
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* Sheet 2: 02 Program Participation */}
+      <div className="report-print-sheet sheet-2">
+        <section className="report-section report-print-page">
+          <div className="report-section-heading"><div><span>02</span><h2>프로그램 참여 분석</h2></div><p>각 활성화 방안의 참여 횟수와 참여 인원을 기준으로 집계합니다.</p></div>
+          <div className="report-two-column">
+            <div className="report-chart-panel report-participation-panel">
+              <ReportParticipationChart
+                participationRate={report.participationRate}
+                operationScore={report.operationScore}
+                nationalAverage={report.nationalOperationAverage}
+                regionAverage={report.regionOperationAverage}
+                region={report.region}
+              />
+            </div>
+            <div className="report-program-list">
+              {report.analysisPrograms.map((program) => {
+                const rowContent = <>
+                  <div><strong>{program.name}</strong><span>{program.detail}</span></div>
+                  <ReportProgramGauge value={program.rate} />
+                  <b>{program.metricLabel}</b>
+                  {program.showEventNames && (
+                    <div className={`report-program-events${program.eventNames.length ? "" : " is-empty"}`}>
+                      <small>참여</small>
+                      <div className="report-program-event-chips">
+                        {program.eventNames.length
+                          ? program.eventNames.map((eventName) => <span key={`${program.name}-${eventName}`}>{eventName}</span>)
+                          : <span>참여 이벤트 없음</span>}
+                      </div>
+                    </div>
+                  )}
+                </>;
+                const externalUrl = programLinks[program.name];
+
+                if (externalUrl) {
+                  return (
+                    <a className="report-program-row is-action" href={externalUrl} target="_blank" rel="noopener noreferrer" key={program.name}>
+                      {rowContent}
+                    </a>
+                  );
+                }
+
+                if (program.name === "지점시설영상") {
+                  return (
+                    <button
+                      type="button"
+                      className="report-program-row is-action"
+                      onClick={onPreviewFacilityVideo}
+                      disabled={!report.facilityVideoUrl}
+                      title={report.facilityVideoUrl ? `${branchLabel} 시설영상 미리보기` : "등록된 시설영상이 없습니다."}
+                      key={program.name}
+                    >
+                      {rowContent}
+                    </button>
+                  );
+                }
+
+                return <div className="report-program-row" key={program.name}>{rowContent}</div>;
+              })}
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* Sheet 3: 03 SNS Performance & 04 Content Assets */}
+      <div className="report-print-sheet sheet-3">
+        <section className="report-section report-print-page">
+          <div className="report-section-heading"><div><span>03</span><h2>SNS 성과 분석</h2></div><p>채널별 점수, 최근 활동량과 마지막 게시일을 함께 진단합니다.</p></div>
+          <div className="report-sns-overview">
+            <ReportSnsDonut blogScore={report.blogScore} instagramScore={report.instagramScore} totalScore={report.snsScore} grade={report.snsGrade} />
+            <ReportSnsChannelCard channel="NAVER BLOG" score={report.blogScore} recentPosts={report.blogRecentPosts} lastPosted={report.blogLastPosted} url={report.blogUrl} tone="blog" />
+            <ReportSnsChannelCard channel="INSTAGRAM" score={report.instagramScore} recentPosts={report.instagramRecentPosts} lastPosted={report.instagramLastPosted} url={report.instagramUrl} tone="instagram" />
+          </div>
+          <div className="report-latest-social-grid">
+            <section className="report-latest-channel report-latest-blog">
+              <div className="report-latest-channel-heading">
+                <div><span>/LATEST</span><h3>BLOG POSTS</h3></div>
+                <small>최신 {report.latestBlogPosts.length}개</small>
+              </div>
+              <div className="report-latest-blog-list">
+                {report.latestBlogPosts.length ? report.latestBlogPosts.map((post, index) => (
+                  <a href={post.url} target="_blank" rel="noopener noreferrer" key={post.url || `report-blog-${index}`}>
+                    <div>
+                      <time>{post.pubDate || "게시일 확인 불가"}</time>
+                      <strong>{post.title || "제목 없는 게시물"}</strong>
+                    </div>
+                    <span>♥ {post.likesCollected === false ? "-" : (post.likes ?? 0)} · 💬 {post.commentsCollected === false ? "-" : (post.comments ?? 0)}</span>
+                  </a>
+                )) : <p className="report-latest-empty">최근 수집된 블로그 게시물이 없습니다.</p>}
+              </div>
+            </section>
+            <section className="report-latest-channel report-latest-instagram">
+              <div className="report-latest-channel-heading">
+                <div><span>/LATEST</span><h3>INSTAGRAM POSTS</h3></div>
+                <small>최신 {report.latestInstagramPosts.length}개</small>
+              </div>
+              <div className="report-latest-instagram-grid">
+                {report.latestInstagramPosts.length ? report.latestInstagramPosts.map((post, index) => {
+                  const displayCaption = getInstagramDisplayCaption(post.caption) || "Instagram 게시물";
+                  return (
+                    <a
+                      href={post.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Instagram 게시물 열기: ${displayCaption}`}
+                      key={post.url || `report-instagram-${index}`}
+                    >
+                      <span
+                        className={`report-instagram-visual${post.thumbnailUrl ? " has-image" : ""}`}
+                        style={post.thumbnailUrl ? { backgroundImage: `url(${post.thumbnailUrl})` } : undefined}
+                      />
+                      <span className="report-instagram-type">{post.type === "reel" ? "▶ REEL" : post.type === "carousel" ? "▣" : "●"}</span>
+                      <span className="report-instagram-copy">
+                        <strong>{displayCaption}</strong>
+                        <small>{post.publishedAt || "게시일 확인 불가"} · ♥ {post.likes ?? "-"} · 💬 {post.comments ?? "-"}</small>
+                      </span>
+                    </a>
+                  );
+                }) : <p className="report-latest-empty">최근 수집된 Instagram 게시물이 없습니다.</p>}
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section className="report-section report-print-page">
+          <div className="report-section-heading"><div><span>04</span><h2>협업 및 콘텐츠 자산</h2></div><p>프로그램별로 확보한 콘텐츠와 인물 자산을 점검합니다.</p></div>
+          <div className="report-content-asset-grid">
+            {report.contentAssetCards.map((asset) => {
+              const isExpandable = ["friends", "experience", "collab", "news", "mentor"].includes(asset.key);
+              const isExpanded = expandedAssetKey === asset.key;
+              const CardTag = isExpandable ? "button" : "div";
+              const actionProps = isExpandable ? {
+                type: "button",
+                "aria-expanded": isExpanded,
+                "aria-controls": "report-featured-asset-contents",
+                onClick: () => setExpandedAssetKey((current) => current === asset.key ? null : asset.key)
+              } : {};
+
+              return (
+                <CardTag
+                  className={`report-content-asset-card ${asset.active ? "active" : "inactive"}${isExpandable ? " is-expandable" : ""}`}
+                  key={asset.label}
+                  {...actionProps}
+                >
+                  <span>{asset.label}</span>
+                  <strong>{asset.value.toLocaleString("ko-KR")}<em>{asset.unit}</em></strong>
+                  <p>{isExpandable
+                    ? asset.key === "mentor"
+                      ? (isExpanded ? "명단 닫기 ↑" : "명단 보기 ↓")
+                      : (isExpanded ? "대표 콘텐츠 닫기 ↑" : "대표 콘텐츠 보기 ↓")
+                    : asset.detail}</p>
+                </CardTag>
+              );
+            })}
+          </div>
+          {expandedAssetKey && (
+            <div className="report-featured-collab" id="report-featured-asset-contents">
+              <div className="report-featured-collab-heading">
+                <span>{expandedAssetKey === "mentor" ? "/ROSTER" : "/FEATURED"}</span>
+                <h3>{expandedAssetKey === "mentor" ? `${expandedAssetLabel} 명단` : `대표 ${expandedAssetLabel} 콘텐츠`}</h3>
+              </div>
+              {expandedAssetKey === "mentor" ? (
+                report.mentorAssetRows.length ? (
+                  <div className="report-mentor-asset-grid">
+                    {report.mentorAssetRows.map((row, index) => (
+                      <article className="report-mentor-asset-card" key={row.id || `report-mentor-${index}`}>
+                        <small>{row.isMentor ? "MENTOR" : "SCHOLAR"} · {row.year || "연도 미등록"}</small>
+                        <strong>{row.name || "이름 미등록"}</strong>
+                        <span>{[row.university, row.department].filter(Boolean).join(" · ") || "합격 정보 미등록"}</span>
+                        <em>{row.group || "장학 그룹 미등록"}{row.amount > 0 ? ` · ${row.amount.toLocaleString("ko-KR")}원` : ""}</em>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="report-featured-collab-empty">등록된 장학생·멘토단이 없습니다.</p>
+                )
+              ) : expandedAssetContents.length ? (
+                <div className="report-featured-collab-grid">
+                  {expandedAssetContents.map((content, index) => (
+                    <a
+                      href={content.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      key={`${content.title}-${content.url}`}
+                      aria-label={`${content.title} ${content.channel} 콘텐츠 열기`}
+                    >
+                      <small>{String(index + 1).padStart(2, "0")} · {content.channel}</small>
+                      <strong>{content.title}</strong>
+                      <span>콘텐츠 보기 ↗</span>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p className="report-featured-collab-empty">등록된 대표 콘텐츠 URL이 없습니다.</p>
+              )}
+            </div>
+          )}
+        </section>
+      </div>
+
+      {/* Sheet 4: 05 Comprehensive Diagnosis & Action Plan & CI */}
+      <div className="report-print-sheet sheet-4">
+        <section className="report-section report-actions-section report-print-page">
+          <div className="report-section-heading">
+            <div>
+              <span>05</span>
+              <h2>종합 진단 및 실행 제안</h2>
+            </div>
+            <div className="report-ai-header-controls report-screen-only">
+              <span className={`report-ai-badge ${currentDiagnosis?.fallback ? "is-fallback" : "is-ai"}`}>
+                {currentDiagnosis?.fallback ? "기본 규칙 모드" : "⚡ Gemini 3.5 Flash-Lite"}
+              </span>
+              <button
+                type="button"
+                className="report-ai-refresh-btn"
+                onClick={() => fetchDiagnosis(true)}
+                disabled={isDiagnosing}
+                title="AI 진단 새로고침"
+              >
+                {isDiagnosing ? "분석 중..." : "AI 재분석 🔄"}
+              </button>
+            </div>
+          </div>
+
+          {isDiagnosing && !currentDiagnosis ? (
+            <div className="report-ai-loading">
+              <div className="report-ai-spinner" />
+              <p><strong>{branchLabel}</strong> 종합 운영 데이터를 바탕으로 Gemini 3.5 Flash-Lite AI가 맞춤 진단 및 실행 제안을 도출 중입니다...</p>
+            </div>
+          ) : (
+            <>
+              {currentDiagnosis?.summary && (
+                <div className="report-ai-diagnosis-card">
+                  <div className="report-ai-diagnosis-header">
+                    <div className="report-ai-card-title-group">
+                      <span className="report-ai-card-tag">AI 종합 브리핑</span>
+                      <strong className="report-ai-branch-highlight">{branchLabel} 운영 진단</strong>
+                    </div>
+                    {currentDiagnosis.generatedAt && (
+                      <small className="report-ai-time">
+                        {currentDiagnosis.fallback ? "(기본 분석)" : `(Gemini 3.5 분석 · ${currentDiagnosis.generatedAt})`}
+                      </small>
+                    )}
+                  </div>
+                  <p className="report-ai-summary-text">{currentDiagnosis.summary}</p>
+                  {currentDiagnosis.diagnosis && currentDiagnosis.diagnosis.length > 0 && (
+                    <div className="report-ai-diagnosis-points">
+                      <span className="report-ai-points-title">핵심 진단 포인트</span>
+                      <div className="report-ai-points-grid">
+                        {currentDiagnosis.diagnosis.map((point, idx) => (
+                          <div className="report-ai-point-item" key={idx}>
+                            <span className="report-ai-point-num">{String(idx + 1).padStart(2, "0")}</span>
+                            <p>{point}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="report-recommendations-header">
+                <div className="report-recommendations-title">
+                  <h3>전술적 우선 실행 제안 (Action Plan)</h3>
+                  <p>원내 활성화 및 상담 전환을 위한 우선 실행 가이드입니다.</p>
+                </div>
+              </div>
+
+              <ol className="report-recommendations">
+                {(currentDiagnosis?.recommendations || report.recommendations).map((recommendation, index) => (
+                  <li key={`${index}-${recommendation}`}>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <p>{recommendation}</p>
+                  </li>
+                ))}
+              </ol>
+            </>
+          )}
+
+          <div className="report-source-note">
+            본 보고서는 최신 데이터와 Google Gemini 3.5 Flash-Lite 모델을 기반으로 생성되었습니다. 미입력 데이터는 실제 미운영 상태와 다를 수 있습니다.
+          </div>
+
+          <div className="report-footer-brand">
+            <img src="/logo-etoos-eci.png" alt="이투스ECI 로고" className="report-footer-logo" />
+            <img src="/logo-etoos-247.png" alt="이투스247학원 로고" className="report-footer-logo" />
+          </div>
+        </section>
+      </div>
+    </article>
+  );
+}
+
+
 export default function HomePage() {
   const [page, setPage] = useState("dashboard");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdminAuthChecked, setIsAdminAuthChecked] = useState(false);
+  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminLoginError, setAdminLoginError] = useState("");
+  const [isAdminLoginSubmitting, setIsAdminLoginSubmitting] = useState(false);
 
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration;
@@ -3086,6 +3821,9 @@ export default function HomePage() {
 
   const [rawTabs, setRawTabs] = useState(initialTabs);
   const rawTabsRef = useRef(rawTabs);
+  const serverWriteEnabledRef = useRef(false);
+  const serverUpdatedAtRef = useRef(null);
+  const lastServerRawTabsSignatureRef = useRef("");
   useEffect(() => {
     rawTabsRef.current = rawTabs;
   }, [rawTabs]);
@@ -3229,7 +3967,17 @@ export default function HomePage() {
       return;
     }
 
+    if (menuName === "report" || menuName === "종합보고서") {
+      sortMentorRowsState();
+      setPage("report");
+      return;
+    }
+
     if (menuName === "rawdata") {
+      if (!isAdmin) {
+        setIsAdminLoginOpen(true);
+        return;
+      }
       sortMentorRowsState();
       setPage("rawdata");
       return;
@@ -3249,6 +3997,10 @@ export default function HomePage() {
       sortMentorRowsState();
       setPage("sns");
     } else if (menuName === "RAWDATASTUDIO") {
+      if (!isAdmin) {
+        setIsAdminLoginOpen(true);
+        return;
+      }
       sortMentorRowsState();
       setPage("rawdata");
     } else if (menuName === "지점 대시보드") {
@@ -3382,6 +4134,7 @@ export default function HomePage() {
   const [saveState, setSaveState] = useState("서버 저장 대기 중");
   const [isHydrated, setIsHydrated] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [reportGeneratedAt, setReportGeneratedAt] = useState("");
   const [mapStatus, setMapStatus] = useState({ provider: "", message: "" });
   const [isCrawling, setIsCrawling] = useState(false);
   const [crawlingLogs, setCrawlingLogs] = useState([]);
@@ -3412,6 +4165,86 @@ export default function HomePage() {
   const [cardViewStyle, setCardViewStyle] = useState("rolling"); // "rolling" | "grid"
   const [selectedCompForPromo, setSelectedCompForPromo] = useState(null);
   const [isSocialLoading, setIsSocialLoading] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadAdminSession() {
+      try {
+        const response = await fetch("/api/admin/session", { cache: "no-store" });
+        const result = await response.json().catch(() => null);
+        if (!ignore) setIsAdmin(Boolean(response.ok && result?.authenticated));
+      } catch {
+        if (!ignore) setIsAdmin(false);
+      } finally {
+        if (!ignore) setIsAdminAuthChecked(true);
+      }
+    }
+
+    loadAdminSession();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isAdminAuthChecked && !isAdmin && page === "rawdata") {
+      setPage("dashboard");
+      setDashboardTabId(OVERVIEW_TAB_ID);
+    }
+  }, [isAdmin, isAdminAuthChecked, page]);
+
+  useEffect(() => {
+    if (!selectedBranch) {
+      setReportGeneratedAt("");
+      return;
+    }
+    setReportGeneratedAt(new Date().toLocaleString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    }));
+  }, [selectedBranch]);
+
+  async function handleAdminLogin(event) {
+    event.preventDefault();
+    if (!adminPassword || isAdminLoginSubmitting) return;
+    setIsAdminLoginSubmitting(true);
+    setAdminLoginError("");
+    try {
+      const response = await fetch("/api/admin/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: adminPassword }),
+        cache: "no-store"
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(result?.error || "관리자 로그인에 실패했습니다.");
+      setIsAdmin(true);
+      setAdminPassword("");
+      setIsAdminLoginOpen(false);
+    } catch (error) {
+      setAdminLoginError(error.message || "관리자 로그인에 실패했습니다.");
+    } finally {
+      setIsAdminLoginSubmitting(false);
+    }
+  }
+
+  async function handleAdminLogout() {
+    try {
+      await fetch("/api/admin/session", { method: "DELETE", cache: "no-store" });
+    } finally {
+      setIsAdmin(false);
+      setAdminPassword("");
+      setAdminLoginError("");
+      if (page === "rawdata") {
+        setPage("dashboard");
+        setDashboardTabId(OVERVIEW_TAB_ID);
+      }
+    }
+  }
   const allBranches = useMemo(() => {
     const list = rawTabs
       .filter((tab) => !isSpecialTabKind(tab.kind))
@@ -3546,6 +4379,51 @@ export default function HomePage() {
     }
   }, [instagramCollections, loadInstagramCollection]);
 
+  async function persistRawTabsToServer(nextTabs, overrides = {}) {
+    if (!isAdmin) {
+      const error = new Error("관리자 로그인이 필요합니다.");
+      error.code = "ADMIN_REQUIRED";
+      throw error;
+    }
+    if (!serverWriteEnabledRef.current) {
+      const error = new Error("서버 데이터 복원이 확인되지 않아 저장을 중단했습니다.");
+      error.code = "SERVER_RESTORE_REQUIRED";
+      throw error;
+    }
+
+    const response = await fetch("/api/rawtabs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        page,
+        rawTabs: nextTabs,
+        activeTabId,
+        dashboardTabId,
+        ...overrides,
+        expectedUpdatedAt: serverUpdatedAtRef.current
+      }),
+      cache: "no-store"
+    });
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      if (response.status === 409 || response.status === 428 || result?.conflict) {
+        serverWriteEnabledRef.current = false;
+        const error = new Error(result?.error || "서버 데이터 버전 충돌이 발생했습니다.");
+        error.code = "SERVER_DATA_CONFLICT";
+        error.currentUpdatedAt = result?.currentUpdatedAt || null;
+        throw error;
+      }
+      const error = new Error(result?.error || "서버 저장에 실패했습니다.");
+      error.code = response.status === 401 ? "ADMIN_REQUIRED" : "SERVER_SAVE_FAILED";
+      throw error;
+    }
+
+    serverUpdatedAtRef.current = result?.updatedAt || serverUpdatedAtRef.current;
+    lastServerRawTabsSignatureRef.current = JSON.stringify(nextTabs);
+    return result;
+  }
+
   const handleSaveSnsMetrics = async (targetBranch, updatedFields) => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -3568,14 +4446,7 @@ export default function HomePage() {
     try {
       window.localStorage.setItem(BROWSER_SAVE_KEY, JSON.stringify(payload));
       setSaveState("SNS 지표 서버 저장 중...");
-      const saveResponse = await fetch("/api/rawtabs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        cache: "no-store"
-      });
-      const saveResult = await saveResponse.json().catch(() => null);
-      if (!saveResponse.ok) throw new Error(saveResult?.error || "SNS metrics save failed");
+      const saveResult = await persistRawTabsToServer(nextTabs);
 
       const verifyResponse = await fetch("/api/rawtabs", { cache: "no-store" });
       const verifyResult = await verifyResponse.json().catch(() => null);
@@ -3592,8 +4463,13 @@ export default function HomePage() {
       return { ok: true };
     } catch (error) {
       console.error("Failed to save SNS metrics.", error);
-      setSaveState("SNS 지표 저장 실패");
-      return { ok: false, error: "저장에 실패했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요." };
+      setSaveState(error.code === "SERVER_DATA_CONFLICT" ? "서버 데이터 충돌 · 새로고침 필요" : "SNS 지표 저장 실패");
+      return {
+        ok: false,
+        error: error.code === "SERVER_DATA_CONFLICT"
+          ? "다른 곳에서 데이터가 변경되었습니다. 새로고침한 뒤 다시 수정해 주세요."
+          : error.message || "저장에 실패했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요."
+      };
     }
   };
 
@@ -3645,32 +4521,25 @@ export default function HomePage() {
       );
     }
 
-    // Apply all updates in a single state call and persist to server
-    setRawTabs(prevTabs => {
-      const nextTabs = prevTabs.map(tab => {
-        if (tab.kind !== SPECIAL_SOCIAL_TAB_KIND) return tab;
-        const newRows = (tab.socialRows || []).map(r => {
+    const nextTabs = rawTabsRef.current.map(tab => {
+      if (tab.kind !== SPECIAL_SOCIAL_TAB_KIND) return tab;
+      return {
+        ...tab,
+        socialRows: (tab.socialRows || []).map(r => {
           const stats = updatedMap[r.branch.trim()];
-          if (!stats) return r;
-          return {
-            ...r,
-            ...stats
-          };
-        });
-        return {
-          ...tab,
-          socialRows: newRows
-        };
-      });
-
-      fetch("/api/rawtabs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rawTabs: nextTabs })
-      }).catch(err => console.error("Error saving batch sync to server:", err));
-
-      return nextTabs;
+          return stats ? { ...r, ...stats } : r;
+        })
+      };
     });
+    rawTabsRef.current = nextTabs;
+    setRawTabs(nextTabs);
+
+    try {
+      await persistRawTabsToServer(nextTabs);
+    } catch (error) {
+      console.error("Error saving batch sync to server:", error);
+      setSaveState(error.code === "SERVER_DATA_CONFLICT" ? "서버 데이터 충돌 · 새로고침 필요" : "일괄 분석 저장 실패");
+    }
 
     setIsSnsSyncing(false);
     setBatchSyncProgress(null);
@@ -3718,14 +4587,17 @@ export default function HomePage() {
   const hasInitializedSaveRef = useRef(false);
   const importInputRef = useRef(null);
   const mapRef = useRef(null);
+  const reportMapFocusRef = useRef(new Map());
   const wheelTimeoutRef = useRef(false);
   const ownPromoContainerRef = useRef(null);
   const compPromoContainerRef = useRef(null);
 
   useEffect(() => {
-    const mapContainer = document.getElementById("competitor-map-leaflet");
+    const mapContainerId = page === "report" ? "branch-report-map" : "competitor-map-leaflet";
+    const mapContainer = document.getElementById(mapContainerId);
 
     const cleanupMap = () => {
+      reportMapFocusRef.current.clear();
       if (mapRef.current?.remove) {
         mapRef.current.remove();
       }
@@ -3733,7 +4605,7 @@ export default function HomePage() {
       if (mapContainer) mapContainer.innerHTML = "";
     };
 
-    if ((page !== "competitors" && page !== "sns") || !mapContainer) {
+    if ((page !== "competitors" && page !== "sns" && page !== "report") || !mapContainer) {
       cleanupMap();
       return;
     }
@@ -3897,7 +4769,7 @@ export default function HomePage() {
       try {
         const initialCoords = selectedBranch ? await resolveNaverBranchCoords(selectedBranch) : [36.2, 127.8];
         const initialZoom = selectedBranch ? 16 : 7;
-        const map = new window.naver.maps.Map("competitor-map-leaflet", {
+        const map = new window.naver.maps.Map(mapContainerId, {
           center: new window.naver.maps.LatLng(initialCoords[0], initialCoords[1]),
           zoom: initialZoom,
           zoomControl: true
@@ -3924,11 +4796,19 @@ export default function HomePage() {
           const marker = new window.naver.maps.Marker({
             position,
             map,
+            zIndex: item.type === "branch" ? 1000 : 100,
             icon: {
               content: getBranchMarkerHtml(item.label, item.isActive, "", item.type),
               anchor: new window.naver.maps.Point(12, 12)
             }
           });
+          if (page === "report") {
+            const focusKey = item.type === "branch" ? "branch" : item.name;
+            reportMapFocusRef.current.set(focusKey, () => {
+              map.panTo(position);
+              map.setZoom(item.type === "branch" ? 17 : 16);
+            });
+          }
           const address = "";
           const infoWindow = new window.naver.maps.InfoWindow({
             content: `
@@ -3970,7 +4850,7 @@ export default function HomePage() {
 
       const initialCoords = selectedBranch ? getBranchCoords(selectedBranch) : [36.2, 127.8];
       const initialZoom = selectedBranch ? 16 : 7;
-      const map = window.L.map("competitor-map-leaflet", {
+      const map = window.L.map(mapContainerId, {
         zoomControl: true,
         scrollWheelZoom: true
       }).setView(initialCoords, initialZoom);
@@ -4004,7 +4884,17 @@ export default function HomePage() {
           iconAnchor: [12, 12]
         });
 
-        const marker = window.L.marker(coords, { icon: customIcon }).addTo(map);
+        const marker = window.L.marker(coords, {
+          icon: customIcon,
+          zIndexOffset: item.type === "branch" ? 1000 : 100
+        }).addTo(map);
+        if (page === "report") {
+          const focusKey = item.type === "branch" ? "branch" : item.name;
+          reportMapFocusRef.current.set(focusKey, () => {
+            map.setView(coords, item.type === "branch" ? 17 : 16, { animate: true, duration: 0.6 });
+            marker.openPopup?.();
+          });
+        }
         marker.on("click", () => {
           if (item.type === "branch") setSelectedBranch(item.name);
           setTypedAiStrategy("");
@@ -4256,20 +5146,7 @@ export default function HomePage() {
     try {
       window.localStorage.setItem(BROWSER_SAVE_KEY, JSON.stringify(payload));
       setSaveState("강제 서버 저장 중...");
-
-      const saveResponse = await fetch("/api/rawtabs", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload),
-        cache: "no-store"
-      });
-      const saveResult = await saveResponse.json().catch(() => null);
-
-      if (!saveResponse.ok) {
-        throw new Error(saveResult?.error || "force save failed");
-      }
+      const saveResult = await persistRawTabsToServer(sortedTabs);
 
       const verifyResponse = await fetch("/api/rawtabs", { cache: "no-store" });
       const verifyResult = await verifyResponse.json().catch(() => null);
@@ -4282,7 +5159,7 @@ export default function HomePage() {
       setSaveState(`강제 저장 완료${savedAt ? ` · ${savedAt}` : ""}`);
     } catch (error) {
       console.error("Failed to force save server state.", error);
-      setSaveState("강제 서버 저장 실패");
+      setSaveState(error.code === "SERVER_DATA_CONFLICT" ? "서버 데이터 충돌 · 새로고침 필요" : "강제 서버 저장 실패");
     }
   }
 
@@ -4299,10 +5176,12 @@ export default function HomePage() {
           const restoredAt = formatStatusTimestamp(parsed.updatedAt);
 
           if (!ignore && normalizedTabs.length > 0) {
+            serverWriteEnabledRef.current = true;
+            serverUpdatedAtRef.current = parsed.updatedAt || null;
+            lastServerRawTabsSignatureRef.current = JSON.stringify(normalizedTabs);
             setRawTabs(normalizedTabs);
             setActiveTabId(parsed.activeTabId || normalizedTabs[0].id);
             setDashboardTabId(OVERVIEW_TAB_ID);
-            setPage("dashboard");
             setSaveState(
               parsed.storageMode === "shared-kv"
                 ? `공유 서버 데이터 복원됨${restoredAt ? ` · ${restoredAt}` : ""}`
@@ -4322,6 +5201,10 @@ export default function HomePage() {
         // Fall through to browser cache restore.
       }
 
+      serverWriteEnabledRef.current = false;
+      serverUpdatedAtRef.current = null;
+      lastServerRawTabsSignatureRef.current = "";
+
       try {
         const cached = window.localStorage.getItem(BROWSER_SAVE_KEY);
         if (!cached) throw new Error("no cached state");
@@ -4333,8 +5216,7 @@ export default function HomePage() {
           setRawTabs(normalizedTabs);
           setActiveTabId(parsed.activeTabId || normalizedTabs[0].id);
           setDashboardTabId(OVERVIEW_TAB_ID);
-          setPage("dashboard");
-          setSaveState("브라우저 저장본 복원됨");
+          setSaveState("브라우저 저장본 복원됨 · 서버 저장 잠김");
           return;
         }
       } catch {
@@ -4376,33 +5258,34 @@ export default function HomePage() {
 
       try {
         window.localStorage.setItem(BROWSER_SAVE_KEY, JSON.stringify(payload));
+        const nextSignature = JSON.stringify(sortedTabs);
+        if (nextSignature === lastServerRawTabsSignatureRef.current) {
+          setSaveState("변경사항 없음");
+          return;
+        }
+        if (!isAdmin) {
+          setSaveState("브라우저에 저장됨 · 관리자 로그인 필요");
+          return;
+        }
+        if (!serverWriteEnabledRef.current) {
+          setSaveState("브라우저에 저장됨 · 서버 저장 잠김");
+          return;
+        }
+
         setSaveState("저장 중...");
-        const response = await fetch("/api/rawtabs", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json().catch(() => null);
-
-        if (!response.ok) {
-          if (result?.storageMode === "browser-fallback") {
-            setSaveState("공유 저장 미설정, 브라우저에 저장됨");
-            return;
-          }
-          throw new Error("failed to save");
-        }
-
-        if (result?.storageMode === "shared-kv") {
-          const savedAt = formatStatusTimestamp(result?.updatedAt);
-          setSaveState(`공유 서버에 저장됨${savedAt ? ` · ${savedAt}` : ""}`);
+        const result = await persistRawTabsToServer(sortedTabs);
+        const savedAt = formatStatusTimestamp(result?.updatedAt);
+        setSaveState(result?.storageMode === "shared-kv"
+          ? `공유 서버에 저장됨${savedAt ? ` · ${savedAt}` : ""}`
+          : `서버에 자동 저장됨${savedAt ? ` · ${savedAt}` : ""}`);
+      } catch (error) {
+        if (error.code === "SERVER_DATA_CONFLICT") {
+          setSaveState("서버 데이터 충돌 · 새로고침 필요");
+        } else if (error.code === "ADMIN_REQUIRED") {
+          setSaveState("브라우저에 저장됨 · 관리자 로그인 필요");
         } else {
-          setSaveState("서버에 자동 저장됨");
+          setSaveState("브라우저에 저장됨 · 서버 저장 실패");
         }
-      } catch {
-        setSaveState("브라우저에 저장됨");
       }
     }, 400);
 
@@ -4411,7 +5294,7 @@ export default function HomePage() {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [activeTabId, dashboardTabId, isHydrated, page, rawTabs]);
+  }, [isAdmin, isHydrated, rawTabs]);
 
   const activeTab = useMemo(
     () => rawTabs.find((tab) => tab.id === activeTabId) ?? rawTabs[0],
@@ -5500,6 +6383,303 @@ export default function HomePage() {
       };
   }, [dashboardRawTabs, overallCollabSummary, overallCollabTab, snsSourceRows]);
 
+  const branchReport = useMemo(() => {
+    if (!selectedBranch) return null;
+
+    const branchKey = normalizeBranchKey(selectedBranch);
+    const scoreboardRow = overallBranchScoreboard.branches.find(
+      (row) => normalizeBranchKey(row.branch) === branchKey
+    ) || null;
+    const snsRow = snsSourceRows.find(
+      (row) => normalizeBranchKey(row.branch) === branchKey
+    ) || null;
+    const collabRow = overallCollabSummary.branchRows.find(
+      (row) => normalizeBranchKey(row.branch) === branchKey
+    ) || null;
+    const facilityTab = rawTabs.find((tab) => tab.kind === SPECIAL_FACILITY_TAB_KIND);
+    const facilityRow = facilityTab?.facilityRows?.find(
+      (row) => normalizeBranchKey(row.branch) === branchKey
+    ) || null;
+    const mentorTab = rawTabs.find((tab) => tab.kind === SPECIAL_MENTOR_TAB_KIND);
+    const branchMentorRows = (mentorTab?.mentorRows || []).filter(
+      (row) => normalizeBranchKey(row.branch) === branchKey
+    );
+
+    const programs = dashboardRawTabs.map((tab) => {
+      const row = tab.rows.find((item) => normalizeBranchKey(item.branch) === branchKey);
+      const activeEventNames = tab.events
+        .filter((event) => Number(row?.eventValues?.[event.id]?.participants || 0) > 0)
+        .map((event) => event.name);
+      const participants = tab.events.reduce(
+        (sum, event) => sum + Number(row?.eventValues?.[event.id]?.participants || 0),
+        0
+      );
+      const activeEvents = activeEventNames.length;
+      return {
+        id: tab.id,
+        name: tab.name,
+        activeEvents,
+        totalEvents: tab.events.length,
+        rate: tab.events.length > 0 ? Math.round((activeEvents / tab.events.length) * 100) : 0,
+        activeEventNames,
+        participants,
+        representativeLinks: (row?.representativeLinks || [])
+          .map((url) => String(url || "").trim())
+          .filter(Boolean)
+          .slice(0, 3)
+      };
+    });
+
+    const totalEvents = programs.reduce((sum, program) => sum + program.totalEvents, 0)
+      + Number(overallCollabSummary.uniqueEvents || 0);
+    const activeEvents = programs.reduce((sum, program) => sum + program.activeEvents, 0)
+      + Number(collabRow?.events?.length || 0);
+    const participationRate = totalEvents > 0 ? Math.round((activeEvents / totalEvents) * 100) : 0;
+    const region = scoreboardRow?.region || collabRow?.region || getBranchAddress(selectedBranch)?.split(" ")[0] || "기타";
+    const regionPeers = overallBranchScoreboard.branches.filter((row) => row.region === region);
+    const score = scoreboardRow?.score ?? Math.round(snsRow?.finalScore || 0);
+    const regionAverage = regionPeers.length
+      ? Math.round(regionPeers.reduce((sum, row) => sum + row.score, 0) / regionPeers.length)
+      : score;
+    const nationalOperationAverage = overallBranchScoreboard.branches.length
+      ? Math.round(overallBranchScoreboard.branches.reduce((sum, row) => sum + Number(row.operationScore || 0), 0) / overallBranchScoreboard.branches.length)
+      : 0;
+    const regionOperationAverage = regionPeers.length
+      ? Math.round(regionPeers.reduce((sum, row) => sum + Number(row.operationScore || 0), 0) / regionPeers.length)
+      : Number(scoreboardRow?.operationScore || 0);
+    const nationalSnsPeers = overallBranchScoreboard.branches.filter(
+      (row) => row.snsScore !== null && Number.isFinite(Number(row.snsScore))
+    );
+    const regionSnsPeers = regionPeers.filter(
+      (row) => row.snsScore !== null && Number.isFinite(Number(row.snsScore))
+    );
+    const nationalSnsAverage = nationalSnsPeers.length
+      ? Math.round((nationalSnsPeers.reduce((sum, row) => sum + Number(row.snsScore), 0) / nationalSnsPeers.length) * 10) / 10
+      : Number(snsRow?.finalScore || 0);
+    const regionSnsAverage = regionSnsPeers.length
+      ? Math.round((regionSnsPeers.reduce((sum, row) => sum + Number(row.snsScore), 0) / regionSnsPeers.length) * 10) / 10
+      : Number(snsRow?.finalScore || 0);
+    const rankIndex = overallBranchScoreboard.branches.findIndex(
+      (row) => normalizeBranchKey(row.branch) === branchKey
+    );
+
+    const findProgram = (...names) => programs.find((program) => names.includes(program.name));
+    const friendsProgram = findProgram("247프렌즈", "프렌즈");
+    const experienceProgram = findProgram("247체험단", "체험단");
+    const newsProgram = findProgram("언론보도");
+    const passProgram = findProgram("합격자 취합", "합격자취합");
+    const hasFacilityVideo = Boolean(facilityRow?.url?.trim());
+    const collabEvents = collabRow?.events?.map((event) => event.name) || [];
+
+    const featuredCollabContents = (collabRow?.events || [])
+      .map((event, eventIndex) => {
+        const instagramLink = event.links?.find((link) => /instagram\.com/i.test(String(link.url || "")));
+        const blogLink = event.links?.find(
+          (link) => /blog\.naver\.com/i.test(String(link.url || "")) || /블로그/i.test(String(link.label || ""))
+        );
+        const selectedLink = instagramLink || blogLink;
+        if (!selectedLink?.url) return null;
+
+        const yearMatch = String(event.name || "").match(/^(\d{2,4})(?:_|\s|-)/);
+        const parsedYear = yearMatch ? Number(yearMatch[1]) : 0;
+        const eventYear = parsedYear > 0 && parsedYear < 100 ? 2000 + parsedYear : parsedYear;
+        const instagramTimestamp = instagramLink ? getInstagramMediaTimestamp(selectedLink.url) : 0;
+        const fallbackTimestamp = eventYear > 0 ? Date.UTC(eventYear, 0, 1) - eventIndex : -eventIndex;
+        return {
+          title: event.name,
+          url: selectedLink.url,
+          channel: instagramLink ? "INSTAGRAM" : "NAVER BLOG",
+          sortTimestamp: instagramTimestamp || fallbackTimestamp
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.sortTimestamp - a.sortTimestamp)
+      .slice(0, 3);
+
+    const toFeaturedProgramContents = (program, label) => (program?.representativeLinks || []).map((url, index) => ({
+      title: `${label} 대표 콘텐츠 ${index + 1}`,
+      url,
+      channel: getRepresentativeContentChannel(url)
+    }));
+    const featuredAssetContents = {
+      friends: toFeaturedProgramContents(friendsProgram, "247프렌즈"),
+      experience: toFeaturedProgramContents(experienceProgram, "247체험단"),
+      collab: featuredCollabContents,
+      news: toFeaturedProgramContents(newsProgram, "언론보도")
+    };
+
+    const latestBlogPosts = [...(crawledOwnPromotions[selectedBranch] || [])].slice(0, 3);
+    const latestInstagramPosts = [...(instagramCollections[selectedBranch]?.posts || [])]
+      .sort((a, b) => {
+        if (a.publishedAt && b.publishedAt && a.publishedAt !== b.publishedAt) {
+          return b.publishedAt.localeCompare(a.publishedAt);
+        }
+        return compareInstagramMediaRecency(a, b);
+      })
+      .slice(0, 6);
+    const recentContentCount = Number(snsRow?.blogRecentPosts || 0) + Number(snsRow?.instagramRecentPosts || 0);
+    const hasProofContent = Boolean((passProgram?.activeEvents || 0) > 0 || branchMentorRows.length > 0);
+    const assets = [
+      { label: "지점 시설영상", active: hasFacilityVideo, detail: hasFacilityVideo ? "시설영상 URL 등록 완료" : "시설영상 URL 미등록" },
+      { label: "협업 콘텐츠", active: Boolean(collabRow?.urlCount), detail: collabRow?.urlCount ? `${collabRow.urlCount}개 URL 운영` : "협업 URL 미등록" },
+      { label: "언론보도", active: Boolean(newsProgram?.activeEvents), detail: newsProgram?.activeEvents ? `${newsProgram.activeEvents}건 참여` : "등록 기록 없음" },
+      { label: "합격·멘토 자산", active: hasProofContent, detail: `${passProgram?.activeEvents || 0}건 · 멘토/장학생 ${branchMentorRows.length}명` }
+    ];
+
+    const activeMarketingProgramNames = [
+      { name: "247프렌즈", active: Boolean(friendsProgram?.activeEvents) },
+      { name: "247체험단", active: Boolean(experienceProgram?.activeEvents) },
+      { name: "협업이벤트", active: Boolean(collabRow?.urlCount) },
+      { name: "언론보도", active: Boolean(newsProgram?.activeEvents) },
+      { name: "합격자취합", active: Boolean(passProgram?.activeEvents) },
+      { name: "지점시설영상", active: hasFacilityVideo }
+    ].filter((program) => program.active).map((program) => program.name);
+
+    const toAnalysisProgram = (name, program, unit = "명") => ({
+      name,
+      detail: `${program?.activeEvents || 0}/${program?.totalEvents || 0}회 참여`,
+      rate: Number(program?.rate || 0),
+      metricLabel: `${Number(program?.participants || 0).toLocaleString("ko-KR")}${unit}`,
+      eventNames: program?.activeEventNames || [],
+      showEventNames: true
+    });
+    const analysisPrograms = [
+      toAnalysisProgram("247프렌즈", friendsProgram),
+      toAnalysisProgram("247체험단", experienceProgram),
+      {
+        name: "협업이벤트",
+        detail: `${collabEvents.length}개 이벤트`,
+        rate: collabEvents.length > 0
+          ? Math.min(100, Math.round((Number(collabRow?.urlCount || 0) / (collabEvents.length * 3)) * 100))
+          : 0,
+        metricLabel: `${Number(collabRow?.urlCount || 0).toLocaleString("ko-KR")}개`,
+        eventNames: collabEvents,
+        showEventNames: true
+      },
+      toAnalysisProgram("언론보도", newsProgram, "개"),
+      toAnalysisProgram("합격자취합", passProgram),
+      {
+        name: "지점시설영상",
+        detail: hasFacilityVideo ? "등록 완료" : "미등록",
+        rate: hasFacilityVideo ? 100 : 0,
+        metricLabel: hasFacilityVideo ? "1개" : "0개",
+        eventNames: [],
+        showEventNames: false
+      }
+    ];
+
+    const contentAssetCount = Number(friendsProgram?.activeEvents || 0) * 4
+      + Number(experienceProgram?.participants || 0)
+      + Number(collabRow?.urlCount || 0)
+      + Number(newsProgram?.participants || 0);
+    const scholarshipAmount = branchMentorRows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+    const contentAssetCards = [
+      { key: "friends", label: "247프렌즈", value: Number(friendsProgram?.activeEvents || 0) * 4, unit: "개", detail: "프렌즈 콘텐츠" },
+      { key: "experience", label: "247체험단", value: Number(experienceProgram?.participants || 0), unit: "개", detail: "체험단 콘텐츠" },
+      { key: "collab", label: "협업이벤트", value: Number(collabRow?.urlCount || 0), unit: "개", detail: "확보 콘텐츠" },
+      { key: "news", label: "언론보도", value: Number(newsProgram?.participants || 0), unit: "개", detail: "보도 콘텐츠" },
+      { key: "mentor", label: "장학생·멘토단", value: branchMentorRows.length, unit: "명", detail: scholarshipAmount > 0 ? `장학금 ${scholarshipAmount.toLocaleString("ko-KR")}원` : "등록 인원" }
+    ].map((asset) => ({ ...asset, active: asset.value > 0 }));
+
+    const completenessSignals = [
+      Boolean(scoreboardRow),
+      Boolean(snsRow),
+      Boolean(getBranchAddress(selectedBranch)),
+      Boolean(facilityRow),
+      Boolean(collabRow),
+      programs.some((program) => program.activeEvents > 0),
+      Boolean(branchMentorRows.length || passProgram)
+    ];
+    const recommendations = [];
+    recommendations.push(participationRate < 50
+      ? `활성화 방안 참여율이 ${participationRate}%입니다. 미참여 프로그램 중 실행 난도가 낮은 항목부터 다음 운영 일정에 반영하세요.`
+      : "현재 우수한 활성화 방안 참여율을 바탕으로 프로그램별 참여 인원 및 실천 횟수를 확대하세요.");
+    recommendations.push(!snsRow || Number(snsRow.finalScore || 0) < 60
+      ? "SNS 종합점수가 보완 구간입니다. 최근 게시 빈도와 반응 점수를 우선 점검하고 블로그·인스타그램의 주간 발행 계획을 고정하세요."
+      : "SNS 채널의 양호한 발행 흐름을 기반으로 실제 상담 문의 전환을 유도하는 콜투액션(CTA)을 배치하세요.");
+    recommendations.push(recentContentCount < 8
+      ? `최근 30일 SNS 콘텐츠가 ${recentContentCount}개입니다. 채널 합산 월 8개 이상 정기 발행을 1차 운영 목표로 설정하세요.`
+      : "최근 30일 SNS 발행 주기를 유지하며, 핵심 입시 정보를 담은 시리즈형 콘텐츠 기획을 추천합니다.");
+    recommendations.push(hasFacilityVideo
+      ? "등록된 시설 영상을 네이버 플레이스 대표 정보 및 인스타그램 프로필 링크에 연동해 노출을 극대화하세요."
+      : "시설영상이 등록되지 않았습니다. 상담 전환에 활용할 수 있도록 학습 공간과 관리 시스템 중심의 시설 영상을 제작·연결하세요.");
+    recommendations.push(collabRow?.urlCount
+      ? "본사 협업 이벤트 콘텐츠를 원내 방문 상담 시 보조 안내 자료로 적극 활용하세요."
+      : "협업 이벤트 콘텐츠가 없습니다. 본사 협업 캠페인의 홈페이지·블로그·SNS 확산 링크를 최소 1개 이상 확보하세요.");
+    recommendations.push(branchMentorRows.length
+      ? "등록된 장학생 및 멘토단의 생생한 합격 수기를 카드뉴스 형태로 제작하여 SNS에 정기 연재하세요."
+      : "멘토·장학생 자산이 등록되지 않았습니다. 합격 사례와 학습 경험을 증빙할 수 있는 인물 콘텐츠를 발굴하세요.");
+
+    return {
+      branch: selectedBranch,
+      address: getBranchAddress(selectedBranch),
+      coords: getBranchCoords(selectedBranch),
+      region,
+      score,
+      grade: scoreboardRow?.grade || getBranchGrade(score),
+      rank: rankIndex >= 0 ? rankIndex + 1 : null,
+      totalRankedBranches: overallBranchScoreboard.branches.length,
+      operationScore: scoreboardRow?.operationScore ?? 0,
+      participationRate,
+      nationalAverage: overallBranchScoreboard.avgScore,
+      regionAverage,
+      nationalOperationAverage,
+      regionOperationAverage,
+      nationalSnsAverage,
+      regionSnsAverage,
+      snsScore: snsRow ? snsRow.finalScore : null,
+      snsGrade: snsRow?.grade || null,
+      blogScore: Number(snsRow?.blogScore || 0),
+      instagramScore: Number(snsRow?.instagramScore || 0),
+      blogRecentPosts: Number(snsRow?.blogRecentPosts || 0),
+      instagramRecentPosts: Number(snsRow?.instagramRecentPosts || 0),
+      blogLastPosted: snsRow?.blogLastPosted || "",
+      instagramLastPosted: snsRow?.instagramLastPosted || "",
+      blogUrl: snsRow?.blogUrl || "",
+      instagramUrl: snsRow?.instagramUrl || "",
+      recentContentCount,
+      latestBlogPosts,
+      latestInstagramPosts,
+      collabUrlCount: Number(collabRow?.urlCount || 0),
+      collabEventCount: collabEvents.length,
+      collabEvents,
+      featuredCollabContents,
+      featuredAssetContents,
+      hasFacilityVideo,
+      facilityVideoUrl: facilityRow?.url?.trim() || "",
+      mentorCount: branchMentorRows.length,
+      mentorAssetRows: branchMentorRows.map((row) => ({
+        id: row.id,
+        year: row.year,
+        name: row.name,
+        university: row.university,
+        department: row.department,
+        group: row.group,
+        amount: Number(row.amount || 0),
+        isMentor: Boolean(row.isMentor)
+      })),
+      scholarshipAmount,
+      assetCoverage: assets.filter((asset) => asset.active).length,
+      activeMarketingProgramNames,
+      contentAssetCount,
+      contentAssetCards,
+      assets,
+      programs,
+      analysisPrograms,
+      completenessRate: Math.round((completenessSignals.filter(Boolean).length / completenessSignals.length) * 100),
+      recommendations: recommendations.slice(0, 6)
+    };
+  }, [
+    selectedBranch,
+    overallBranchScoreboard,
+    overallCollabSummary,
+    snsSourceRows,
+    rawTabs,
+    dashboardRawTabs,
+    crawledOwnPromotions,
+    instagramCollections
+  ]);
+
   const filteredOverviewBranchScoreboard = useMemo(() => {
     const keyword = overviewSearch.trim().toLowerCase();
     const branches = !keyword
@@ -5574,6 +6754,22 @@ export default function HomePage() {
     updateActiveTab((tab) => ({
       ...tab,
       rows: tab.rows.map((row, index) => (index === rowIndex ? { ...row, [field]: value } : row))
+    }));
+  }
+
+  function updateRepresentativeLink(rowIndex, linkIndex, value) {
+    updateActiveTab((tab) => ({
+      ...tab,
+      rows: tab.rows.map((row, index) => {
+        if (index !== rowIndex) return row;
+        const representativeLinks = Array.from(
+          { length: 3 },
+          (_, currentIndex) => currentIndex === linkIndex
+            ? value
+            : String(row.representativeLinks?.[currentIndex] || "")
+        );
+        return { ...row, representativeLinks };
+      })
     }));
   }
 
@@ -6063,22 +7259,25 @@ export default function HomePage() {
           {[
             { key: "dashboard", label: "전체 현황" },
             { key: "sns", label: "SNS 분석" },
+            { key: "report", label: "종합보고서" },
             { key: "rawdata", label: "RAWDATASTUDIO" }
-          ].map((menu) => (
+          ].filter((menu) => menu.key !== "rawdata" || isAdmin).map((menu) => (
             <li key={menu.key} className="premium-navbar-menu-item">
               <a 
                 href="#" 
                 onClick={(e) => { e.preventDefault(); handleNavMenuClick(menu.key); }}
                 style={{ 
-                  color: 
-                    (menu.key === "dashboard" && page === "dashboard") || 
-                    (menu.key === "sns" && page === "sns") || 
-                    (menu.key === "rawdata" && page === "rawdata") 
+                  color:
+                    (menu.key === "dashboard" && page === "dashboard") ||
+                    (menu.key === "sns" && page === "sns") ||
+                    (menu.key === "report" && page === "report") ||
+                    (menu.key === "rawdata" && page === "rawdata")
                       ? "#ffffff" 
                       : "rgba(255, 255, 255, 0.7)",
-                  fontWeight: 
-                    (menu.key === "dashboard" && page === "dashboard") || 
-                    (menu.key === "sns" && page === "sns") || 
+                  fontWeight:
+                    (menu.key === "dashboard" && page === "dashboard") ||
+                    (menu.key === "sns" && page === "sns") ||
+                    (menu.key === "report" && page === "report") ||
                     (menu.key === "rawdata" && page === "rawdata")
                       ? "700"
                       : "500"
@@ -6090,20 +7289,65 @@ export default function HomePage() {
           ))}
         </ul>
         <div className="premium-navbar-actions" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          {saveState && (
+          {isAdmin && saveState && (
             <span style={{ fontSize: "0.85rem", opacity: 0.85, color: "rgba(255, 255, 255, 0.8)", fontFamily: "'Outfit', sans-serif" }}>
               {saveState}
             </span>
           )}
           <button
-            className="premium-navbar-btn active"
-            onClick={forceServerSave}
-            style={{ display: "flex", alignItems: "center", gap: "6px" }}
+            className="premium-navbar-btn active admin-access-btn"
+            onClick={() => isAdmin ? handleAdminLogout() : setIsAdminLoginOpen(true)}
           >
-            💾 저장
+            {isAdmin ? "관리자 로그아웃" : "관리자 로그인"}
           </button>
         </div>
       </nav>
+
+      {isAdminLoginOpen && !isAdmin && (
+        <div
+          className="admin-login-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isAdminLoginSubmitting) {
+              setIsAdminLoginOpen(false);
+              setAdminLoginError("");
+              setAdminPassword("");
+            }
+          }}
+        >
+          <form className="admin-login-modal" onSubmit={handleAdminLogin}>
+            <button
+              type="button"
+              className="admin-login-close"
+              aria-label="관리자 로그인 닫기"
+              onClick={() => {
+                setIsAdminLoginOpen(false);
+                setAdminLoginError("");
+                setAdminPassword("");
+              }}
+            >
+              ×
+            </button>
+            <span className="admin-login-kicker">ADMIN ONLY</span>
+            <h2>관리자 로그인</h2>
+            <p>로그인 후에만 RAWDATASTUDIO를 열고 데이터를 수정할 수 있습니다.</p>
+            <label htmlFor="admin-password">관리자 비밀번호</label>
+            <input
+              id="admin-password"
+              type="password"
+              autoComplete="current-password"
+              value={adminPassword}
+              onChange={(event) => setAdminPassword(event.target.value)}
+              placeholder="비밀번호를 입력하세요"
+              autoFocus
+            />
+            {adminLoginError && <div className="admin-login-error" role="alert">{adminLoginError}</div>}
+            <button type="submit" className="admin-login-submit" disabled={!adminPassword || isAdminLoginSubmitting}>
+              {isAdminLoginSubmitting ? "로그인 확인 중..." : "로그인"}
+            </button>
+          </form>
+        </div>
+      )}
 
       {page === "dashboard" ? (
         <div className="workbook">
@@ -7170,7 +8414,81 @@ export default function HomePage() {
           </main>
           </div>
         </div>
-            ) : (page === "competitors" || page === "sns") ? (
+            ) : page === "report" ? (
+        <div className="report-workbook">
+          <div className="report-selector report-screen-only">
+            <div className="report-search-box">
+              <span>🔍</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="지점명을 검색하세요 (예: 분당정자, 목동, 대치...)"
+              />
+              {searchQuery && (
+                <button type="button" onClick={() => setSearchQuery("")}>✕</button>
+              )}
+            </div>
+            {searchQuery && (
+              <div className="report-search-results">
+                {allBranches
+                  .filter((b) => b.includes(searchQuery.trim()))
+                  .slice(0, 12)
+                  .map((branch) => (
+                    <button
+                      type="button"
+                      key={`report-result-${branch}`}
+                      onClick={() => {
+                        setSelectedBranch(branch);
+                        setSearchQuery(branch);
+                      }}
+                    >
+                      <span>📍</span>{branch === "본사" ? "본사" : `${branch} 지점`}
+                    </button>
+                  ))}
+              </div>
+            )}
+          </div>
+
+          {selectedBranch && branchReport ? (
+            <BranchMarketingReport
+              report={branchReport}
+              generatedAt={reportGeneratedAt}
+              mapStatus={mapStatus}
+              onPrint={() => window.print()}
+              onFocusBranch={() => reportMapFocusRef.current.get("branch")?.()}
+              onFocusCompetitor={(competitorName) => reportMapFocusRef.current.get(competitorName)?.()}
+              onPreviewFacilityVideo={() => {
+                if (!branchReport.facilityVideoUrl) return;
+                setActiveVideoUrl(branchReport.facilityVideoUrl);
+                setActiveVideoBranch(branchReport.branch);
+              }}
+            />
+          ) : (
+            <div className="report-empty-state report-screen-only">
+              <span>▤</span>
+              <h2>보고서를 생성할 지점을 선택해 주세요</h2>
+              <p>검색창에 지점명을 입력하거나 아래 주요 지점을 선택하면 즉시 보고서가 생성됩니다.</p>
+              <div>
+                {["대치", "분당정자", "이천기숙", "독학기숙", "동탄", "인천송도", "대구달서", "부산교대", "광주동구", "춘천"].map((branch) => (
+                  <button
+                    type="button"
+                    className="report-branch-chip"
+                    key={`report-chip-${branch}`}
+                    onClick={() => {
+                      setSelectedBranch(branch);
+                      setSearchQuery(branch);
+                    }}
+                  >
+                    <span className="report-branch-chip-pin" aria-hidden="true">📍</span>
+                    <span>{branch}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (page === "competitors" || page === "sns") ? (
               <div className="workbook" style={{ marginTop: "40px" }}>
                 <div className="competitor-view-container" style={{ padding: "0 10px", width: "100%", maxWidth: "1200px", margin: "0 auto" }}>
                   
@@ -9572,6 +10890,11 @@ export default function HomePage() {
                             </div>
                           </th>
                         ))}
+                        {["247프렌즈", "247체험단", "언론보도"].includes(activeTab.name) && [0, 1, 2].map((linkIndex) => (
+                          <th className="special-head" rowSpan={2} style={{ minWidth: "240px" }} key={`representative-link-head-${linkIndex}`}>
+                            대표 링크 {linkIndex + 1}
+                          </th>
+                        ))}
                         <th className="special-head special-memo" rowSpan={2} style={{ width: "80px" }}>행 삭제</th>
                       </tr>
                       <tr>
@@ -9629,6 +10952,16 @@ export default function HomePage() {
                               </Fragment>
                             );
                           })}
+                          {["247프렌즈", "247체험단", "언론보도"].includes(activeTab.name) && [0, 1, 2].map((linkIndex) => (
+                            <td className="special-cell" key={`${row.id}-representative-link-${linkIndex}`}>
+                              <input
+                                type="url"
+                                value={row.representativeLinks?.[linkIndex] ?? ""}
+                                onChange={(e) => updateRepresentativeLink(rowIndex, linkIndex, e.target.value)}
+                                placeholder={`대표 콘텐츠 URL ${linkIndex + 1}`}
+                              />
+                            </td>
+                          ))}
                           <td className="special-cell special-memo" style={{ textAlign: "center" }}>
                             <button className="mini-button" onClick={() => removeRow(rowIndex)}>삭제</button>
                           </td>
@@ -9700,6 +11033,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-
-
