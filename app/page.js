@@ -546,6 +546,13 @@ const branchAddressMap = {
 };
 
 const branchCompetitorAddressMap = {
+  "대치": [
+    { name: "수능선배 대치", address: "서울특별시 강남구 역삼로 424 진영빌딩" },
+    { name: "잇올 스파르타 대치센터", address: "서울특별시 강남구 역삼로 428 우일빌딩" },
+    { name: "PK독학재수학원 대치점", address: "서울특별시 강남구 역삼로 424 진영빌딩 5층" },
+    { name: "메가스터디 러셀 대치학원", address: "서울특별시 강남구 남부순환로 2942" },
+    { name: "강남대성SⅡ", address: "서울특별시 강남구 도곡로77길 3" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -777,6 +784,61 @@ function generateDynamicCompetitorData(compName, promotions) {
 
 function getCompetitorsForBranch(branchName) {
   const cleanName = String(branchName || "").trim();
+
+  if (cleanName.includes("대치")) {
+    return [
+      {
+        name: "수능선배 대치",
+        urgency: "high",
+        metrics: { ours: { mgmt: 94, content: 95, facility: 90 }, theirs: { mgmt: 95, content: 80, facility: 94 } },
+        trend: "1. 프리미엄 1인 태블릿 자습석 및 실시간 화면 원격 출결 감시 시스템을 도입해 밀착 관리 마케팅 전개\n2. 등록 원생 전원 대상 수능 배치 점수별 맞춤 원서 대면 컨설팅 무료 제공",
+        promotions: [
+          { title: "수시/정시 입시 컨설팅 무료 제공", content: "등록 원생 전원에게 수능 배치 점수별 맞춤 원서 대면 컨설팅 무료 서비스 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [관리 방식 대응] 기계적 화면 감시보다 개개인의 약점을 진단·보완하는 이투스247 1:1 밀착 학습 코칭 케어의 교육적 우월성을 상담 시 핵심 차별점으로 어필하십시오.\n2. [컨설팅 대응] 경쟁사의 무료 컨설팅 공세에 맞서 자사 이투스 교육평가연구소의 정밀 생기부 진단 수시 컨설팅의 깊이와 신뢰도를 부각하십시오."
+      },
+      {
+        name: "잇올 스파르타 대치센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 94, content: 95, facility: 90 }, theirs: { mgmt: 93, content: 82, facility: 93 } },
+        trend: "1. 대치동 중심의 엄격한 생활 루틴 관리 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 프로그램 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문·피드백, 개인별 학습 전략 설계를 한 번에 제공하는 잇올 티처스 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 대해 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오.\n2. [모의고사 대응] 모의고사 응시에 맞서 이투스 자체 모의고사 + 1:1 오답 피드백 클리닉의 결합 가치를 전면 홍보하십시오."
+      },
+      {
+        name: "PK독학재수학원 대치점",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 94, content: 95, facility: 90 }, theirs: { mgmt: 90, content: 80, facility: 85 } },
+        trend: "1. 1:1 과목별 코칭 및 스케줄링 관리를 내세운 독학재수 특화 프로그램 홍보\n2. 소수 정예 밀착 질의응답 시스템 강조",
+        promotions: [
+          { title: "1:1 과목별 맞춤 스케줄링 프로그램", content: "취약 과목 집중 보완 및 개인별 밀착 스케줄링 코칭 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [콘텐츠/인프라 대응] 소수 코칭에 맞서 이투스의 방대한 교육 콘텐츠 인프라와 체계적인 학습 진단 시스템의 비교 우위를 안내하십시오."
+      },
+      {
+        name: "메가스터디 러셀 대치학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 94, content: 95, facility: 90 }, theirs: { mgmt: 82, content: 98, facility: 95 } },
+        trend: "1. 대형 단과 연계 바자관 수강료 할인 패키지 및 메가스터디 모의고사 콘텐츠 독점 제공\n2. 스타 강사 라인업과 대형 브랜드 파워를 내세운 신뢰도 마케팅",
+        promotions: [
+          { title: "단과 연계 바자관 수강료 패키지", content: "러셀 단과 수강 시 바른공부 자습관 이용료 연계 할인 혜택", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [환경 대응] 대형 단과 자습실의 산만한 분위기 대비, 이투스247의 독립 면학 전용 공간과 정숙 관리 환경의 집중력 효과를 강조하십시오.\n2. [1:1 케어 대응] 대형 학원의 개별 관리 한계에 맞서 자사 담임의 밀착 1:1 오답 피드백을 차별점으로 부각하십시오."
+      },
+      {
+        name: "강남대성SⅡ",
+        urgency: "high",
+        metrics: { ours: { mgmt: 94, content: 95, facility: 90 }, theirs: { mgmt: 85, content: 97, facility: 94 } },
+        trend: "1. 최상위권 대상 강대 K 모의고사 및 대성 프리미엄 콘텐츠를 전면에 내세운 상위권 선점 전략\n2. 명문대 합격 실적 중심의 브랜드 신뢰도 마케팅",
+        promotions: [
+          { title: "강대 모의고사 콘텐츠 라인업", content: "최상위권 수험생을 위한 강대 K 콘텐츠 및 실전 모의고사 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [맞춤 학습 대응] 집단 강의 위주의 강남대성 대비, 학생 개개인의 취약점을 집중 타깃하는 이투스247 독학재수만의 자기주도 학습 효율성을 부각하십시오."
+      }
+    ];
+  }
 
   if (cleanName.includes("분당정자") || cleanName.includes("분당")) {
     return [
@@ -9547,6 +9609,8 @@ export default function HomePage() {
                               if (clean.includes("수능선배")) return "#5856d6"; // 수능선배 보라색
                               if (clean.includes("수만휘")) return "#0f52ba"; // 수만휘 남색
                               if (clean.includes("디랩")) return "#00c7b1"; // 디랩 민트색
+                              if (clean.includes("강남대성") || clean.includes("대성")) return "#004b97"; // 강남대성 블루
+                              if (clean.includes("pk")) return "#e11d48"; // PK 로즈레드
                               return null;
                             };
 

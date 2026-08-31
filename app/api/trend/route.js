@@ -21,16 +21,16 @@ export async function GET(request) {
   const fallbackTrend = [];
   const months = ["1월", "2월", "3월", "4월", "5월", "6월"];
 
-  if (cleanBranch.includes("분당정자") || cleanBranch.includes("분당")) {
+  if (cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
         month: months[i],
         ours: Math.round(45 + Math.sin(i + 1) * 10 + i * 3),
-        comp1: Math.round(30 + Math.cos(i + 2) * 12 + i * 2), // 수만휘
-        comp2: Math.round(40 + Math.sin(i * 1.2 + 3) * 15 + i * 4), // 수능선배
-        comp3: Math.round(55 + Math.cos(i * 0.8 + 4) * 8 + i * 2), // 러셀
-        comp4: Math.round(50 + Math.sin(i + 5) * 14 + i * 3), // 잇올
-        comp5: Math.round(20 + Math.cos(i + 6) * 6 + i * 1) // 디랩
+        comp1: Math.round(30 + Math.cos(i + 2) * 12 + i * 2), // 수능선배 / 수만휘
+        comp2: Math.round(40 + Math.sin(i * 1.2 + 3) * 15 + i * 4), // 잇올 / 수능선배
+        comp3: Math.round(55 + Math.cos(i * 0.8 + 4) * 8 + i * 2), // PK / 러셀
+        comp4: Math.round(50 + Math.sin(i + 5) * 14 + i * 3), // 러셀 / 잇올
+        comp5: Math.round(20 + Math.cos(i + 6) * 6 + i * 1) // 강남대성 / 디랩
       });
     }
   } else {
@@ -57,28 +57,42 @@ export async function GET(request) {
     const periodMonths = ["2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01"];
     const monthLabels = ["1월", "2월", "3월", "4월", "5월", "6월"];
 
-    if (cleanBranch.includes("분당정자") || cleanBranch.includes("분당")) {
+    if (cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치")) {
+      const isDaech = cleanBranch.includes("대치");
       // 6 groups exceeds Naver API limit (max 5 per call). We make two parallel requests and normalize the scale using "ours"
       const body1 = {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: [
-          { groupName: "ours", keywords: ["분당정자 이투스247", "분당정자 이투스", "분당정자이투스"] },
-          { groupName: "comp1", keywords: ["수만휘 스파르타 분당정자점", "수만휘 스파르타 분당정자", "분당정자 수만휘"] },
-          { groupName: "comp2", keywords: ["수능선배 분당점", "수능선배 분당"] },
-          { groupName: "comp3", keywords: ["메가스터디 러셀 분당학원", "러셀 분당", "메가스터디 분당러셀"] },
-          { groupName: "comp4", keywords: ["잇올 스파르타 분당정자센터", "잇올 스파르타 분당정자", "분당정자 잇올"] }
-        ]
+        keywordGroups: isDaech
+          ? [
+              { groupName: "ours", keywords: ["대치 이투스247", "대치 이투스", "대치이투스"] },
+              { groupName: "comp1", keywords: ["수능선배 대치", "대치 수능선배"] },
+              { groupName: "comp2", keywords: ["잇올 스파르타 대치센터", "잇올 대치", "대치 잇올"] },
+              { groupName: "comp3", keywords: ["PK독학재수학원 대치점", "PK 대치", "대치 PK독학재수"] },
+              { groupName: "comp4", keywords: ["메가스터디 러셀 대치학원", "러셀 대치", "메가스터디 대치러셀"] }
+            ]
+          : [
+              { groupName: "ours", keywords: ["분당정자 이투스247", "분당정자 이투스", "분당정자이투스"] },
+              { groupName: "comp1", keywords: ["수만휘 스파르타 분당정자점", "수만휘 스파르타 분당정자", "분당정자 수만휘"] },
+              { groupName: "comp2", keywords: ["수능선배 분당점", "수능선배 분당"] },
+              { groupName: "comp3", keywords: ["메가스터디 러셀 분당학원", "러셀 분당", "메가스터디 분당러셀"] },
+              { groupName: "comp4", keywords: ["잇올 스파르타 분당정자센터", "잇올 스파르타 분당정자", "분당정자 잇올"] }
+            ]
       };
       const body2 = {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: [
-          { groupName: "ours", keywords: ["분당정자 이투스247", "분당정자 이투스", "분당정자이투스"] },
-          { groupName: "comp5", keywords: ["디랩 분당", "분당 디랩"] }
-        ]
+        keywordGroups: isDaech
+          ? [
+              { groupName: "ours", keywords: ["대치 이투스247", "대치 이투스", "대치이투스"] },
+              { groupName: "comp5", keywords: ["강남대성SⅡ", "강남대성 대치", "대성S2"] }
+            ]
+          : [
+              { groupName: "ours", keywords: ["분당정자 이투스247", "분당정자 이투스", "분당정자이투스"] },
+              { groupName: "comp5", keywords: ["디랩 분당", "분당 디랩"] }
+            ]
       };
 
       const [res1, res2] = await Promise.all([
