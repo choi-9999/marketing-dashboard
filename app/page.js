@@ -573,6 +573,16 @@ const branchCompetitorAddressMap = {
     { name: "역사적사명 기숙학원", address: "경기도 안성시 일죽면 판교길 65-9" },
     { name: "72시간공부캠프안성캠퍼스", address: "경기도 안성시 삼죽면 보삼로 590-9" }
   ],
+  "동탄": [
+    { name: "수능선배 동탄점", address: "경기도 화성시 메타폴리스로 42 디앤씨빌딩 4층" },
+    { name: "수만휘 스파르타 동탄영천점", address: "경기도 화성시 동탄순환대로 701 1동 2층" },
+    { name: "디랩 독학재수학원 동탄", address: "경기도 화성시 동탄원천로 163 위너스타빌딩 9층" },
+    { name: "수만휘 스파르타 동탄호수공원점", address: "경기도 화성시 동탄순환대로 127-9 8층" },
+    { name: "잇올 스파르타 동탄센터", address: "경기도 화성시 메타폴리스로 42 디앤씨빌딩 8층" },
+    { name: "PK대치스파르타 2동탄센터점", address: "경기도 화성시 동탄순환대로 127-23 동탄2 우성에듀파크 5층" },
+    { name: "수만휘 관리형 독서실 동탄반송점", address: "경기도 화성시 동탄중심상가1길 40 엔터프라임빌딩" },
+    { name: "PK대치스파르타 관리형독서실 동탄센터", address: "경기도 화성시 동탄반석로 196 아이프라자 7~8층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1011,6 +1021,91 @@ function getCompetitorsForBranch(branchName) {
           { title: "72시간 몰입 공부캠프 참가자 모집", content: "단기 몰입 학습 훈련 및 멘토 피드백 프로그램 운영", url: "https://www.etoos.com" }
         ],
         guide: "1. [장기 지속성 대응] 일시적 단기 캠프와 달리 수능 당일까지 흔들림 없이 이어지는 이투스247의 1년 풀코스 담임 책임 관리 시스템을 강조하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("동탄")) {
+    return [
+      {
+        name: "수능선배 동탄점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 78, facility: 92 } },
+        trend: "1. 프리미엄 1인 태블릿 자습석 및 실시간 화면 원격 출결 감시 시스템 도입\n2. 등록 원생 대상 수능 배치 점수별 맞춤 원서 컨설팅 무료 지원",
+        promotions: [
+          { title: "수시/정시 입시 컨설팅 무료 제공", content: "등록 원생 대상 수능 배치 점수별 맞춤 원서 대면 컨설팅 무료 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [관리 방식 대응] 기계적 화면 감시보다 개개인의 학습 약점을 진단하고 보완하는 이투스247 1:1 밀착 학습 코칭의 교육적 우월성을 강조하십시오."
+      },
+      {
+        name: "수만휘 스파르타 동탄영천점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 88 } },
+        trend: "1. 11자상가 인근 영천동 지역 밀착 홍보 및 수만휘 회원 10% 수강료 감면 공세\n2. 입시 매거진 배포 및 엄격한 생활 루틴 통제 홍보",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 콘텐츠 대응] 단순 수강료 할인 공세에 맞서 이투스 교육평가연구소의 공신력 높은 입시 리포트 및 장학 제도의 실질 혜택을 부각하십시오."
+      },
+      {
+        name: "디랩 독학재수학원 동탄",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 86, content: 90, facility: 89 } },
+        trend: "1. 대성 모의고사(더프/이감) 외부생 모집 및 성적 관리 시스템 성공사례 홍보\n2. 수시/정시 지원 전략 설명회 개최",
+        promotions: [
+          { title: "7월 더프 및 이감 외부생 모집", content: "실전 감각 극대화를 위한 전국 모의고사 외부생 응시 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [모의고사 대응] 자사 풀시즌 모의고사 라인업과 1:1 오답 피드백 클리닉의 결합 가치를 전면에 내세우십시오."
+      },
+      {
+        name: "수만휘 스파르타 동탄호수공원점",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 87, content: 79, facility: 90 } },
+        trend: "1. 남동탄 2동탄 호수공원 상권 대상 프리미엄 시설 및 무료체험 이벤트 진행\n2. 플래너 점검 및 등하원 실시간 알림 강조",
+        promotions: [
+          { title: "신규 등록 1일 무료체험 이벤트", content: "호수공원점 좌석 무료체험 및 학습 진단 상담 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [시설/케어 대응] 자사의 독립 면학 공간 집중도와 담임의 전문 1:1 코칭 노하우를 비교 제시하십시오."
+      },
+      {
+        name: "잇올 스파르타 동탄센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 91 } },
+        trend: "1. 메타폴리스 인근 중심상가 중심 엄격한 생활 관리 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 학교프로젝트 실전 시뮬레이션 모의고사 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임의 전담 밀착 관리 체계와 성적 향상 실증 데이터를 제시하십시오."
+      },
+      {
+        name: "PK대치스파르타 2동탄센터점",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 89, content: 80, facility: 86 } },
+        trend: "1. 2동탄 산척동 중심 1:1 과목별 코칭 및 스케줄링 관리 특화 홍보\n2. 소수 정예 밀착 질의응답 시스템 강조",
+        promotions: [
+          { title: "1:1 과목별 맞춤 스케줄링 프로그램", content: "취약 과목 집중 보완 및 개인별 밀착 스케줄링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [인프라 대응] 소수 코칭 대비 이투스의 방대한 교육 콘텐츠 인프라와 체계적인 학습 진단 시스템의 비교 우위를 안내하십시오."
+      },
+      {
+        name: "수만휘 관리형 독서실 동탄반송점",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 86, content: 75, facility: 88 } },
+        trend: "1. 반송동 중심상가 가성비 자습 공간 및 휴대폰 수거 등 기본 생활 관리 강조\n2. 단기 등록생 유치 이벤트 전개",
+        promotions: [
+          { title: "관리형 독서실 첫 달 할인 이벤트", content: "첫 달 등록 시 수강료 감면 및 플래너 무료 증정", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 단순 독서실형 관리 대비 이투스247의 체계적인 입시 코칭과 콘텐츠의 격차를 명확히 안내하십시오."
+      },
+      {
+        name: "PK대치스파르타 관리형독서실 동탄센터",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 77, facility: 86 } },
+        trend: "1. 반송동 중심상가 대형 관리형 독서실 시설 및 대치동식 스케줄 통제 강조\n2. 의무 자습 시간 관리 및 출결 알림 홍보",
+        promotions: [
+          { title: "대치식 스파르타 관리 프로그램", content: "엄격한 의무 자습 시간표 및 출결 통제 시스템 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [학습 피드백 대응] 시간 통제를 넘어선 이투스247만의 1:1 교과 피드백과 모의고사 오답 클리닉의 완성도를 부각하십시오."
       }
     ];
   }
