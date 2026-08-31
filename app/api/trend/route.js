@@ -33,6 +33,16 @@ export async function GET(request) {
         comp5: Math.round(20 + Math.cos(i + 6) * 6 + i * 1) // 강남대성 / 디랩
       });
     }
+  } else if (cleanBranch.includes("독학기숙") || (cleanBranch.includes("기숙") && !cleanBranch.includes("안성") && !cleanBranch.includes("이천"))) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(42 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(48 + Math.cos(i + 2) * 10 + i * 2), // 이투스 기숙학원
+        comp2: Math.round(35 + Math.sin(i * 1.2 + 3) * 12 + i * 3), // 비상에듀독학기숙
+        comp3: Math.round(28 + Math.cos(i * 0.8 + 4) * 7 + i * 2) // 진성스파르타기숙
+      });
+    }
   } else {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -152,20 +162,35 @@ export async function GET(request) {
 
       return NextResponse.json({ success: true, mode: "naver-api-5comps", trendData: realTrend });
     } else {
-      // Default 2 competitors path
-      const oursKeywords = [`${cleanBranch} 이투스247`, `${cleanBranch} 이투스`].filter(Boolean);
-      const comp1Keywords = [`${cleanBranch} 잇올`].filter(Boolean);
-      const comp2Keywords = [`${cleanBranch} 수능선배`].filter(Boolean);
+      const isDokhakGisuk = cleanBranch.includes("독학기숙") || (cleanBranch.includes("기숙") && !cleanBranch.includes("안성") && !cleanBranch.includes("이천"));
+      const oursKeywords = isDokhakGisuk
+        ? ["이투스247 독학기숙학원", "이투스247 독학기숙", "이투스 독학기숙"]
+        : [`${cleanBranch} 이투스247`, `${cleanBranch} 이투스`].filter(Boolean);
+      const comp1Keywords = isDokhakGisuk
+        ? ["이투스 기숙학원", "이투스기숙학원"]
+        : [`${cleanBranch} 잇올`].filter(Boolean);
+      const comp2Keywords = isDokhakGisuk
+        ? ["비상에듀독학기숙학원", "비상에듀 독학기숙", "광주 비상에듀 기숙"]
+        : [`${cleanBranch} 수능선배`].filter(Boolean);
+      const comp3Keywords = isDokhakGisuk
+        ? ["진성스파르타기숙학원", "진성스파르타", "진성기숙학원"]
+        : [];
+
+      const keywordGroups = [
+        { groupName: "ours", keywords: oursKeywords },
+        { groupName: "comp1", keywords: comp1Keywords },
+        { groupName: "comp2", keywords: comp2Keywords }
+      ];
+
+      if (isDokhakGisuk && comp3Keywords.length > 0) {
+        keywordGroups.push({ groupName: "comp3", keywords: comp3Keywords });
+      }
 
       const requestBody = {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: [
-          { groupName: "ours", keywords: oursKeywords },
-          { groupName: "comp1", keywords: comp1Keywords },
-          { groupName: "comp2", keywords: comp2Keywords }
-        ]
+        keywordGroups
       };
 
       const naverResponse = await fetch("https://naverapihub.apigw.ntruss.com/search-trend/v1/search", {
@@ -190,21 +215,29 @@ export async function GET(request) {
       const oursData = results.find(r => r.title === "ours")?.data || [];
       const comp1Data = results.find(r => r.title === "comp1")?.data || [];
       const comp2Data = results.find(r => r.title === "comp2")?.data || [];
+      const comp3Data = results.find(r => r.title === "comp3")?.data || [];
 
       const realTrend = periodMonths.map((period, index) => {
         const oursVal = oursData.find(d => d.period === period)?.ratio || 0;
         const comp1Val = comp1Data.find(d => d.period === period)?.ratio || 0;
         const comp2Val = comp2Data.find(d => d.period === period)?.ratio || 0;
+        const comp3Val = comp3Data.find(d => d.period === period)?.ratio || 0;
 
-        return {
+        const row = {
           month: monthLabels[index],
           ours: Math.round(oursVal > 0 ? oursVal : 10 + (hash % 10) + index * 2),
           comp1: Math.round(comp1Val > 0 ? comp1Val : 15 + (hash % 15) + index),
           comp2: Math.round(comp2Val > 0 ? comp2Val : 8 + (hash % 8) + index * 1.5)
         };
+
+        if (isDokhakGisuk) {
+          row.comp3 = Math.round(comp3Val > 0 ? comp3Val : 6 + (hash % 6) + index);
+        }
+
+        return row;
       });
 
-      return NextResponse.json({ success: true, mode: "naver-api", trendData: realTrend });
+      return NextResponse.json({ success: true, mode: isDokhakGisuk ? "naver-api-3comps" : "naver-api", trendData: realTrend });
     }
   } catch (error) {
     console.error("Failed to fetch NAVER Search Trend API:", error);

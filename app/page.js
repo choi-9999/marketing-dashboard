@@ -553,6 +553,11 @@ const branchCompetitorAddressMap = {
     { name: "메가스터디 러셀 대치학원", address: "서울특별시 강남구 남부순환로 2942" },
     { name: "강남대성SⅡ", address: "서울특별시 강남구 도곡로77길 3" }
   ],
+  "독학기숙": [
+    { name: "이투스 기숙학원", address: "경기도 광주시 초월읍 설월길 8" },
+    { name: "비상에듀독학기숙학원", address: "경기도 광주시 회안대로 99" },
+    { name: "진성스파르타기숙학원", address: "경기도 광주시 초월읍 양지길 105" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -836,6 +841,41 @@ function getCompetitorsForBranch(branchName) {
           { title: "강대 모의고사 콘텐츠 라인업", content: "최상위권 수험생을 위한 강대 K 콘텐츠 및 실전 모의고사 운영", url: "https://www.etoos.com" }
         ],
         guide: "1. [맞춤 학습 대응] 집단 강의 위주의 강남대성 대비, 학생 개개인의 취약점을 집중 타깃하는 이투스247 독학재수만의 자기주도 학습 효율성을 부각하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("독학기숙") || (cleanName.includes("기숙") && !cleanName.includes("안성") && !cleanName.includes("이천"))) {
+    return [
+      {
+        name: "이투스 기숙학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 92 }, theirs: { mgmt: 94, content: 96, facility: 94 } },
+        trend: "1. 메이저 재수종합 기숙 시스템과 프리미엄 시설 인프라를 바탕으로 최상위권 집중 유치\n2. 검증된 강사진의 현장 강의 및 맞춤형 질의응답 시스템 강조",
+        promotions: [
+          { title: "기숙 재수 성공 패키지", content: "최상위권 전용 몰입 학습 환경 및 전문 강사진 질의응답 시스템 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [자기주도 학습 대응] 일방적 수업 중심의 종합 기숙 대비, 불필요한 수업을 줄이고 순수 자습 시간과 1:1 개인 맞춤 관리를 극대화하는 독학기숙의 학습 효율성을 강조하십시오.\n2. [가성비/효율 대응] 고액의 재종 기숙 비용 대비 실속 있는 독학기숙의 수강료 및 장학 혜택을 부각하십시오."
+      },
+      {
+        name: "비상에듀독학기숙학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 92 }, theirs: { mgmt: 92, content: 88, facility: 90 } },
+        trend: "1. 경기 광주 인근 독학기숙 시설 리뉴얼 및 24시간 생활 밀착 관리 시스템 홍보\n2. 취약 과목 1:1 클리닉 및 스케줄링 플래너 점검 마케팅 전개",
+        promotions: [
+          { title: "24시간 독학기숙 생활관리 프로그램", content: "생활 루틴 전담 관리 및 취약 과목 1:1 클리닉 상시 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [콘텐츠/진단 대응] 단순 독서실형 관리 대비 이투스247만의 방대한 입시 데이터, 모의고사 라인업 및 전문 담임 코칭의 깊이를 상담 시 안내하십시오.\n2. [생활 관리 대응] 24시간 철저한 학습 시간 통제 및 숙소/면학 공간의 쾌적함을 비교 제시하십시오."
+      },
+      {
+        name: "진성스파르타기숙학원",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 92 }, theirs: { mgmt: 93, content: 82, facility: 88 } },
+        trend: "1. 스파르타식 엄격한 규율 및 휴대폰/전자기기 완전 통제 중심의 몰입 환경 강조\n2. 규칙적인 생활 습관 형성 및 반수반 특별 장학 프로모션 진행",
+        promotions: [
+          { title: "스파르타 몰입 학습 반수반 모집", content: "철저한 규율과 생활 통제를 통한 단기 성적 향상 몰입 프로그램", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [학습 동기부여 대응] 강압적 통제에 치우친 스파르타 방식 대비, 학생 스스로 계획하고 실천할 수 있도록 돕는 이투스247의 과학적 학습 로드맵 코칭 시스템을 부각하십시오.\n2. [시설/식단 쾌적성 대응] 기숙 생활에서 중요한 숙소 쾌적성, 헬스/휴식 시설 및 건강 식단 관리 시스템의 비교 우위를 강조하십시오."
       }
     ];
   }
@@ -9611,6 +9651,8 @@ export default function HomePage() {
                               if (clean.includes("디랩")) return "#00c7b1"; // 디랩 민트색
                               if (clean.includes("강남대성") || clean.includes("대성")) return "#004b97"; // 강남대성 블루
                               if (clean.includes("pk")) return "#e11d48"; // PK 로즈레드
+                              if (clean.includes("비상")) return "#0284c7"; // 비상에듀 스카이블루
+                              if (clean.includes("진성")) return "#16a34a"; // 진성 그린
                               return null;
                             };
 
