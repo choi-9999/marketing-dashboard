@@ -558,6 +558,14 @@ const branchCompetitorAddressMap = {
     { name: "비상에듀독학기숙학원", address: "경기도 광주시 회안대로 99" },
     { name: "진성스파르타기숙학원", address: "경기도 광주시 초월읍 양지길 105" }
   ],
+  "이천기숙": [
+    { name: "강남대성 QUETTA", address: "경기도 이천시 마장면 서이천로337번길 55" },
+    { name: "이천청솔기숙학원", address: "경기도 이천시 신둔면 황무로338번길 317" },
+    { name: "이천탑클래스기숙학원", address: "경기도 이천시 설성면 노성로259번길 39-17" },
+    { name: "잇올 기숙학원 이천캠프", address: "경기도 이천시 마장면 서이천로337번길 64" },
+    { name: "이천아이나인독학기숙재수학원", address: "경기도 이천시 설성면 노성로259번길 39-17" },
+    { name: "강남대성기숙 의대관", address: "경기도 이천시 호법면 이섭대천로527번길 25" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -876,6 +884,71 @@ function getCompetitorsForBranch(branchName) {
           { title: "스파르타 몰입 학습 반수반 모집", content: "철저한 규율과 생활 통제를 통한 단기 성적 향상 몰입 프로그램", url: "https://www.etoos.com" }
         ],
         guide: "1. [학습 동기부여 대응] 강압적 통제에 치우친 스파르타 방식 대비, 학생 스스로 계획하고 실천할 수 있도록 돕는 이투스247의 과학적 학습 로드맵 코칭 시스템을 부각하십시오.\n2. [시설/식단 쾌적성 대응] 기숙 생활에서 중요한 숙소 쾌적성, 헬스/휴식 시설 및 건강 식단 관리 시스템의 비교 우위를 강조하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("이천기숙") || cleanName.includes("이천")) {
+    return [
+      {
+        name: "강남대성 QUETTA",
+        urgency: "high",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 94 }, theirs: { mgmt: 92, content: 98, facility: 96 } },
+        trend: "1. 최상위권 전용 퀀텀 점프 커리큘럼 및 대성 프리미엄 모의고사 콘텐츠 독점 제공\n2. 쾌적한 1인 호텔식 기숙 시설 및 명문대 강사진 라인업 강조",
+        promotions: [
+          { title: "강남대성 QUETTA 최상위권 선발", content: "최상위권 수험생을 위한 프리미엄 기숙 학습 몰입관 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [자기주도성 대응] 고난도 의무 수업 부담 대비, 이투스247만의 개인별 취약점 중심 맞춤 자습 시간 확보의 우수성을 어필하십시오.\n2. [밀착 코칭 대응] 1:1 전담 담임의 정밀 학습 플래너 피드백 케어를 비교 우위로 제시하십시오."
+      },
+      {
+        name: "잇올 기숙학원 이천캠프",
+        urgency: "high",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 94 }, theirs: { mgmt: 94, content: 85, facility: 95 } },
+        trend: "1. 잇올 독학 관리 시스템을 기숙 환경에 결합한 24시간 초밀착 생활 통제 마케팅\n2. 프리미엄 기숙 시설 및 '잇올 티처스' 원격/대면 멘토링 프로그램 홍보",
+        promotions: [
+          { title: "잇올 기숙캠프 24시간 생활관리", content: "엄격한 통제 규율과 스마트 관리 시스템을 결합한 기숙 몰입 프로그램", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [콘텐츠/입시 진단 대응] 단순 생활 통제형 기숙 대비 이투스 교육평가연구소의 공신력 있는 모의고사 분석 및 1:1 수시/정시 컨설팅의 깊이를 강조하십시오.\n2. [학습 피드백 대응] 교과 전문 질의응답 및 담임 선생님의 체계적 피드백 시스템을 부각하십시오."
+      },
+      {
+        name: "강남대성기숙 의대관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 94 }, theirs: { mgmt: 93, content: 98, facility: 97 } },
+        trend: "1. 의치한약수 목표 최상위권 전문 의대관 특화 커리큘럼 및 모의고사 라인업 홍보\n2. 압도적인 의약학계열 합격 실적을 앞세운 브랜드 마케팅",
+        promotions: [
+          { title: "강남대성 의대관 전용 라인업", content: "의약학계열 합격을 위한 킬러 문항 집중 훈련 및 실전 시뮬레이션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [맞춤 약점 케어 대응] 획일화된 의대반 수업 대비, 본인의 취약 영역을 선택 집중하여 시간을 최적화하는 자기주도 학습의 효율성을 상담 시 설명하십시오."
+      },
+      {
+        name: "이천청솔기숙학원",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 94 }, theirs: { mgmt: 90, content: 88, facility: 90 } },
+        trend: "1. 전통 있는 기숙학원 운영 노하우와 철저한 생활 지도 및 정규 수업 연계 홍보\n2. 장학 혜택 및 반수생 특별 유치 프로모션 진행",
+        promotions: [
+          { title: "이천청솔 반수반 장학 혜택", content: "성적 우수자 대상 학원비 감면 장학 혜택 및 규칙적 기숙 루틴 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [시설/콘텐츠 대응] 전통식 기숙 대비 최신 학습 트렌드에 맞춘 스마트 학습 기기 지원 및 1인 면학 공간의 쾌적함을 부각하십시오."
+      },
+      {
+        name: "이천탑클래스기숙학원",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 94 }, theirs: { mgmt: 89, content: 86, facility: 88 } },
+        trend: "1. 소수 정예 집중 관리 및 기초 클리닉 연계 수업 중심 마케팅\n2. 24시간 상주 담임 교사의 생활 및 멘토링 케어 홍보",
+        promotions: [
+          { title: "소수 정예 몰입 기숙 프로그램", content: "1:1 취약점 집중 보완 및 소수 정예 학습 케어 시스템", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 인프라 대응] 소수 학원 대비 이투스의 대형 입시 인프라 및 전국 단위 모의고사 빅데이터 기반 성적 진단 경쟁력을 안내하십시오."
+      },
+      {
+        name: "이천아이나인독학기숙재수학원",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 95, content: 96, facility: 94 }, theirs: { mgmt: 91, content: 82, facility: 89 } },
+        trend: "1. 독학재수 기숙 특화 개인별 인강 맞춤 시간표 및 질의응답 시스템 홍보\n2. 가성비 중심 수강료 프로모션 전개",
+        promotions: [
+          { title: "독학기숙 맞춤 시간표 운영", content: "개인별 인강 수강 계획 및 자습 몰입 환경 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [전문 코칭 대응] 단순 독학 관리 대비 이투스247만의 전문 담임 피드백 및 모의고사 오답 클리닉의 교육적 차별점을 제시하십시오."
       }
     ];
   }
@@ -9653,6 +9726,9 @@ export default function HomePage() {
                               if (clean.includes("pk")) return "#e11d48"; // PK 로즈레드
                               if (clean.includes("비상")) return "#0284c7"; // 비상에듀 스카이블루
                               if (clean.includes("진성")) return "#16a34a"; // 진성 그린
+                              if (clean.includes("청솔")) return "#059669"; // 청솔 에메랄드
+                              if (clean.includes("탑클래스")) return "#d97706"; // 탑클래스 앰버
+                              if (clean.includes("아이나인")) return "#7c3aed"; // 아이나인 바이올렛
                               return null;
                             };
 

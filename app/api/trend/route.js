@@ -33,6 +33,19 @@ export async function GET(request) {
         comp5: Math.round(20 + Math.cos(i + 6) * 6 + i * 1) // 강남대성 / 디랩
       });
     }
+  } else if (cleanBranch.includes("이천기숙") || cleanBranch.includes("이천")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(44 + Math.sin(i + 1) * 9 + i * 3),
+        comp1: Math.round(52 + Math.cos(i + 2) * 10 + i * 3), // 강남대성 QUETTA
+        comp2: Math.round(46 + Math.sin(i * 1.2 + 3) * 12 + i * 3), // 잇올 이천캠프
+        comp3: Math.round(49 + Math.cos(i * 0.8 + 4) * 9 + i * 2), // 강남대성 의대관
+        comp4: Math.round(38 + Math.sin(i + 5) * 10 + i * 2), // 이천청솔
+        comp5: Math.round(30 + Math.cos(i + 6) * 7 + i * 1), // 이천탑클래스
+        comp6: Math.round(25 + Math.sin(i + 7) * 6 + i * 1) // 이천아이나인
+      });
+    }
   } else if (cleanBranch.includes("독학기숙") || (cleanBranch.includes("기숙") && !cleanBranch.includes("안성") && !cleanBranch.includes("이천"))) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -67,14 +80,23 @@ export async function GET(request) {
     const periodMonths = ["2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01"];
     const monthLabels = ["1월", "2월", "3월", "4월", "5월", "6월"];
 
-    if (cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치")) {
+    if (cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천")) {
       const isDaech = cleanBranch.includes("대치");
-      // 6 groups exceeds Naver API limit (max 5 per call). We make two parallel requests and normalize the scale using "ours"
+      const isIcheon = cleanBranch.includes("이천기숙") || cleanBranch.includes("이천");
+      // 6+ groups exceeds Naver API limit (max 5 per call). We make two parallel requests and normalize the scale using "ours"
       const body1 = {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isDaech
+        keywordGroups: isIcheon
+          ? [
+              { groupName: "ours", keywords: ["이투스247 이천기숙", "이투스 이천기숙", "이천 이투스247"] },
+              { groupName: "comp1", keywords: ["강남대성 QUETTA", "강남대성 퀘타", "대성 퀘타"] },
+              { groupName: "comp2", keywords: ["잇올 기숙학원 이천캠프", "잇올 이천기숙", "잇올 이천캠프"] },
+              { groupName: "comp3", keywords: ["강남대성기숙 의대관", "강남대성 의대관", "대성기숙 의대관"] },
+              { groupName: "comp4", keywords: ["이천청솔기숙학원", "이천청솔", "이천 청솔기숙"] }
+            ]
+          : isDaech
           ? [
               { groupName: "ours", keywords: ["대치 이투스247", "대치 이투스", "대치이투스"] },
               { groupName: "comp1", keywords: ["수능선배 대치", "대치 수능선배"] },
@@ -94,7 +116,13 @@ export async function GET(request) {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isDaech
+        keywordGroups: isIcheon
+          ? [
+              { groupName: "ours", keywords: ["이투스247 이천기숙", "이투스 이천기숙", "이천 이투스247"] },
+              { groupName: "comp5", keywords: ["이천탑클래스기숙학원", "이천탑클래스", "탑클래스 기숙학원"] },
+              { groupName: "comp6", keywords: ["이천아이나인독학기숙재수학원", "이천아이나인", "아이나인 기숙학원"] }
+            ]
+          : isDaech
           ? [
               { groupName: "ours", keywords: ["대치 이투스247", "대치 이투스", "대치이투스"] },
               { groupName: "comp5", keywords: ["강남대성SⅡ", "강남대성 대치", "대성S2"] }
@@ -134,6 +162,7 @@ export async function GET(request) {
 
       const oursData2 = data2.results.find(r => r.title === "ours")?.data || [];
       const comp5Data = data2.results.find(r => r.title === "comp5")?.data || [];
+      const comp6Data = data2.results.find(r => r.title === "comp6")?.data || [];
 
       const realTrend = periodMonths.map((period, index) => {
         const oursVal1 = oursData1.find(d => d.period === period)?.ratio || 0;
@@ -144,12 +173,14 @@ export async function GET(request) {
         const comp3Val = comp3Data.find(d => d.period === period)?.ratio || 0;
         const comp4Val = comp4Data.find(d => d.period === period)?.ratio || 0;
         const comp5Val = comp5Data.find(d => d.period === period)?.ratio || 0;
+        const comp6Val = comp6Data.find(d => d.period === period)?.ratio || 0;
 
-        // Normalise comp5 ratio relative to ours ratio
+        // Normalise comp5 & comp6 ratio relative to ours ratio
         const factor = oursVal2 > 0 ? oursVal1 / oursVal2 : 1;
         const comp5ValNormalized = comp5Val * factor;
+        const comp6ValNormalized = comp6Val * factor;
 
-        return {
+        const row = {
           month: monthLabels[index],
           ours: Math.round(oursVal1 > 0 ? oursVal1 : 45 + index * 3),
           comp1: Math.round(comp1Val > 0 ? comp1Val : 30 + index * 2),
@@ -158,9 +189,15 @@ export async function GET(request) {
           comp4: Math.round(comp4Val > 0 ? comp4Val : 50 + index * 3),
           comp5: Math.round(comp5ValNormalized > 0 ? comp5ValNormalized : 20 + index)
         };
+
+        if (isIcheon) {
+          row.comp6 = Math.round(comp6ValNormalized > 0 ? comp6ValNormalized : 15 + index);
+        }
+
+        return row;
       });
 
-      return NextResponse.json({ success: true, mode: "naver-api-5comps", trendData: realTrend });
+      return NextResponse.json({ success: true, mode: isIcheon ? "naver-api-6comps" : "naver-api-5comps", trendData: realTrend });
     } else {
       const isDokhakGisuk = cleanBranch.includes("독학기숙") || (cleanBranch.includes("기숙") && !cleanBranch.includes("안성") && !cleanBranch.includes("이천"));
       const oursKeywords = isDokhakGisuk
