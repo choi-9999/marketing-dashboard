@@ -6508,7 +6508,7 @@ export default function HomePage() {
       news: toFeaturedProgramContents(newsProgram, "언론보도")
     };
 
-    const latestBlogPosts = [...(crawledOwnPromotions[selectedBranch] || [])].slice(0, 3);
+    const latestBlogPosts = [...(crawledOwnPromotions[selectedBranch] || [])].slice(0, 5);
     const latestInstagramPosts = [...(instagramCollections[selectedBranch]?.posts || [])]
       .sort((a, b) => {
         if (a.publishedAt && b.publishedAt && a.publishedAt !== b.publishedAt) {
