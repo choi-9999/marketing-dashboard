@@ -121,6 +121,17 @@ export async function GET(request) {
         comp3: Math.round(43 + Math.cos(i * 0.8 + 4) * 8 + i * 2) // 수만휘 하남미사점
       });
     }
+  } else if (cleanBranch.includes("일산서구") || cleanBranch.includes("일산")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(46 + Math.cos(i + 2) * 10 + i * 2), // 디랩 일산
+        comp2: Math.round(48 + Math.sin(i * 1.2 + 3) * 11 + i * 3), // 잇올 일산 주엽센터
+        comp3: Math.round(44 + Math.cos(i * 0.8 + 4) * 9 + i * 2), // 일산청솔학원
+        comp4: Math.round(47 + Math.sin(i + 5) * 10 + i * 2) // 일산 메가스터디학원
+      });
+    }
   } else if (cleanBranch.includes("의정부")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -427,6 +438,7 @@ export async function GET(request) {
       const isPyeongtaek = cleanBranch.includes("평택");
       const isHanam = cleanBranch.includes("하남");
       const isUijeongbu = cleanBranch.includes("의정부");
+      const isIlsan = cleanBranch.includes("일산서구") || cleanBranch.includes("일산");
       const oursKeywords = isDokhakGisuk
         ? ["이투스247 독학기숙학원", "이투스247 독학기숙", "이투스 독학기숙"]
         : isDalseo
@@ -443,6 +455,8 @@ export async function GET(request) {
         ? ["하남 이투스247", "하남 이투스", "하남이투스", "미사 이투스247"]
         : isUijeongbu
         ? ["의정부 이투스247", "의정부 이투스", "의정부이투스"]
+        : isIlsan
+        ? ["일산서구 이투스247", "일산 이투스247", "일산 이투스", "일산이투스"]
         : [`${cleanBranch} 이투스247`, `${cleanBranch} 이투스`].filter(Boolean);
       const comp1Keywords = isDokhakGisuk
         ? ["이투스 기숙학원", "이투스기숙학원"]
@@ -460,6 +474,8 @@ export async function GET(request) {
         ? ["수능선배 하남점", "하남 수능선배", "미사 수능선배"]
         : isUijeongbu
         ? ["잇올 스파르타 의정부센터", "의정부 잇올", "의정부동 잇올"]
+        : isIlsan
+        ? ["디랩 일산", "일산 디랩", "대화동 디랩"]
         : [`${cleanBranch} 잇올`].filter(Boolean);
       const comp2Keywords = isDokhakGisuk
         ? ["비상에듀독학기숙학원", "비상에듀 독학기숙", "광주 비상에듀 기숙"]
@@ -477,6 +493,8 @@ export async function GET(request) {
         ? ["잇올 스파르타 하남미사센터", "하남미사 잇올", "하남 잇올", "미사 잇올"]
         : isUijeongbu
         ? ["수만휘 스파르타 의정부금오점", "의정부금오 수만휘", "금오동 수만휘"]
+        : isIlsan
+        ? ["잇올 스파르타 일산 주엽센터", "일산주엽 잇올", "주엽동 잇올"]
         : [`${cleanBranch} 수능선배`].filter(Boolean);
       const comp3Keywords = isDokhakGisuk
         ? ["진성스파르타기숙학원", "진성스파르타", "진성기숙학원"]
@@ -488,9 +506,13 @@ export async function GET(request) {
         ? ["PK대치스파르타 춘천온의센터", "춘천 PK대치스파르타", "온의동 PK"]
         : isHanam
         ? ["수만휘 스파르타 하남미사점", "하남미사 수만휘", "하남 수만휘", "미사 수만휘"]
+        : isIlsan
+        ? ["일산청솔학원", "일산청솔", "주엽 청솔학원"]
         : [];
       const comp4Keywords = isGwangjuDonggu
         ? ["수만휘 스파르타 광주봉선점", "광주봉선 수만휘", "봉선동 수만휘"]
+        : isIlsan
+        ? ["일산 메가스터디학원", "일산 메가스터디", "대화 메가스터디"]
         : [];
 
       const keywordGroups = [
@@ -499,10 +521,10 @@ export async function GET(request) {
         { groupName: "comp2", keywords: comp2Keywords }
       ];
 
-      if ((isDokhakGisuk || isDalseo || isGwangjuDonggu || isChuncheon || isHanam) && comp3Keywords.length > 0) {
+      if ((isDokhakGisuk || isDalseo || isGwangjuDonggu || isChuncheon || isHanam || isIlsan) && comp3Keywords.length > 0) {
         keywordGroups.push({ groupName: "comp3", keywords: comp3Keywords });
       }
-      if (isGwangjuDonggu && comp4Keywords.length > 0) {
+      if ((isGwangjuDonggu || isIlsan) && comp4Keywords.length > 0) {
         keywordGroups.push({ groupName: "comp4", keywords: comp4Keywords });
       }
 
@@ -552,17 +574,17 @@ export async function GET(request) {
           comp2: Math.round(comp2Val > 0 ? comp2Val : 8 + (hash % 8) + index * 1.5)
         };
 
-        if (isDokhakGisuk || isDalseo || isGwangjuDonggu || isChuncheon || isHanam) {
+        if (isDokhakGisuk || isDalseo || isGwangjuDonggu || isChuncheon || isHanam || isIlsan) {
           row.comp3 = Math.round(comp3Val > 0 ? comp3Val : 6 + (hash % 6) + index);
         }
-        if (isGwangjuDonggu) {
+        if (isGwangjuDonggu || isIlsan) {
           row.comp4 = Math.round(comp4Val > 0 ? comp4Val : 5 + (hash % 5) + index);
         }
 
         return row;
       });
 
-      return NextResponse.json({ success: true, mode: isGwangjuDonggu ? "naver-api-4comps" : isDokhakGisuk || isDalseo || isChuncheon || isHanam ? "naver-api-3comps" : "naver-api", trendData: realTrend });
+      return NextResponse.json({ success: true, mode: isGwangjuDonggu || isIlsan ? "naver-api-4comps" : isDokhakGisuk || isDalseo || isChuncheon || isHanam ? "naver-api-3comps" : "naver-api", trendData: realTrend });
     }
   } catch (error) {
     console.error("Failed to fetch NAVER Search Trend API:", error);

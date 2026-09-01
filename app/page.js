@@ -639,6 +639,18 @@ const branchCompetitorAddressMap = {
     { name: "잇올 스파르타 의정부센터", address: "경기도 의정부시 시민로 24 신도아크라티움 4층" },
     { name: "수만휘 스파르타 의정부금오점", address: "경기도 의정부시 청사로 41 삼성프라자 8층 801~803호" }
   ],
+  "일산서구": [
+    { name: "디랩 일산", address: "경기도 고양시 일산서구 중앙로 1559 10층" },
+    { name: "잇올 스파르타 일산 주엽센터", address: "경기도 고양시 일산서구 중앙로 1415 CITY2000빌딩 6층" },
+    { name: "일산청솔학원", address: "경기도 고양시 일산서구 강성로 141 명운빌딩" },
+    { name: "일산 메가스터디학원", address: "경기도 고양시 일산서구 중앙로 1542 유화프라자 6~8층" }
+  ],
+  "일산": [
+    { name: "디랩 일산", address: "경기도 고양시 일산서구 중앙로 1559 10층" },
+    { name: "잇올 스파르타 일산 주엽센터", address: "경기도 고양시 일산서구 중앙로 1415 CITY2000빌딩 6층" },
+    { name: "일산청솔학원", address: "경기도 고양시 일산서구 강성로 141 명운빌딩" },
+    { name: "일산 메가스터디학원", address: "경기도 고양시 일산서구 중앙로 1542 유화프라자 6~8층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1692,6 +1704,51 @@ function getCompetitorsForBranch(branchName) {
           { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
         ],
         guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("일산서구") || cleanName.includes("일산")) {
+    return [
+      {
+        name: "디랩 일산",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 86, content: 90, facility: 89 } },
+        trend: "1. 대화동 거점 대성 모의고사(더프/이감) 외부생 모집 및 성적 관리 시스템 홍보\n2. 수시/정시 지원 전략 설명회 개최",
+        promotions: [
+          { title: "더프 및 이감 외부생 모집", content: "실전 감각 극대화를 위한 전국 모의고사 외부생 응시 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [모의고사 대응] 자사 풀시즌 모의고사 라인업과 1:1 오답 피드백 클리닉의 결합 가치를 전면에 내세우십시오."
+      },
+      {
+        name: "잇올 스파르타 일산 주엽센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 91 } },
+        trend: "1. 주엽동 CITY2000빌딩 6층 거점 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "일산청솔학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 91, content: 92, facility: 90 } },
+        trend: "1. 주엽동 명운빌딩 거점 전통의 입시 전문 재수종합 및 선택형 단과 홍보\n2. 6평/9평 심층 분석 입시 리포트 및 입시 설명회 전개",
+        promotions: [
+          { title: "청솔 선택형 단과 및 독학관리반 모집", content: "필요 수업만 선택 수강하는 자율 선택형 종합 관리 프로그램", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [완전 독학 맞춤 대응] 불필요한 의무 수업을 배제하고 오직 개인에게 필요한 학습과 피드백에 100% 집중하는 이투스247의 완벽한 독학 관리 체계를 부각하십시오."
+      },
+      {
+        name: "일산 메가스터디학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 89, content: 93, facility: 90 } },
+        trend: "1. 대화역 유화프라자 6~8층 대형 재수종합 및 단과 결합 자습 시스템 홍보\n2. 메가패스 결합 수강 할인 혜택 마케팅",
+        promotions: [
+          { title: "대입 재수종합/독학관리반 모집", content: "메가스터디 입시 콘텐츠 및 스타강사진 단과 연계 혜택 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [자기주도성 대응] 대형 단과 위주의 획일적 강의 수강보다 자기주도 학습 몰입을 극대화하는 이투스247의 개인 맞춤 학습 설계를 제안하십시오."
       }
     ];
   }
