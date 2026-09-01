@@ -605,6 +605,11 @@ const branchCompetitorAddressMap = {
     { name: "잇올 스파르타 광주봉선센터", address: "광주광역시 남구 제석로 104 메디월상가 8층" },
     { name: "수만휘 스파르타 광주봉선점", address: "광주광역시 남구 제석로 110 3층" }
   ],
+  "춘천": [
+    { name: "잇올 스파르타 춘천센터", address: "강원특별자치도 춘천시 퇴계농공로 11 스타플러스빌딩 4층" },
+    { name: "수만휘 스파르타 춘천후평점", address: "강원특별자치도 춘천시 후석로326번길 5 스카이빌딩 5층" },
+    { name: "PK대치스파르타 춘천온의센터", address: "강원특별자치도 춘천시 방송길 106 4층 401호" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1408,6 +1413,41 @@ function getCompetitorsForBranch(branchName) {
           { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
         ],
         guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("춘천")) {
+    return [
+      {
+        name: "잇올 스파르타 춘천센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 91, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 91 } },
+        trend: "1. 석사동 스타플러스빌딩 4층 거점 엄격한 생활 통제 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "수만휘 스파르타 춘천후평점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 91, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 90 } },
+        trend: "1. 후평동 스카이빌딩 중심 수만휘 회원 수강료 10% 감면 프로모션 및 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 알림 강조",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
+      },
+      {
+        name: "PK대치스파르타 춘천온의센터",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 91, content: 94, facility: 90 }, theirs: { mgmt: 89, content: 80, facility: 88 } },
+        trend: "1. 온의동 중심 1:1 과목별 코칭 및 스케줄링 관리 특화 홍보\n2. 소수 정예 밀착 질의응답 시스템 강조",
+        promotions: [
+          { title: "1:1 과목별 맞춤 스케줄링 프로그램", content: "취약 과목 집중 보완 및 개인별 밀착 스케줄링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [인프라 대응] 소수 코칭 대비 이투스의 방대한 교육 콘텐츠 인프라와 체계적인 학습 진단 시스템의 비교 우위를 안내하십시오."
       }
     ];
   }
