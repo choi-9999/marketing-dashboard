@@ -610,6 +610,10 @@ const branchCompetitorAddressMap = {
     { name: "수만휘 스파르타 춘천후평점", address: "강원특별자치도 춘천시 후석로326번길 5 스카이빌딩 5층" },
     { name: "PK대치스파르타 춘천온의센터", address: "강원특별자치도 춘천시 방송길 106 4층 401호" }
   ],
+  "평택": [
+    { name: "잇올 스파르타 평택센터", address: "경기도 평택시 만세로 1845-2 광신프라자 10층" },
+    { name: "커넥츠프랩 수능관 평택합정점", address: "경기도 평택시 평택5로20번길 39 타임스퀘어 3층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1448,6 +1452,31 @@ function getCompetitorsForBranch(branchName) {
           { title: "1:1 과목별 맞춤 스케줄링 프로그램", content: "취약 과목 집중 보완 및 개인별 밀착 스케줄링 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [인프라 대응] 소수 코칭 대비 이투스의 방대한 교육 콘텐츠 인프라와 체계적인 학습 진단 시스템의 비교 우위를 안내하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("평택")) {
+    return [
+      {
+        name: "잇올 스파르타 평택센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 91 } },
+        trend: "1. 비전동 만세로 광신프라자 10층 거점 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "커넥츠프랩 수능관 평택합정점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 82, facility: 88 } },
+        trend: "1. 합정동 타임스퀘어 거점 공단기/수능관 결합 관리형 독서실 및 가성비 수강료 마케팅\n2. 엄격한 출결 관리 및 의무 자습 시간표 홍보",
+        promotions: [
+          { title: "커넥츠프랩 첫 달 수강료 할인", content: "첫 달 등록 시 수강료 감면 및 학습 플래너 무료 증정", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 공시 위주 관리형 독서실 시스템 대비 이투스247의 정밀 대입 모의고사 분석과 1:1 수시/정시 컨설팅의 압도적 입시 전문성을 강조하십시오."
       }
     ];
   }
@@ -10084,6 +10113,7 @@ export default function HomePage() {
                               if (clean.includes("아이나인")) return "#7c3aed"; // 아이나인 바이올렛
                               if (clean.includes("역사적사명")) return "#b45309"; // 역사적사명 브라운
                               if (clean.includes("72시간")) return "#0891b2"; // 72시간 시안
+                              if (clean.includes("커넥츠") || clean.includes("공단기")) return "#4338ca"; // 커넥츠 인디고
                               return null;
                             };
 

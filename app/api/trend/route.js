@@ -85,6 +85,15 @@ export async function GET(request) {
         comp6: Math.round(25 + Math.sin(i + 7) * 6 + i * 1) // 이천아이나인
       });
     }
+  } else if (cleanBranch.includes("평택")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(44 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(48 + Math.cos(i + 2) * 10 + i * 2), // 잇올 평택센터
+        comp2: Math.round(38 + Math.sin(i * 1.2 + 3) * 9 + i * 2) // 커넥츠프랩 수능관 평택합정점
+      });
+    }
   } else if (cleanBranch.includes("춘천")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -338,6 +347,7 @@ export async function GET(request) {
       const isBusanGyodae = cleanBranch.includes("부산교대") || cleanBranch.includes("교대");
       const isGwangjuDonggu = cleanBranch.includes("광주동구") || (cleanBranch.includes("광주") && cleanBranch.includes("동구"));
       const isChuncheon = cleanBranch.includes("춘천");
+      const isPyeongtaek = cleanBranch.includes("평택");
       const oursKeywords = isDokhakGisuk
         ? ["이투스247 독학기숙학원", "이투스247 독학기숙", "이투스 독학기숙"]
         : isDalseo
@@ -348,6 +358,8 @@ export async function GET(request) {
         ? ["광주동구 이투스247", "광주동구 이투스", "광주 이투스247", "광주이투스"]
         : isChuncheon
         ? ["춘천 이투스247", "춘천 이투스", "춘천이투스"]
+        : isPyeongtaek
+        ? ["평택 이투스247", "평택 이투스", "평택이투스"]
         : [`${cleanBranch} 이투스247`, `${cleanBranch} 이투스`].filter(Boolean);
       const comp1Keywords = isDokhakGisuk
         ? ["이투스 기숙학원", "이투스기숙학원"]
@@ -359,6 +371,8 @@ export async function GET(request) {
         ? ["메가스터디 러셀 광주", "러셀 광주", "광주 러셀"]
         : isChuncheon
         ? ["잇올 스파르타 춘천센터", "춘천 잇올", "석사동 잇올"]
+        : isPyeongtaek
+        ? ["잇올 스파르타 평택센터", "평택 잇올", "비전동 잇올"]
         : [`${cleanBranch} 잇올`].filter(Boolean);
       const comp2Keywords = isDokhakGisuk
         ? ["비상에듀독학기숙학원", "비상에듀 독학기숙", "광주 비상에듀 기숙"]
@@ -370,6 +384,8 @@ export async function GET(request) {
         ? ["잇올 스파르타 광주충장로센터", "광주충장로 잇올", "충장로 잇올"]
         : isChuncheon
         ? ["수만휘 스파르타 춘천후평점", "춘천후평 수만휘", "후평동 수만휘"]
+        : isPyeongtaek
+        ? ["커넥츠프랩 수능관 평택합정점", "평택 커넥츠프랩", "합정동 커넥츠프랩"]
         : [`${cleanBranch} 수능선배`].filter(Boolean);
       const comp3Keywords = isDokhakGisuk
         ? ["진성스파르타기숙학원", "진성스파르타", "진성기숙학원"]
