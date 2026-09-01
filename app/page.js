@@ -635,6 +635,10 @@ const branchCompetitorAddressMap = {
     { name: "강북 메가스터디학원 중계관", address: "서울특별시 노원구 한글비석로 232 7층" },
     { name: "강북청솔학원", address: "서울특별시 노원구 한글비석로 242 8층" }
   ],
+  "의정부": [
+    { name: "잇올 스파르타 의정부센터", address: "경기도 의정부시 시민로 24 신도아크라티움 4층" },
+    { name: "수만휘 스파르타 의정부금오점", address: "경기도 의정부시 청사로 41 삼성프라자 8층 801~803호" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1663,6 +1667,31 @@ function getCompetitorsForBranch(branchName) {
           { title: "청솔 선택형 단과 및 독학관리반 모집", content: "필요 수업만 선택 수강하는 자율 선택형 종합 관리 프로그램", url: "https://www.etoos.com" }
         ],
         guide: "1. [완전 독학 맞춤 대응] 불필요한 의무 수업을 배제하고 오직 개인에게 필요한 학습과 피드백에 100% 집중하는 이투스247의 완벽한 독학 관리 체계를 부각하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("의정부")) {
+    return [
+      {
+        name: "잇올 스파르타 의정부센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 91 } },
+        trend: "1. 의정부역 신도아크라티움 거점 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "수만휘 스파르타 의정부금오점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 89 } },
+        trend: "1. 금오동 삼성프라자 8층 중심 수만휘 회원 수강료 10% 감면 프로모션 및 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 알림 강조",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
       }
     ];
   }

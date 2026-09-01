@@ -121,6 +121,15 @@ export async function GET(request) {
         comp3: Math.round(43 + Math.cos(i * 0.8 + 4) * 8 + i * 2) // 수만휘 하남미사점
       });
     }
+  } else if (cleanBranch.includes("의정부")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(44 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(48 + Math.cos(i + 2) * 10 + i * 2), // 잇올 의정부센터
+        comp2: Math.round(43 + Math.sin(i * 1.2 + 3) * 9 + i * 2) // 수만휘 의정부금오점
+      });
+    }
   } else if (cleanBranch.includes("평택")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -417,6 +426,7 @@ export async function GET(request) {
       const isChuncheon = cleanBranch.includes("춘천");
       const isPyeongtaek = cleanBranch.includes("평택");
       const isHanam = cleanBranch.includes("하남");
+      const isUijeongbu = cleanBranch.includes("의정부");
       const oursKeywords = isDokhakGisuk
         ? ["이투스247 독학기숙학원", "이투스247 독학기숙", "이투스 독학기숙"]
         : isDalseo
@@ -431,6 +441,8 @@ export async function GET(request) {
         ? ["평택 이투스247", "평택 이투스", "평택이투스"]
         : isHanam
         ? ["하남 이투스247", "하남 이투스", "하남이투스", "미사 이투스247"]
+        : isUijeongbu
+        ? ["의정부 이투스247", "의정부 이투스", "의정부이투스"]
         : [`${cleanBranch} 이투스247`, `${cleanBranch} 이투스`].filter(Boolean);
       const comp1Keywords = isDokhakGisuk
         ? ["이투스 기숙학원", "이투스기숙학원"]
@@ -446,6 +458,8 @@ export async function GET(request) {
         ? ["잇올 스파르타 평택센터", "평택 잇올", "비전동 잇올"]
         : isHanam
         ? ["수능선배 하남점", "하남 수능선배", "미사 수능선배"]
+        : isUijeongbu
+        ? ["잇올 스파르타 의정부센터", "의정부 잇올", "의정부동 잇올"]
         : [`${cleanBranch} 잇올`].filter(Boolean);
       const comp2Keywords = isDokhakGisuk
         ? ["비상에듀독학기숙학원", "비상에듀 독학기숙", "광주 비상에듀 기숙"]
@@ -461,6 +475,8 @@ export async function GET(request) {
         ? ["커넥츠프랩 수능관 평택합정점", "평택 커넥츠프랩", "합정동 커넥츠프랩"]
         : isHanam
         ? ["잇올 스파르타 하남미사센터", "하남미사 잇올", "하남 잇올", "미사 잇올"]
+        : isUijeongbu
+        ? ["수만휘 스파르타 의정부금오점", "의정부금오 수만휘", "금오동 수만휘"]
         : [`${cleanBranch} 수능선배`].filter(Boolean);
       const comp3Keywords = isDokhakGisuk
         ? ["진성스파르타기숙학원", "진성스파르타", "진성기숙학원"]
