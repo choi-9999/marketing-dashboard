@@ -140,6 +140,15 @@ export async function GET(request) {
         comp6: Math.round(25 + Math.sin(i + 7) * 6 + i * 1) // 이천아이나인
       });
     }
+  } else if (cleanBranch.includes("수원시청") || (cleanBranch.includes("수원") && !cleanBranch.includes("영통") && !cleanBranch.includes("장안") && !cleanBranch.includes("정자"))) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(47 + Math.cos(i + 2) * 10 + i * 2), // 수원 스카이에듀학원
+        comp2: Math.round(50 + Math.sin(i * 1.2 + 3) * 11 + i * 3) // 수원 메가스터디학원
+      });
+    }
   } else if (cleanBranch.includes("마포") || cleanBranch.includes("신촌")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -559,6 +568,7 @@ export async function GET(request) {
       const isIlsan = cleanBranch.includes("일산서구") || cleanBranch.includes("일산");
       const isDasan = cleanBranch.includes("다산") || cleanBranch.includes("남양주다산");
       const isMapo = cleanBranch.includes("마포") || cleanBranch.includes("신촌");
+      const isSuwonSicheong = cleanBranch.includes("수원시청") || (cleanBranch.includes("수원") && !cleanBranch.includes("영통") && !cleanBranch.includes("장안") && !cleanBranch.includes("정자"));
       const oursKeywords = isDokhakGisuk
         ? ["이투스247 독학기숙학원", "이투스247 독학기숙", "이투스 독학기숙"]
         : isDalseo
@@ -581,6 +591,8 @@ export async function GET(request) {
         ? ["다산 이투스247", "남양주다산 이투스247", "다산 이투스", "다산이투스"]
         : isMapo
         ? ["마포 이투스247", "마포 이투스", "신촌 이투스247", "마포이투스"]
+        : isSuwonSicheong
+        ? ["수원시청 이투스247", "수원시청 이투스", "수원 이투스247", "인계동 이투스247"]
         : [`${cleanBranch} 이투스247`, `${cleanBranch} 이투스`].filter(Boolean);
       const comp1Keywords = isDokhakGisuk
         ? ["이투스 기숙학원", "이투스기숙학원"]
@@ -604,6 +616,8 @@ export async function GET(request) {
         ? ["수만휘 스파르타 남양주다산점", "남양주다산 수만휘", "다산 수만휘"]
         : isMapo
         ? ["수능선배 신촌점", "신촌 수능선배", "마포 수능선배"]
+        : isSuwonSicheong
+        ? ["수원 스카이에듀학원", "수원 스카이에듀", "인계동 스카이에듀"]
         : [`${cleanBranch} 잇올`].filter(Boolean);
       const comp2Keywords = isDokhakGisuk
         ? ["비상에듀독학기숙학원", "비상에듀 독학기숙", "광주 비상에듀 기숙"]
@@ -625,6 +639,8 @@ export async function GET(request) {
         ? ["잇올 스파르타 일산 주엽센터", "일산주엽 잇올", "주엽동 잇올"]
         : isMapo
         ? ["잇올 스파르타 마포신촌센터", "마포신촌 잇올", "마포 잇올", "신촌 잇올"]
+        : isSuwonSicheong
+        ? ["수원 메가스터디학원", "수원 메가스터디", "권선동 메가스터디"]
         : [`${cleanBranch} 수능선배`].filter(Boolean);
       const comp3Keywords = isDokhakGisuk
         ? ["진성스파르타기숙학원", "진성스파르타", "진성기숙학원"]

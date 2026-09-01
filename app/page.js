@@ -695,6 +695,14 @@ const branchCompetitorAddressMap = {
     { name: "메가스터디 러셀 목동", address: "서울특별시 양천구 신월로 358 남부필타운 7층" },
     { name: "PK대치스파르타 목동센터 1관", address: "서울특별시 양천구 목동로 173 4층" }
   ],
+  "수원시청": [
+    { name: "수원 스카이에듀학원", address: "경기도 수원시 팔달구 권선로 733" },
+    { name: "수원 메가스터디학원", address: "경기도 수원시 권선구 권광로 90" }
+  ],
+  "수원": [
+    { name: "수원 스카이에듀학원", address: "경기도 수원시 팔달구 권선로 733" },
+    { name: "수원 메가스터디학원", address: "경기도 수원시 권선구 권광로 90" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -2013,6 +2021,31 @@ function getCompetitorsForBranch(branchName) {
           { title: "1:1 과목별 맞춤 스케줄링 프로그램", content: "취약 과목 집중 보완 및 개인별 밀착 스케줄링 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [인프라 대응] 소수 코칭 대비 이투스의 방대한 교육 콘텐츠 인프라와 체계적인 학습 진단 시스템의 비교 우위를 안내하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("수원시청") || (cleanName.includes("수원") && !cleanBranch?.includes("영통") && !cleanBranch?.includes("장안") && !cleanBranch?.includes("정자"))) {
+    return [
+      {
+        name: "수원 스카이에듀학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 89, content: 90, facility: 89 } },
+        trend: "1. 인계동 거점 대입 재수종합 및 독학관리 융합 커리큘럼 홍보\n2. 스카이에듀 스타강사진 단과 연계 및 1:1 입시 상담 진행",
+        promotions: [
+          { title: "스카이에듀 재수/독학관리반 모집", content: "단과 및 독학 결합 프로그램 수강 시 입시 컨설팅 무료 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [독학 전문성 대응] 단과 병행식 자습 대비 100% 자기주도 학습 몰입과 이투스247의 정밀 진단 클리닉의 효율성을 부각하십시오."
+      },
+      {
+        name: "수원 메가스터디학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 90, content: 93, facility: 91 } },
+        trend: "1. 권선동 권광로 거점 대형 재수종합 및 메가패스 결합 단과 자습관 홍보\n2. 6평/9평 심층 분석 입시 설명회 전개",
+        promotions: [
+          { title: "대입 재수종합/독학관리반 모집", content: "메가스터디 입시 콘텐츠 및 스타강사진 단과 연계 혜택 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [1:1 밀착 케어 대응] 대형 재종의 획일적 진도보다 개인별 취약점을 1:1로 밀착 피드백하는 이투스247 담임 코칭의 우수성을 강조하십시오."
       }
     ];
   }
@@ -10652,6 +10685,7 @@ export default function HomePage() {
                               if (clean.includes("커넥츠") || clean.includes("공단기")) return "#4338ca"; // 커넥츠 인디고
                               if (clean.includes("종로")) return "#0d9488"; // 종로 틸
                               if (clean.includes("하이퍼")) return "#b91c1c"; // 하이퍼 딥레드
+                              if (clean.includes("스카이에듀")) return "#0284c7"; // 스카이에듀 스카이블루
                               return null;
                             };
 
