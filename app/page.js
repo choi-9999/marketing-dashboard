@@ -614,6 +614,13 @@ const branchCompetitorAddressMap = {
     { name: "잇올 스파르타 평택센터", address: "경기도 평택시 만세로 1845-2 광신프라자 10층" },
     { name: "커넥츠프랩 수능관 평택합정점", address: "경기도 평택시 평택5로20번길 39 타임스퀘어 3층" }
   ],
+  "김포": [
+    { name: "수능선배 김포점", address: "경기도 김포시 사우중로 49 4층" },
+    { name: "수만휘 스파르타 김포장기점", address: "경기도 김포시 김포한강4로 113 8층 805~806호" },
+    { name: "디랩 김포", address: "경기도 김포시 김포한강1로 85 3층 일부" },
+    { name: "잇올 몰입관 김포장기캠프", address: "경기도 김포시 김포한강4로135번길 11" },
+    { name: "잇올 스파르타 김포센터", address: "경기도 김포시 김포대로 851 제일메디칼센타빌딩 8층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1477,6 +1484,61 @@ function getCompetitorsForBranch(branchName) {
           { title: "커넥츠프랩 첫 달 수강료 할인", content: "첫 달 등록 시 수강료 감면 및 학습 플래너 무료 증정", url: "https://www.etoos.com" }
         ],
         guide: "1. [입시 전문성 대응] 공시 위주 관리형 독서실 시스템 대비 이투스247의 정밀 대입 모의고사 분석과 1:1 수시/정시 컨설팅의 압도적 입시 전문성을 강조하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("김포")) {
+    return [
+      {
+        name: "수능선배 김포점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 78, facility: 92 } },
+        trend: "1. 사우동 중심 1인 태블릿 자습석 및 실시간 화면 원격 감시 시스템 도입\n2. 등록 원생 대상 수능 배치 점수별 맞춤 원서 컨설팅 무료 지원",
+        promotions: [
+          { title: "수시/정시 입시 컨설팅 무료 제공", content: "등록 원생 대상 수능 배치 점수별 맞춤 원서 대면 컨설팅 무료 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [관리 방식 대응] 기계적 화면 감시보다 개개인의 학습 약점을 진단하고 보완하는 이투스247 1:1 밀착 학습 코칭의 교육적 우월성을 강조하십시오."
+      },
+      {
+        name: "수만휘 스파르타 김포장기점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 89 } },
+        trend: "1. 장기동 중심상가 수만휘 회원 수강료 10% 감면 프로모션 및 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 알림 강조",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
+      },
+      {
+        name: "디랩 김포",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 86, content: 90, facility: 89 } },
+        trend: "1. 장기동 거점 대성 모의고사(더프/이감) 외부생 모집 및 성적 관리 시스템 홍보\n2. 수시/정시 지원 전략 설명회 개최",
+        promotions: [
+          { title: "더프 및 이감 외부생 모집", content: "실전 감각 극대화를 위한 전국 모의고사 외부생 응시 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [모의고사 대응] 자사 풀시즌 모의고사 라인업과 1:1 오답 피드백 클리닉의 결합 가치를 전면에 내세우십시오."
+      },
+      {
+        name: "잇올 몰입관 김포장기캠프",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 93 } },
+        trend: "1. 장기동 프리미엄 몰입형 자습 공간 및 소음 차단 1인석 집중 홍보\n2. 반수생 및 재수생 몰입 관리 프로그램 전개",
+        promotions: [
+          { title: "몰입관 좌석 1일 무료체험 이벤트", content: "프리미엄 몰입형 자습 좌석 체험 및 1:1 학습 상담 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [시설/학습 대응] 단순 공간 프리미엄을 넘어선 이투스247의 체계적인 교과 질의응답 및 입시 컨설팅의 결합 가치를 전면에 내세우십시오."
+      },
+      {
+        name: "잇올 스파르타 김포센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 91 } },
+        trend: "1. 사우동 제일메디칼센타빌딩 거점 엄격한 생활 통제 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
       }
     ];
   }
