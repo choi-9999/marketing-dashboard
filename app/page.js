@@ -590,6 +590,11 @@ const branchCompetitorAddressMap = {
     { name: "잇올 스파르타 인천연수송도센터 1관", address: "인천광역시 연수구 청능대로 109 탑피온빌딩 5층" },
     { name: "PK독학재수학원 인천연수점", address: "인천광역시 연수구 앵고개로264번길 30-3 영창빌딩 6층" }
   ],
+  "대구달서": [
+    { name: "수만휘 스파르타 대구달서점", address: "대구광역시 달서구 조암로 13 5층" },
+    { name: "잇올 스파르타 대구월성센터", address: "대구광역시 달서구 조암로 13 그루타워 6층" },
+    { name: "잇올 스파르타 대구상인센터", address: "대구광역시 달서구 월곡로 260 상인프라자 6층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1288,6 +1293,41 @@ function getCompetitorsForBranch(branchName) {
           { title: "연수동춘 스파르타 관리 프로그램", content: "엄격한 의무 자습 시간표 및 출결 통제 시스템 운영", url: "https://www.etoos.com" }
         ],
         guide: "1. [입시 인프라 대응] 개인별 맞춤 시간표와 더불어 이투스 자체 풀시즌 모의고사 라인업의 비교 우위를 상담 시 적극 안내하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("대구달서") || cleanName.includes("달서")) {
+    return [
+      {
+        name: "수만휘 스파르타 대구달서점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 90 } },
+        trend: "1. 월성동 그루타워 중심 수만휘 회원 수강료 10% 감면 프로모션 및 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 알림 강조",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
+      },
+      {
+        name: "잇올 스파르타 대구월성센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 월성동 학원가 중심 엄격한 생활 관리 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "잇올 스파르타 대구상인센터",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 91, content: 79, facility: 90 } },
+        trend: "1. 상인역 상인프라자 거점 전통적 독학 관리 및 엄격한 출결 통제 마케팅\n2. 반수반 모집 및 장학 혜택 프로모션 진행",
+        promotions: [
+          { title: "대구상인센터 반수반 모집", content: "성적 우수자 장학 혜택 및 규칙적 생활 루틴 관리 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [피드백/케어 대응] 단순 시간 통제를 넘어선 이투스247만의 1:1 교과 피드백과 모의고사 오답 클리닉의 완성도를 부각하십시오."
       }
     ];
   }
