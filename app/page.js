@@ -599,6 +599,12 @@ const branchCompetitorAddressMap = {
     { name: "잇올 스파르타 부산사직센터", address: "부산광역시 동래구 종합운동장로 60 거성빌딩 2층" },
     { name: "잇올 몰입관 부산동래사직캠프", address: "부산광역시 동래구 아시아드대로 245 위드피플타워 2층" }
   ],
+  "광주동구": [
+    { name: "메가스터디 러셀 광주", address: "광주광역시 남구 봉선로 168 센트럴빌딩 2~4층" },
+    { name: "잇올 스파르타 광주충장로센터", address: "광주광역시 동구 중앙로196번길 25 만성회관빌딩 5~6층" },
+    { name: "잇올 스파르타 광주봉선센터", address: "광주광역시 남구 제석로 104 메디월상가 8층" },
+    { name: "수만휘 스파르타 광주봉선점", address: "광주광역시 남구 제석로 110 3층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1357,6 +1363,51 @@ function getCompetitorsForBranch(branchName) {
           { title: "몰입관 좌석 1일 무료체험 이벤트", content: "프리미엄 몰입형 자습 좌석 체험 및 1:1 학습 상담 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [시설/학습 대응] 단순 공간 프리미엄을 넘어선 이투스247의 체계적인 교과 질의응답 및 입시 컨설팅의 결합 가치를 전면에 내세우십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("광주동구") || (cleanName.includes("광주") && cleanName.includes("동구"))) {
+    return [
+      {
+        name: "메가스터디 러셀 광주",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 90, content: 93, facility: 92 } },
+        trend: "1. 봉선동 센트럴빌딩 대형 단과 연계 바른공부 자습전용관(바자관) 홍보\n2. 메가스터디 모의고사 및 수능/내신 단과 패키지 할인 공세",
+        promotions: [
+          { title: "단과 연계 바자관 수강료 지원 패키지", content: "러셀 단과 2과목 이상 수강 등록 시 자습관 이용료 감면 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [환경/밀착 케어 대응] 대형 단과 자습관의 혼잡함 대비 이투스247의 엄격한 1인 독립 면학 환경과 1:1 담임 밀착 코칭의 차별성을 안내하십시오."
+      },
+      {
+        name: "잇올 스파르타 광주충장로센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 90 } },
+        trend: "1. 금남로5가 만성회관빌딩 중심 엄격한 생활 통제 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "잇올 스파르타 광주봉선센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 봉선동 메디월상가 거점 전통적 독학 관리 및 엄격한 출결 통제 마케팅\n2. 반수반 모집 및 성적 우수자 장학 혜택 프로모션 전개",
+        promotions: [
+          { title: "광주봉선센터 반수반 모집", content: "성적 우수자 장학 혜택 및 규칙적 생활 루틴 관리 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [피드백/케어 대응] 단순 시간 통제를 넘어선 이투스247만의 1:1 교과 피드백과 모의고사 오답 클리닉의 완성도를 부각하십시오."
+      },
+      {
+        name: "수만휘 스파르타 광주봉선점",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 89 } },
+        trend: "1. 봉선동 진헌빌딩 중심 수만휘 회원 수강료 10% 감면 프로모션 및 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 알림 강조",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
       }
     ];
   }
