@@ -4185,7 +4185,8 @@ select:focus {
 
 .report-summary-tooltip.score small:first-of-type,
 .report-summary-tooltip.program small:first-of-type,
-.report-summary-tooltip.sns small:first-of-type {
+.report-summary-tooltip.sns small:first-of-type,
+.report-summary-tooltip.asset small:first-of-type {
   margin: 7px 0 6px;
   color: #ffffff;
   font-family: 'Outfit', sans-serif;
@@ -4197,7 +4198,8 @@ select:focus {
 
 .report-summary-tooltip.score small:last-child,
 .report-summary-tooltip.program small:last-child,
-.report-summary-tooltip.sns small:last-child {
+.report-summary-tooltip.sns small:last-child,
+.report-summary-tooltip.asset small:last-child {
   color: rgba(255, 255, 255, 0.78);
   font-size: 0.82rem;
   line-height: 1.3;

@@ -4553,7 +4553,15 @@ function BranchMarketingReport({ report, generatedAt, mapStatus, onPrint, onFocu
     {
       label: "콘텐츠 자산",
       value: `${report.contentAssetCount}개`,
-      detail: "프렌즈 · 체험단 · 협업 · 언론"
+      detail: "프렌즈 · 체험단 · 협업 · 언론",
+      tooltip: {
+        title: "콘텐츠 자산 평균",
+        variant: "asset",
+        items: [
+          `전국 평균 ${report.nationalContentAssetAverage.toFixed(1)}개`,
+          `${report.region} 평균 ${report.regionContentAssetAverage.toFixed(1)}개`
+        ]
+      }
     }
   ];
 
@@ -7389,6 +7397,7 @@ export default function HomePage() {
             inactiveEvents: 0,
             totalParticipants: 0,
             collabUrlCount: 0,
+            contentAssetCount: 0,
             activePlans: new Set()
           });
         }
@@ -7400,16 +7409,26 @@ export default function HomePage() {
 
         target.eligibleEvents += tab.events.length;
 
+        let tabActiveEvents = 0;
+        let tabParticipants = 0;
         tab.events.forEach((event) => {
           const participants = Number(row.eventValues?.[event.id]?.participants || 0);
           if (participants > 0) {
             target.participatedEvents += 1;
             target.totalParticipants += participants;
+            tabActiveEvents += 1;
+            tabParticipants += participants;
             target.activePlans.add(tab.name);
           } else {
             target.inactiveEvents += 1;
           }
         });
+
+        if (["247프렌즈", "프렌즈"].includes(tab.name)) {
+          target.contentAssetCount += tabActiveEvents * 4;
+        } else if (["247체험단", "체험단", "언론보도"].includes(tab.name)) {
+          target.contentAssetCount += tabParticipants;
+        }
       });
     });
 
@@ -7427,6 +7446,7 @@ export default function HomePage() {
             inactiveEvents: 0,
             totalParticipants: 0,
             collabUrlCount: 0,
+            contentAssetCount: 0,
             activePlans: new Set()
           });
         }
@@ -7440,6 +7460,7 @@ export default function HomePage() {
         target.participatedEvents += row.events.length;
         target.inactiveEvents += Math.max(overallCollabSummary.uniqueEvents - row.events.length, 0);
         target.collabUrlCount += row.urlCount;
+        target.contentAssetCount += row.urlCount;
 
         if (row.events.length > 0) {
           target.activePlans.add(overallCollabTab.name);
@@ -7477,6 +7498,7 @@ export default function HomePage() {
           inactiveEvents: item.inactiveEvents,
           totalParticipants: item.totalParticipants,
           collabUrlCount: item.collabUrlCount,
+          contentAssetCount: item.contentAssetCount,
           activePlanCount: item.activePlans.size,
           activePlans: [...item.activePlans].sort((a, b) => a.localeCompare(b, "ko")),
           participationRate,
@@ -7585,6 +7607,12 @@ export default function HomePage() {
     const regionSnsAverage = regionSnsPeers.length
       ? Math.round((regionSnsPeers.reduce((sum, row) => sum + Number(row.snsScore), 0) / regionSnsPeers.length) * 10) / 10
       : Number(snsRow?.finalScore || 0);
+    const nationalContentAssetAverage = overallBranchScoreboard.branches.length
+      ? Math.round((overallBranchScoreboard.branches.reduce((sum, row) => sum + Number(row.contentAssetCount || 0), 0) / overallBranchScoreboard.branches.length) * 10) / 10
+      : 0;
+    const regionContentAssetAverage = regionPeers.length
+      ? Math.round((regionPeers.reduce((sum, row) => sum + Number(row.contentAssetCount || 0), 0) / regionPeers.length) * 10) / 10
+      : Number(scoreboardRow?.contentAssetCount || 0);
     const rankIndex = overallBranchScoreboard.branches.findIndex(
       (row) => normalizeBranchKey(row.branch) === branchKey
     );
@@ -7753,6 +7781,8 @@ export default function HomePage() {
       regionOperationAverage,
       nationalSnsAverage,
       regionSnsAverage,
+      nationalContentAssetAverage,
+      regionContentAssetAverage,
       snsScore: snsRow ? snsRow.finalScore : null,
       snsGrade: snsRow?.grade || null,
       blogScore: Number(snsRow?.blogScore || 0),
