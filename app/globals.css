@@ -5651,7 +5651,7 @@ select:focus {
     page-break-inside: avoid !important;
   }
   .report-map-frame {
-    height: 175px !important;
+    height: 260px !important;
     margin-bottom: 8px !important;
   }
   .report-location-strip {
