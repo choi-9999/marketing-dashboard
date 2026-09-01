@@ -657,6 +657,20 @@ const branchCompetitorAddressMap = {
   "남양주다산": [
     { name: "수만휘 스파르타 남양주다산점", address: "경기도 남양주시 다산중앙로123번길 22-24 맥스타워 7층" }
   ],
+  "대전둔산": [
+    { name: "디랩 대전", address: "대전광역시 서구 둔산남로 46 4층" },
+    { name: "수만휘 스파르타 대전둔산 1관", address: "대전광역시 서구 둔산남로 96 9층" },
+    { name: "수만휘 스파르타 대전둔산 2관", address: "대전광역시 서구 둔산남로 41 4·5층" },
+    { name: "잇올 스파르타 대전둔산센터 1관", address: "대전광역시 서구 둔산서로 15 8·9층" },
+    { name: "메가스터디 러셀 대전", address: "대전광역시 서구 둔산로123번길 21 엠시티타워 5·6층" }
+  ],
+  "둔산": [
+    { name: "디랩 대전", address: "대전광역시 서구 둔산남로 46 4층" },
+    { name: "수만휘 스파르타 대전둔산 1관", address: "대전광역시 서구 둔산남로 96 9층" },
+    { name: "수만휘 스파르타 대전둔산 2관", address: "대전광역시 서구 둔산남로 41 4·5층" },
+    { name: "잇올 스파르타 대전둔산센터 1관", address: "대전광역시 서구 둔산서로 15 8·9층" },
+    { name: "메가스터디 러셀 대전", address: "대전광역시 서구 둔산로123번길 21 엠시티타워 5·6층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1770,6 +1784,61 @@ function getCompetitorsForBranch(branchName) {
           { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
         ],
         guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("대전둔산") || cleanName.includes("둔산") || (cleanName.includes("대전") && !cleanBranch?.includes("유성"))) {
+    return [
+      {
+        name: "디랩 대전",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 86, content: 90, facility: 89 } },
+        trend: "1. 둔산동 뱅뱅빌딩 거점 대성 모의고사(더프/이감) 외부생 응시 및 성적 분석 리포트 홍보\n2. 수시/정시 지원 전략 설명회 개최",
+        promotions: [
+          { title: "더프 및 이감 외부생 모집", content: "실전 감각 극대화를 위한 전국 모의고사 외부생 응시 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [모의고사 대응] 자사 풀시즌 모의고사 라인업과 1:1 오답 피드백 클리닉의 결합 가치를 전면에 내세우십시오."
+      },
+      {
+        name: "수만휘 스파르타 대전둔산 1관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 90 } },
+        trend: "1. 서경빌딩 9층 중심 수만휘 회원 수강료 10% 감면 프로모션 및 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 알림 강조",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
+      },
+      {
+        name: "수만휘 스파르타 대전둔산 2관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 91 } },
+        trend: "1. 동우빌딩 4·5층 단독 좌석 확장 및 엄격한 생활 관리 마케팅\n2. 수험생 맞춤형 플래너 관리 및 자습 시간표 운영",
+        promotions: [
+          { title: "대전둔산 2관 신규 오픈 장학 혜택", content: "신규 등록생 첫 달 수강료 감면 및 플래너 무료 증정", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [관리 질적 차별화] 단순 좌석/시간 통제 대비 이투스247의 정밀 학습 진단과 과목별 1:1 질의응답 피드백의 우수성을 부각하십시오."
+      },
+      {
+        name: "잇올 스파르타 대전둔산센터 1관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 새천년빌딩 8·9층 거점 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "메가스터디 러셀 대전",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 90, content: 93, facility: 92 } },
+        trend: "1. 엠시티타워 거점 대형 단과 연계 바른공부 자습전용관(바자관) 홍보\n2. 메가스터디 모의고사 및 수능/내신 단과 패키지 할인 공세",
+        promotions: [
+          { title: "단과 연계 바자관 수강료 지원 패키지", content: "러셀 단과 2과목 이상 수강 등록 시 자습관 이용료 감면 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [환경/밀착 케어 대응] 대형 단과 자습관의 혼잡함 대비 이투스247의 엄격한 1인 독립 면학 환경과 1:1 담임 밀착 코칭의 차별성을 안내하십시오."
       }
     ];
   }

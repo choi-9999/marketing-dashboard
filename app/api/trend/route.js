@@ -36,6 +36,18 @@ export async function GET(request) {
         comp8: Math.round(32 + Math.sin(i + 9) * 6 + i * 1) // PK 동탄센터
       });
     }
+  } else if (cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성"))) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(44 + Math.cos(i + 2) * 10 + i * 2), // 디랩 대전
+        comp2: Math.round(46 + Math.sin(i * 1.2 + 3) * 11 + i * 2), // 수만휘 대전둔산 1관
+        comp3: Math.round(42 + Math.cos(i * 0.8 + 4) * 8 + i * 2), // 수만휘 대전둔산 2관
+        comp4: Math.round(49 + Math.sin(i + 5) * 10 + i * 3), // 잇올 대전둔산 1관
+        comp5: Math.round(52 + Math.cos(i + 6) * 12 + i * 3) // 러셀 대전
+      });
+    }
   } else if (cleanBranch.includes("강북")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -232,8 +244,9 @@ export async function GET(request) {
     const periodMonths = ["2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01"];
     const monthLabels = ["1월", "2월", "3월", "4월", "5월", "6월"];
 
-    if (cleanBranch.includes("동탄") || cleanBranch.includes("강북") || cleanBranch.includes("김포") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
+    if (cleanBranch.includes("동탄") || cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성")) || cleanBranch.includes("강북") || cleanBranch.includes("김포") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
       const isDongtan = cleanBranch.includes("동탄");
+      const isDaejeonDunsan = cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성"));
       const isGangbuk = cleanBranch.includes("강북");
       const isGimpo = cleanBranch.includes("김포");
       const isSongdo = cleanBranch.includes("송도") || cleanBranch.includes("인천송도");
@@ -245,7 +258,15 @@ export async function GET(request) {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isGangbuk
+        keywordGroups: isDaejeonDunsan
+          ? [
+              { groupName: "ours", keywords: ["대전둔산 이투스247", "둔산 이투스247", "대전 이투스247", "둔산동 이투스"] },
+              { groupName: "comp1", keywords: ["디랩 대전", "대전 디랩", "둔산동 디랩"] },
+              { groupName: "comp2", keywords: ["수만휘 스파르타 대전둔산 1관", "대전둔산 수만휘 1관", "둔산동 수만휘 1관"] },
+              { groupName: "comp3", keywords: ["수만휘 스파르타 대전둔산 2관", "대전둔산 수만휘 2관", "둔산동 수만휘 2관"] },
+              { groupName: "comp4", keywords: ["잇올 스파르타 대전둔산센터 1관", "대전둔산 잇올", "둔산동 잇올"] }
+            ]
+          : isGangbuk
           ? [
               { groupName: "ours", keywords: ["강북 이투스247", "강북 이투스", "노원 이투스247", "중계 이투스247"] },
               { groupName: "comp1", keywords: ["잇올 스파르타 노원중계센터 1관", "노원중계 잇올 1관", "중계동 잇올 1관"] },
@@ -313,7 +334,12 @@ export async function GET(request) {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isGangbuk
+        keywordGroups: isDaejeonDunsan
+          ? [
+              { groupName: "ours", keywords: ["대전둔산 이투스247", "둔산 이투스247", "대전 이투스247", "둔산동 이투스"] },
+              { groupName: "comp5", keywords: ["메가스터디 러셀 대전", "러셀 대전", "대전 러셀"] }
+            ]
+          : isGangbuk
           ? [
               { groupName: "ours", keywords: ["강북 이투스247", "강북 이투스", "노원 이투스247", "중계 이투스247"] },
               { groupName: "comp5", keywords: ["PK독학재수학원 노원점", "노원 PK독학재수", "상계동 PK"] },
