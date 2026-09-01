@@ -683,6 +683,18 @@ const branchCompetitorAddressMap = {
     { name: "종로학원 강북", address: "서울특별시 마포구 신촌로 118" },
     { name: "신촌 메가스터디학원", address: "서울특별시 서대문구 신촌로 73 거화빌딩" }
   ],
+  "목동": [
+    { name: "강남하이퍼학원 목동관", address: "서울특별시 양천구 오목로 325 대학빌딩 7층" },
+    { name: "디랩 목동", address: "서울특별시 양천구 목동동로 233-1 드림타워 20층" },
+    { name: "수만휘 스파르타 목동2관", address: "서울특별시 양천구 목동서로 61" },
+    { name: "잇올 스파르타 목동센터 2관", address: "서울특별시 양천구 목동동로 339 목동 트윈빌 4층" },
+    { name: "종로학원 목동", address: "서울특별시 양천구 오목로 282" },
+    { name: "수만휘 스파르타 목동1관", address: "서울특별시 양천구 목동로 201 3층 일부" },
+    { name: "잇올 스파르타 목동센터 1관", address: "서울특별시 양천구 목동로 183 재성빌딩 2·4층" },
+    { name: "잇올 스파르타 목동센터 3관", address: "서울특별시 양천구 목동서로 349 센트럴프라자 10층" },
+    { name: "메가스터디 러셀 목동", address: "서울특별시 양천구 신월로 358 남부필타운 7층" },
+    { name: "PK대치스파르타 목동센터 1관", address: "서울특별시 양천구 목동로 173 4층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1896,6 +1908,111 @@ function getCompetitorsForBranch(branchName) {
           { title: "대입 재수종합/독학관리반 모집", content: "메가스터디 입시 콘텐츠 및 스타강사진 단과 연계 혜택 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [자기주도성 대응] 대형 단과 위주의 획일적 강의 수강보다 자기주도 학습 몰입을 극대화하는 이투스247의 개인 맞춤 학습 설계를 제안하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("목동")) {
+    return [
+      {
+        name: "강남하이퍼학원 목동관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 94, facility: 92 } },
+        trend: "1. 오목로 대학빌딩 거점 최상위권 전문 의치한약수/SKY 맞춤 입시 프로그램 강조\n2. 킬러 문항 대비 심화 콘텐츠 및 1:1 취약점 클리닉 홍보",
+        promotions: [
+          { title: "최상위권 의약학계열 전문반 모집", content: "의치한약수/최상위권 전용 하이퍼 킬러 콘텐츠 및 심층 입시 컨설팅 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [콘텐츠/관리 대응] 최상위권 전문 브랜딩에 맞서 이투스247의 정밀 진단 기반 과목별 취약 영역 맞춤 클리닉과 독학 효율성을 부각하십시오."
+      },
+      {
+        name: "디랩 목동",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 86, content: 90, facility: 90 } },
+        trend: "1. 드림타워 20층 고층 뷰 프리미엄 자습 환경 및 대성 모의고사(더프/이감) 외부생 응시 홍보\n2. 수시/정시 지원 전략 설명회 개최",
+        promotions: [
+          { title: "더프 및 이감 모의고사 외부생 모집", content: "실전 감각 극대화를 위한 전국 모의고사 외부생 응시 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [모의고사 대응] 자사 풀시즌 모의고사 라인업과 1:1 오답 피드백 클리닉의 결합 가치를 전면에 내세우십시오."
+      },
+      {
+        name: "수만휘 스파르타 목동2관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 91 } },
+        trend: "1. 목동서로 거점 수만휘 회원 수강료 10% 감면 프로모션 및 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 알림 강조",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
+      },
+      {
+        name: "잇올 스파르타 목동센터 2관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 목동 트윈빌 4층 거점 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 학교프로젝트 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "종로학원 목동",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 90, content: 91, facility: 89 } },
+        trend: "1. 오목로 거점 전통의 종로학원 대입 재수종합 및 독학관리 인프라 홍보\n2. 종로 모의고사 및 입시 설명회 전개",
+        promotions: [
+          { title: "종로학원 독학재수/재수종합 모집", content: "종로 모의고사 풀세트 및 수시/정시 정밀 배치표 무료 제공", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [1:1 맞춤 관리 대응] 전통 재종식 집단 관리 대비 이투스247의 개인별 학습 진단 알고리즘과 1:1 밀착 피드백의 정밀성을 부각하십시오."
+      },
+      {
+        name: "수만휘 스파르타 목동1관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 89 } },
+        trend: "1. 목동로 201 안내/스카 연계 엄격한 출결 및 자습 시간표 통제 마케팅\n2. 과목별 취약점 보완 플래너 점검 운영",
+        promotions: [
+          { title: "목동 1관 첫 달 등록 장학 프로모션", content: "신규 등록생 첫 달 수강료 감면 및 학습 플래너 증정", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [관리 차별화] 단순 시간 통제를 넘어선 이투스247만의 1:1 교과 피드백과 모의고사 오답 클리닉의 완성도를 부각하십시오."
+      },
+      {
+        name: "잇올 스파르타 목동센터 1관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 91 } },
+        trend: "1. 재성빌딩 2·4층 단독관 운영 및 엄격한 생활 통제/면학 분위기 홍보\n2. 모의고사 현장 응시 및 피드백 프로그램",
+        promotions: [
+          { title: "목동센터 1관 재원생 장학 혜택", content: "성적 우수자 수강료 감면 및 1:1 학습 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [밀착 케어 대응] 시설 규모 경쟁보다 원생 개개인의 성향과 학습 수준에 최적화된 담임 밀착 코칭의 강점을 안내하십시오."
+      },
+      {
+        name: "잇올 스파르타 목동센터 3관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 93 } },
+        trend: "1. 센트럴프라자 10층 거점 쾌적한 학습 공간 및 최신 인테리어 시설 마케팅\n2. 반수반 모집 및 실전 모의고사 운영",
+        promotions: [
+          { title: "목동 3관 반수반 스페셜 패키지", content: "반수생 전용 학습 플랜 설계 및 좌석 우선 배정", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [인프라 대응] 신축 시설 공세 대비 이투스247의 축적된 입시 데이터와 명문대 합격생 배출 노하우를 제시하십시오."
+      },
+      {
+        name: "메가스터디 러셀 목동",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 90, content: 93, facility: 92 } },
+        trend: "1. 남부필타운 7층 거점 대형 단과 연계 바른공부 자습전용관(바자관) 홍보\n2. 메가스터디 모의고사 및 수능/내신 단과 패키지 할인 공세",
+        promotions: [
+          { title: "단과 연계 바자관 수강료 지원 패키지", content: "러셀 단과 2과목 이상 수강 등록 시 자습관 이용료 감면 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [환경/밀착 케어 대응] 대형 단과 자습관의 혼잡함 대비 이투스247의 엄격한 1인 독립 면학 환경과 1:1 담임 밀착 코칭의 차별성을 안내하십시오."
+      },
+      {
+        name: "PK대치스파르타 목동센터 1관",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 89, content: 80, facility: 88 } },
+        trend: "1. 목동로 173 거점 1:1 과목별 코칭 및 스케줄링 관리 특화 홍보\n2. 소수 정예 밀착 질의응답 시스템 강조",
+        promotions: [
+          { title: "1:1 과목별 맞춤 스케줄링 프로그램", content: "취약 과목 집중 보완 및 개인별 밀착 스케줄링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [인프라 대응] 소수 코칭 대비 이투스의 방대한 교육 콘텐츠 인프라와 체계적인 학습 진단 시스템의 비교 우위를 안내하십시오."
       }
     ];
   }
@@ -10534,6 +10651,7 @@ export default function HomePage() {
                               if (clean.includes("72시간")) return "#0891b2"; // 72시간 시안
                               if (clean.includes("커넥츠") || clean.includes("공단기")) return "#4338ca"; // 커넥츠 인디고
                               if (clean.includes("종로")) return "#0d9488"; // 종로 틸
+                              if (clean.includes("하이퍼")) return "#b91c1c"; // 하이퍼 딥레드
                               return null;
                             };
 

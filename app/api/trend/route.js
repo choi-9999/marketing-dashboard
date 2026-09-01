@@ -36,6 +36,23 @@ export async function GET(request) {
         comp8: Math.round(32 + Math.sin(i + 9) * 6 + i * 1) // PK 동탄센터
       });
     }
+  } else if (cleanBranch.includes("목동")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(46 + Math.sin(i + 1) * 9 + i * 3),
+        comp1: Math.round(48 + Math.cos(i + 2) * 11 + i * 3), // 강남하이퍼 목동관
+        comp2: Math.round(43 + Math.sin(i * 1.2 + 3) * 10 + i * 2), // 디랩 목동
+        comp3: Math.round(45 + Math.cos(i * 0.8 + 4) * 8 + i * 2), // 수만휘 목동2관
+        comp4: Math.round(49 + Math.sin(i + 5) * 9 + i * 2), // 잇올 목동 2관
+        comp5: Math.round(47 + Math.cos(i + 6) * 10 + i * 3), // 종로학원 목동
+        comp6: Math.round(44 + Math.sin(i + 7) * 7 + i * 2), // 수만휘 목동1관
+        comp7: Math.round(50 + Math.cos(i + 8) * 8 + i * 3), // 잇올 목동 1관
+        comp8: Math.round(46 + Math.sin(i + 9) * 7 + i * 2), // 잇올 목동 3관
+        comp9: Math.round(52 + Math.cos(i + 10) * 11 + i * 3), // 러셀 목동
+        comp10: Math.round(38 + Math.sin(i + 11) * 6 + i * 1) // PK 목동 1관
+      });
+    }
   } else if (cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성"))) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -255,8 +272,9 @@ export async function GET(request) {
     const periodMonths = ["2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01"];
     const monthLabels = ["1월", "2월", "3월", "4월", "5월", "6월"];
 
-    if (cleanBranch.includes("동탄") || cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성")) || cleanBranch.includes("강북") || cleanBranch.includes("김포") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
+    if (cleanBranch.includes("동탄") || cleanBranch.includes("목동") || cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성")) || cleanBranch.includes("강북") || cleanBranch.includes("김포") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
       const isDongtan = cleanBranch.includes("동탄");
+      const isMokdong = cleanBranch.includes("목동");
       const isDaejeonDunsan = cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성"));
       const isGangbuk = cleanBranch.includes("강북");
       const isGimpo = cleanBranch.includes("김포");
@@ -264,12 +282,20 @@ export async function GET(request) {
       const isDaech = cleanBranch.includes("대치");
       const isIcheon = cleanBranch.includes("이천기숙") || cleanBranch.includes("이천");
       const isAnseong = cleanBranch.includes("안성기숙") || cleanBranch.includes("안성");
-      // 6+ groups exceeds Naver API limit (max 5 per call). We make two parallel requests and normalize the scale using "ours"
+      // 6+ groups exceeds Naver API limit (max 5 per call). We make parallel requests and normalize the scale using "ours"
       const body1 = {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isDaejeonDunsan
+        keywordGroups: isMokdong
+          ? [
+              { groupName: "ours", keywords: ["목동 이투스247", "목동 이투스", "목동이투스", "양천 이투스247"] },
+              { groupName: "comp1", keywords: ["강남하이퍼학원 목동관", "강남하이퍼 목동관", "하이퍼 목동관"] },
+              { groupName: "comp2", keywords: ["디랩 목동", "목동 디랩"] },
+              { groupName: "comp3", keywords: ["수만휘 스파르타 목동2관", "목동2관 수만휘", "목동 수만휘 2관"] },
+              { groupName: "comp4", keywords: ["잇올 스파르타 목동센터 2관", "목동 잇올 2관", "목동잇올 2관"] }
+            ]
+          : isDaejeonDunsan
           ? [
               { groupName: "ours", keywords: ["대전둔산 이투스247", "둔산 이투스247", "대전 이투스247", "둔산동 이투스"] },
               { groupName: "comp1", keywords: ["디랩 대전", "대전 디랩", "둔산동 디랩"] },
@@ -345,7 +371,15 @@ export async function GET(request) {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isDaejeonDunsan
+        keywordGroups: isMokdong
+          ? [
+              { groupName: "ours", keywords: ["목동 이투스247", "목동 이투스", "목동이투스", "양천 이투스247"] },
+              { groupName: "comp5", keywords: ["종로학원 목동", "목동 종로학원", "목동 종로"] },
+              { groupName: "comp6", keywords: ["수만휘 스파르타 목동1관", "목동1관 수만휘", "목동 수만휘 1관"] },
+              { groupName: "comp7", keywords: ["잇올 스파르타 목동센터 1관", "목동 잇올 1관", "목동잇올 1관"] },
+              { groupName: "comp8", keywords: ["잇올 스파르타 목동센터 3관", "목동 잇올 3관", "목동잇올 3관"] }
+            ]
+          : isDaejeonDunsan
           ? [
               { groupName: "ours", keywords: ["대전둔산 이투스247", "둔산 이투스247", "대전 이투스247", "둔산동 이투스"] },
               { groupName: "comp5", keywords: ["메가스터디 러셀 대전", "러셀 대전", "대전 러셀"] }
@@ -396,8 +430,20 @@ export async function GET(request) {
               { groupName: "comp5", keywords: ["디랩 분당", "분당 디랩"] }
             ]
       };
+      const body3 = isMokdong
+        ? {
+            startDate: "2026-01-01",
+            endDate: "2026-06-30",
+            timeUnit: "month",
+            keywordGroups: [
+              { groupName: "ours", keywords: ["목동 이투스247", "목동 이투스", "목동이투스", "양천 이투스247"] },
+              { groupName: "comp9", keywords: ["메가스터디 러셀 목동", "러셀 목동", "목동 러셀"] },
+              { groupName: "comp10", keywords: ["PK대치스파르타 목동센터 1관", "목동 PK대치스파르타", "목동 PK 1관"] }
+            ]
+          }
+        : null;
 
-      const [res1, res2] = await Promise.all([
+      const fetchRequests = [
         fetch("https://naverapihub.apigw.ntruss.com/search-trend/v1/search", {
           method: "POST",
           headers: { "x-ncp-apigw-api-key-id": clientId, "x-ncp-apigw-api-key": clientSecret, "Content-Type": "application/json" },
@@ -408,15 +454,27 @@ export async function GET(request) {
           headers: { "x-ncp-apigw-api-key-id": clientId, "x-ncp-apigw-api-key": clientSecret, "Content-Type": "application/json" },
           body: JSON.stringify(body2)
         })
-      ]);
+      ];
+      if (body3) {
+        fetchRequests.push(
+          fetch("https://naverapihub.apigw.ntruss.com/search-trend/v1/search", {
+            method: "POST",
+            headers: { "x-ncp-apigw-api-key-id": clientId, "x-ncp-apigw-api-key": clientSecret, "Content-Type": "application/json" },
+            body: JSON.stringify(body3)
+          })
+        );
+      }
 
-      if (!res1.ok || !res2.ok) {
+      const responses = await Promise.all(fetchRequests);
+
+      if (responses.some(r => !r.ok)) {
         console.warn("One of the parallel Naver Search Trend API requests failed.");
         return NextResponse.json({ success: true, mode: "mock-fallback-api-error", trendData: fallbackTrend });
       }
 
-      const data1 = await res1.json();
-      const data2 = await res2.json();
+      const data1 = await responses[0].json();
+      const data2 = await responses[1].json();
+      const data3 = body3 ? await responses[2].json() : null;
 
       const oursData1 = data1.results.find(r => r.title === "ours")?.data || [];
       const comp1Data = data1.results.find(r => r.title === "comp1")?.data || [];
@@ -430,9 +488,14 @@ export async function GET(request) {
       const comp7Data = data2.results.find(r => r.title === "comp7")?.data || [];
       const comp8Data = data2.results.find(r => r.title === "comp8")?.data || [];
 
+      const oursData3 = data3 ? (data3.results.find(r => r.title === "ours")?.data || []) : [];
+      const comp9Data = data3 ? (data3.results.find(r => r.title === "comp9")?.data || []) : [];
+      const comp10Data = data3 ? (data3.results.find(r => r.title === "comp10")?.data || []) : [];
+
       const realTrend = periodMonths.map((period, index) => {
         const oursVal1 = oursData1.find(d => d.period === period)?.ratio || 0;
         const oursVal2 = oursData2.find(d => d.period === period)?.ratio || 0;
+        const oursVal3 = oursData3.find(d => d.period === period)?.ratio || 0;
 
         const comp1Val = comp1Data.find(d => d.period === period)?.ratio || 0;
         const comp2Val = comp2Data.find(d => d.period === period)?.ratio || 0;
@@ -442,6 +505,8 @@ export async function GET(request) {
         const comp6Val = comp6Data.find(d => d.period === period)?.ratio || 0;
         const comp7Val = comp7Data.find(d => d.period === period)?.ratio || 0;
         const comp8Val = comp8Data.find(d => d.period === period)?.ratio || 0;
+        const comp9Val = comp9Data.find(d => d.period === period)?.ratio || 0;
+        const comp10Val = comp10Data.find(d => d.period === period)?.ratio || 0;
 
         // Normalise comp5..comp8 ratio relative to ours ratio
         const factor = oursVal2 > 0 ? oursVal1 / oursVal2 : 1;
@@ -449,6 +514,10 @@ export async function GET(request) {
         const comp6ValNormalized = comp6Val * factor;
         const comp7ValNormalized = comp7Val * factor;
         const comp8ValNormalized = comp8Val * factor;
+
+        const factor3 = oursVal3 > 0 ? oursVal1 / oursVal3 : 1;
+        const comp9ValNormalized = comp9Val * factor3;
+        const comp10ValNormalized = comp10Val * factor3;
 
         const row = {
           month: monthLabels[index],
@@ -460,20 +529,24 @@ export async function GET(request) {
           comp5: Math.round(comp5ValNormalized > 0 ? comp5ValNormalized : 20 + index)
         };
 
-        if (isIcheon || isDongtan || isGangbuk) {
+        if (isIcheon || isDongtan || isGangbuk || isMokdong) {
           row.comp6 = Math.round(comp6ValNormalized > 0 ? comp6ValNormalized : 15 + index);
         }
-        if (isDongtan || isGangbuk) {
+        if (isDongtan || isGangbuk || isMokdong) {
           row.comp7 = Math.round(comp7ValNormalized > 0 ? comp7ValNormalized : 12 + index);
         }
-        if (isDongtan) {
+        if (isDongtan || isMokdong) {
           row.comp8 = Math.round(comp8ValNormalized > 0 ? comp8ValNormalized : 14 + index);
+        }
+        if (isMokdong) {
+          row.comp9 = Math.round(comp9ValNormalized > 0 ? comp9ValNormalized : 18 + index);
+          row.comp10 = Math.round(comp10ValNormalized > 0 ? comp10ValNormalized : 11 + index);
         }
 
         return row;
       });
 
-      return NextResponse.json({ success: true, mode: isDongtan ? "naver-api-8comps" : isGangbuk ? "naver-api-7comps" : isIcheon ? "naver-api-6comps" : "naver-api-5comps", trendData: realTrend });
+      return NextResponse.json({ success: true, mode: isMokdong ? "naver-api-10comps" : isDongtan ? "naver-api-8comps" : isGangbuk ? "naver-api-7comps" : isIcheon ? "naver-api-6comps" : "naver-api-5comps", trendData: realTrend });
     } else {
       const isDokhakGisuk = cleanBranch.includes("독학기숙") || (cleanBranch.includes("기숙") && !cleanBranch.includes("안성") && !cleanBranch.includes("이천"));
       const isDalseo = cleanBranch.includes("대구달서") || cleanBranch.includes("달서");
