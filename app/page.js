@@ -626,6 +626,15 @@ const branchCompetitorAddressMap = {
     { name: "잇올 스파르타 하남미사센터", address: "경기도 하남시 미사강변대로 54 상아프라자 2 5층" },
     { name: "수만휘 스파르타 하남미사점", address: "경기도 하남시 미사강변대로226번안길 17 4층 401호" }
   ],
+  "강북": [
+    { name: "잇올 스파르타 노원중계센터 1관", address: "서울특별시 노원구 한글비석로 270 스카이타워 12~14층" },
+    { name: "수만휘 스파르타 노원중계점", address: "서울특별시 노원구 한글비석로 242 삼부프라자 7층" },
+    { name: "잇올 스파르타 노원중계센터 2관", address: "서울특별시 노원구 한글비석로 231 위성프라자 9~10층" },
+    { name: "메가스터디 러셀 중계", address: "서울특별시 노원구 한글비석로 232 7층" },
+    { name: "PK독학재수학원 노원점", address: "서울특별시 노원구 동일로 1382 올림피아빌딩 5층" },
+    { name: "강북 메가스터디학원 중계관", address: "서울특별시 노원구 한글비석로 232 7층" },
+    { name: "강북청솔학원", address: "서울특별시 노원구 한글비석로 242 8층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1579,6 +1588,81 @@ function getCompetitorsForBranch(branchName) {
           { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
         ],
         guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("강북")) {
+    return [
+      {
+        name: "잇올 스파르타 노원중계센터 1관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 중계동 은행사거리 스카이타워 거점 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 학교프로젝트 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "수만휘 스파르타 노원중계점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 89 } },
+        trend: "1. 삼부프라자 7층 중심 수만휘 회원 수강료 10% 감면 프로모션 및 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 알림 강조",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
+      },
+      {
+        name: "잇올 스파르타 노원중계센터 2관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 93 } },
+        trend: "1. 위성프라자 9~10층 단독 좌석 확장 및 엄격한 출결/학습 태도 관리 마케팅\n2. 반수반 모집 및 성적 우수자 장학 혜택 프로모션 전개",
+        promotions: [
+          { title: "노원중계 2관 반수반 모집", content: "성적 우수자 장학 혜택 및 규칙적 생활 루틴 관리 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [피드백/케어 대응] 단순 시간 통제를 넘어선 이투스247만의 1:1 교과 피드백과 모의고사 오답 클리닉의 완성도를 부각하십시오."
+      },
+      {
+        name: "메가스터디 러셀 중계",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 90, content: 93, facility: 92 } },
+        trend: "1. 은행사거리 대형 단과 연계 바른공부 자습전용관(바자관) 홍보\n2. 메가스터디 모의고사 및 수능/내신 단과 패키지 할인 공세",
+        promotions: [
+          { title: "단과 연계 바자관 수강료 지원 패키지", content: "러셀 단과 2과목 이상 수강 등록 시 자습관 이용료 감면 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [환경/밀착 케어 대응] 대형 단과 자습관의 혼잡함 대비 이투스247의 엄격한 1인 독립 면학 환경과 1:1 담임 밀착 코칭의 차별성을 안내하십시오."
+      },
+      {
+        name: "PK독학재수학원 노원점",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 89, content: 80, facility: 88 } },
+        trend: "1. 상계동 노원역 중심 1:1 과목별 코칭 및 스케줄링 관리 특화 홍보\n2. 소수 정예 밀착 질의응답 시스템 강조",
+        promotions: [
+          { title: "1:1 과목별 맞춤 스케줄링 프로그램", content: "취약 과목 집중 보완 및 개인별 밀착 스케줄링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [인프라 대응] 소수 코칭 대비 이투스의 방대한 교육 콘텐츠 인프라와 체계적인 학습 진단 시스템의 비교 우위를 안내하십시오."
+      },
+      {
+        name: "강북 메가스터디학원 중계관",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 92, facility: 89 } },
+        trend: "1. 중계동 대입 재수종합 및 독학 결합 관리반 홍보\n2. 메가스터디 입시 콘텐츠 결합 설명회 개최",
+        promotions: [
+          { title: "재수종합/독학관리 입시 설명회", content: "수시/정시 합격 전략 및 메가스터디 입시 콘텐츠 설명회", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [자기주도성 대응] 일방적 강의 수강보다 자기주도 학습 효율을 극대화하는 이투스247의 개인 맞춤 학습 설계를 제안하십시오."
+      },
+      {
+        name: "강북청솔학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 91, content: 92, facility: 90 } },
+        trend: "1. 은행사거리 전통의 재수종합 학원 인프라 및 선택형 맞춤 수업 강조\n2. 6평/9평 심층 분석 입시 리포트 배포",
+        promotions: [
+          { title: "청솔 선택형 단과 및 독학관리반 모집", content: "필요 수업만 선택 수강하는 자율 선택형 종합 관리 프로그램", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [완전 독학 맞춤 대응] 불필요한 의무 수업을 배제하고 오직 개인에게 필요한 학습과 피드백에 100% 집중하는 이투스247의 완벽한 독학 관리 체계를 부각하십시오."
       }
     ];
   }

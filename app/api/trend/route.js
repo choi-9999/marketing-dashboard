@@ -36,6 +36,20 @@ export async function GET(request) {
         comp8: Math.round(32 + Math.sin(i + 9) * 6 + i * 1) // PK 동탄센터
       });
     }
+  } else if (cleanBranch.includes("강북")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 9 + i * 3),
+        comp1: Math.round(50 + Math.cos(i + 2) * 11 + i * 3), // 잇올 노원중계 1관
+        comp2: Math.round(46 + Math.sin(i * 1.2 + 3) * 10 + i * 2), // 수만휘 노원중계점
+        comp3: Math.round(48 + Math.cos(i * 0.8 + 4) * 9 + i * 3), // 잇올 노원중계 2관
+        comp4: Math.round(52 + Math.sin(i + 5) * 12 + i * 3), // 러셀 중계
+        comp5: Math.round(38 + Math.cos(i + 6) * 8 + i * 2), // PK 노원점
+        comp6: Math.round(42 + Math.sin(i + 7) * 9 + i * 2), // 강북 메가스터디 중계관
+        comp7: Math.round(45 + Math.cos(i + 8) * 10 + i * 2) // 강북청솔학원
+      });
+    }
   } else if (cleanBranch.includes("김포")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -190,8 +204,9 @@ export async function GET(request) {
     const periodMonths = ["2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01"];
     const monthLabels = ["1월", "2월", "3월", "4월", "5월", "6월"];
 
-    if (cleanBranch.includes("동탄") || cleanBranch.includes("김포") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
+    if (cleanBranch.includes("동탄") || cleanBranch.includes("강북") || cleanBranch.includes("김포") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
       const isDongtan = cleanBranch.includes("동탄");
+      const isGangbuk = cleanBranch.includes("강북");
       const isGimpo = cleanBranch.includes("김포");
       const isSongdo = cleanBranch.includes("송도") || cleanBranch.includes("인천송도");
       const isDaech = cleanBranch.includes("대치");
@@ -202,7 +217,15 @@ export async function GET(request) {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isGimpo
+        keywordGroups: isGangbuk
+          ? [
+              { groupName: "ours", keywords: ["강북 이투스247", "강북 이투스", "노원 이투스247", "중계 이투스247"] },
+              { groupName: "comp1", keywords: ["잇올 스파르타 노원중계센터 1관", "노원중계 잇올 1관", "중계동 잇올 1관"] },
+              { groupName: "comp2", keywords: ["수만휘 스파르타 노원중계점", "노원중계 수만휘", "중계동 수만휘"] },
+              { groupName: "comp3", keywords: ["잇올 스파르타 노원중계센터 2관", "노원중계 잇올 2관", "중계동 잇올 2관"] },
+              { groupName: "comp4", keywords: ["메가스터디 러셀 중계", "러셀 중계", "중계 러셀"] }
+            ]
+          : isGimpo
           ? [
               { groupName: "ours", keywords: ["김포 이투스247", "김포 이투스", "김포이투스"] },
               { groupName: "comp1", keywords: ["수능선배 김포점", "김포 수능선배", "사우동 수능선배"] },
@@ -262,7 +285,14 @@ export async function GET(request) {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isGimpo
+        keywordGroups: isGangbuk
+          ? [
+              { groupName: "ours", keywords: ["강북 이투스247", "강북 이투스", "노원 이투스247", "중계 이투스247"] },
+              { groupName: "comp5", keywords: ["PK독학재수학원 노원점", "노원 PK독학재수", "상계동 PK"] },
+              { groupName: "comp6", keywords: ["강북 메가스터디학원 중계관", "강북 메가스터디", "중계 메가스터디"] },
+              { groupName: "comp7", keywords: ["강북청솔학원", "강북청솔", "중계 청솔학원"] }
+            ]
+          : isGimpo
           ? [
               { groupName: "ours", keywords: ["김포 이투스247", "김포 이투스", "김포이투스"] },
               { groupName: "comp5", keywords: ["잇올 스파르타 김포센터", "김포 잇올", "사우동 잇올"] }
@@ -365,18 +395,20 @@ export async function GET(request) {
           comp5: Math.round(comp5ValNormalized > 0 ? comp5ValNormalized : 20 + index)
         };
 
-        if (isIcheon || isDongtan) {
+        if (isIcheon || isDongtan || isGangbuk) {
           row.comp6 = Math.round(comp6ValNormalized > 0 ? comp6ValNormalized : 15 + index);
         }
-        if (isDongtan) {
+        if (isDongtan || isGangbuk) {
           row.comp7 = Math.round(comp7ValNormalized > 0 ? comp7ValNormalized : 12 + index);
+        }
+        if (isDongtan) {
           row.comp8 = Math.round(comp8ValNormalized > 0 ? comp8ValNormalized : 14 + index);
         }
 
         return row;
       });
 
-      return NextResponse.json({ success: true, mode: isDongtan ? "naver-api-8comps" : isIcheon ? "naver-api-6comps" : "naver-api-5comps", trendData: realTrend });
+      return NextResponse.json({ success: true, mode: isDongtan ? "naver-api-8comps" : isGangbuk ? "naver-api-7comps" : isIcheon ? "naver-api-6comps" : "naver-api-5comps", trendData: realTrend });
     } else {
       const isDokhakGisuk = cleanBranch.includes("독학기숙") || (cleanBranch.includes("기숙") && !cleanBranch.includes("안성") && !cleanBranch.includes("이천"));
       const isDalseo = cleanBranch.includes("대구달서") || cleanBranch.includes("달서");
