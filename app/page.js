@@ -583,6 +583,13 @@ const branchCompetitorAddressMap = {
     { name: "수만휘 관리형 독서실 동탄반송점", address: "경기도 화성시 동탄중심상가1길 40 엔터프라임빌딩" },
     { name: "PK대치스파르타 관리형독서실 동탄센터", address: "경기도 화성시 동탄반석로 196 아이프라자 7~8층" }
   ],
+  "인천송도": [
+    { name: "수만휘 스파르타 인천송도점", address: "인천광역시 연수구 신송로 165-14 7층 702호" },
+    { name: "PK독학재수학원 인천송도점", address: "인천광역시 연수구 신송로 164 8층 801~802호" },
+    { name: "잇올 스파르타 인천연수송도센터 2관", address: "인천광역시 연수구 신송로 154 더 제니스 10층" },
+    { name: "잇올 스파르타 인천연수송도센터 1관", address: "인천광역시 연수구 청능대로 109 탑피온빌딩 5층" },
+    { name: "PK독학재수학원 인천연수점", address: "인천광역시 연수구 앵고개로264번길 30-3 영창빌딩 6층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1233,25 +1240,54 @@ function getCompetitorsForBranch(branchName) {
   if (cleanName.includes("송도") || cleanName.includes("인천송도")) {
     return [
       {
-        name: "수능선배 송도점",
+        name: "수만휘 스파르타 인천송도점",
         urgency: "high",
-        blogUrl: "https://blog.naver.com/bioochemistry",
-        metrics: { ours: { mgmt: 88, content: 90, facility: 90 }, theirs: { mgmt: 95, content: 82, facility: 94 } },
-        trend: "자체 출입 통제 관리 프로그램 및 태블릿 자습 관리 모니터링 시스템을 도입해 밀착 관리 마케팅을 전개하고 있습니다.",
+        metrics: { ours: { mgmt: 90, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 91 } },
+        trend: "1. 송도 이든프라자 프리미엄 시설 및 수만휘 회원 수강료 10% 감면 프로모션 전개\n2. 주간 플래너 점검 및 생활 루틴 통제 홍보",
         promotions: [
-          { title: "태블릿 출결 감시 무료 런칭", content: "실시간 학습 화면 원격 모니터링 서비스 추가 비용 없이 상시 무료 서비스 제공", url: "https://www.etoos.com" }
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 수강료 즉시 감면 및 플래너 무료 증정", url: "https://www.etoos.com" }
         ],
-        guide: "자사의 엄격한 지각/벌점 관리 규정과 실시간 출결 학부모 알림 기능을 강조하여 관리 불안감을 종식시키십시오."
+        guide: "1. [입시 전문성 대응] 단순 수강료 할인 공세에 맞서 이투스 교육평가연구소의 공신력 높은 1:1 생기부 수시/정시 컨설팅의 깊이를 강조하십시오."
       },
       {
-        name: "잇올 스파르타 송도센터",
-        urgency: "medium",
-        metrics: { ours: { mgmt: 88, content: 90, facility: 90 }, theirs: { mgmt: 92, content: 78, facility: 92 } },
-        trend: "송도 국제도시 학부모 타깃의 프리미엄 교육 인테리어 리뉴얼을 마친 상태로 대대적인 체험권 배포 중입니다.",
+        name: "PK독학재수학원 인천송도점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 90, content: 94, facility: 90 }, theirs: { mgmt: 90, content: 82, facility: 88 } },
+        trend: "1. 1:1 과목별 코칭 및 스케줄링 관리를 내세운 송도 중심 독학재수 프로그램 홍보\n2. 소수 정예 밀착 질의응답 시스템 강조",
         promotions: [
-          { title: "리뉴얼 기념 1일 무료체험", content: "신규 단독 자습 전용석 100석 증설 기념 무료 1일 좌석 대여 이벤트 진행 중", url: "https://www.etoos.com" }
+          { title: "1:1 과목별 맞춤 스케줄링 지원", content: "개인별 취약점 진단 및 1:1 밀착 학습 코칭 프로그램 운영", url: "https://www.etoos.com" }
         ],
-        guide: "쾌적성 부문에서 자사 시설의 편의 요소를 블로그에 재소개하고, 장학생 성공 수기 포스터를 원내에 전면 배치하십시오."
+        guide: "1. [콘텐츠/인프라 대응] 소수 코칭 대비 이투스의 방대한 교육 콘텐츠 인프라와 전국 단위 모의고사 빅데이터 진단의 비교 우위를 안내하십시오."
+      },
+      {
+        name: "잇올 스파르타 인천연수송도센터 2관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 90, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 94 } },
+        trend: "1. 송도 더 제니스 10층 프리미엄 신규 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "잇올 스파르타 인천연수송도센터 1관",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 90, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 90 } },
+        trend: "1. 연수동 중심상가 탑피온빌딩 거점 전통적 독학 관리 및 엄격한 생활 통제 홍보\n2. 반수반 및 장학 혜택 프로모션 진행",
+        promotions: [
+          { title: "연수송도 1관 반수반 모집", content: "성적 우수자 장학 혜택 및 규칙적 생활 루틴 관리 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [피드백/케어 대응] 단순 시간 통제를 넘어선 이투스247만의 1:1 교과 피드백과 모의고사 오답 클리닉의 완성도를 부각하십시오."
+      },
+      {
+        name: "PK독학재수학원 인천연수점",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 90, content: 94, facility: 90 }, theirs: { mgmt: 89, content: 79, facility: 86 } },
+        trend: "1. 동춘동 학원가 중심 밀착 코칭 및 대치동식 스케줄링 관리 홍보\n2. 의무 자습 시간 및 출결 알림 관리 강조",
+        promotions: [
+          { title: "연수동춘 스파르타 관리 프로그램", content: "엄격한 의무 자습 시간표 및 출결 통제 시스템 운영", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 인프라 대응] 개인별 맞춤 시간표와 더불어 이투스 자체 풀시즌 모의고사 라인업의 비교 우위를 상담 시 적극 안내하십시오."
       }
     ];
   }

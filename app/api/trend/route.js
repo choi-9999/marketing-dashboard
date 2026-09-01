@@ -36,6 +36,18 @@ export async function GET(request) {
         comp8: Math.round(32 + Math.sin(i + 9) * 6 + i * 1) // PK 동탄센터
       });
     }
+  } else if (cleanBranch.includes("송도") || cleanBranch.includes("인천송도")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(44 + Math.cos(i + 2) * 10 + i * 2), // 수만휘 인천송도점
+        comp2: Math.round(40 + Math.sin(i * 1.2 + 3) * 11 + i * 3), // PK 인천송도점
+        comp3: Math.round(48 + Math.cos(i * 0.8 + 4) * 9 + i * 3), // 잇올 연수송도 2관
+        comp4: Math.round(38 + Math.sin(i + 5) * 8 + i * 2), // 잇올 연수송도 1관
+        comp5: Math.round(32 + Math.cos(i + 6) * 7 + i * 1) // PK 인천연수점
+      });
+    }
   } else if (cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -107,8 +119,9 @@ export async function GET(request) {
     const periodMonths = ["2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01"];
     const monthLabels = ["1월", "2월", "3월", "4월", "5월", "6월"];
 
-    if (cleanBranch.includes("동탄") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
+    if (cleanBranch.includes("동탄") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
       const isDongtan = cleanBranch.includes("동탄");
+      const isSongdo = cleanBranch.includes("송도") || cleanBranch.includes("인천송도");
       const isDaech = cleanBranch.includes("대치");
       const isIcheon = cleanBranch.includes("이천기숙") || cleanBranch.includes("이천");
       const isAnseong = cleanBranch.includes("안성기숙") || cleanBranch.includes("안성");
@@ -117,7 +130,15 @@ export async function GET(request) {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isDongtan
+        keywordGroups: isSongdo
+          ? [
+              { groupName: "ours", keywords: ["인천송도 이투스247", "송도 이투스247", "송도 이투스"] },
+              { groupName: "comp1", keywords: ["수만휘 스파르타 인천송도점", "송도 수만휘", "인천송도 수만휘"] },
+              { groupName: "comp2", keywords: ["PK독학재수학원 인천송도점", "송도 PK독학재수", "송도 PK"] },
+              { groupName: "comp3", keywords: ["잇올 스파르타 인천연수송도센터 2관", "송도 잇올 2관", "송도 잇올"] },
+              { groupName: "comp4", keywords: ["잇올 스파르타 인천연수송도센터 1관", "연수 잇올 1관", "연수동 잇올"] }
+            ]
+          : isDongtan
           ? [
               { groupName: "ours", keywords: ["동탄 이투스247", "동탄 이투스", "동탄이투스"] },
               { groupName: "comp1", keywords: ["수능선배 동탄점", "수능선배 동탄", "동탄 수능선배"] },
@@ -161,7 +182,12 @@ export async function GET(request) {
         startDate: "2026-01-01",
         endDate: "2026-06-30",
         timeUnit: "month",
-        keywordGroups: isDongtan
+        keywordGroups: isSongdo
+          ? [
+              { groupName: "ours", keywords: ["인천송도 이투스247", "송도 이투스247", "송도 이투스"] },
+              { groupName: "comp5", keywords: ["PK독학재수학원 인천연수점", "연수 PK독학재수", "동춘동 PK"] }
+            ]
+          : isDongtan
           ? [
               { groupName: "ours", keywords: ["동탄 이투스247", "동탄 이투스", "동탄이투스"] },
               { groupName: "comp5", keywords: ["잇올 스파르타 동탄센터", "잇올 동탄", "동탄 잇올"] },
