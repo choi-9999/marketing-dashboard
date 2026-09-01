@@ -5729,14 +5729,62 @@ export default function HomePage() {
   useEffect(() => {
     const mapContainerId = page === "report" ? "branch-report-map" : "competitor-map-leaflet";
     const mapContainer = document.getElementById(mapContainerId);
+    let cleanupPrintMapAlignment = null;
 
     const cleanupMap = () => {
+      cleanupPrintMapAlignment?.();
+      cleanupPrintMapAlignment = null;
       reportMapFocusRef.current.clear();
       if (mapRef.current?.remove) {
         mapRef.current.remove();
       }
       mapRef.current = null;
       if (mapContainer) mapContainer.innerHTML = "";
+    };
+
+    const registerPrintMapAlignment = ({ getView, centerBranch, restoreView }) => {
+      if (page !== "report" || !selectedBranch) return;
+
+      let previousView = null;
+      let alignmentFrame = null;
+      let alignmentTimer = null;
+
+      const clearScheduledAlignment = () => {
+        if (alignmentFrame) window.cancelAnimationFrame(alignmentFrame);
+        if (alignmentTimer) window.clearTimeout(alignmentTimer);
+        alignmentFrame = null;
+        alignmentTimer = null;
+      };
+
+      const alignToBranch = () => {
+        mapContainer.getBoundingClientRect();
+        centerBranch();
+      };
+
+      const handleBeforePrint = () => {
+        if (!previousView) previousView = getView();
+        clearScheduledAlignment();
+        alignToBranch();
+        alignmentFrame = window.requestAnimationFrame(alignToBranch);
+        alignmentTimer = window.setTimeout(alignToBranch, 120);
+      };
+
+      const handleAfterPrint = () => {
+        clearScheduledAlignment();
+        const viewToRestore = previousView;
+        previousView = null;
+        if (!viewToRestore) return;
+        restoreView(viewToRestore);
+        alignmentFrame = window.requestAnimationFrame(() => restoreView(viewToRestore));
+      };
+
+      window.addEventListener("beforeprint", handleBeforePrint);
+      window.addEventListener("afterprint", handleAfterPrint);
+      cleanupPrintMapAlignment = () => {
+        clearScheduledAlignment();
+        window.removeEventListener("beforeprint", handleBeforePrint);
+        window.removeEventListener("afterprint", handleAfterPrint);
+      };
     };
 
     if ((page !== "competitors" && page !== "sns" && page !== "report") || !mapContainer) {
@@ -5967,6 +6015,23 @@ export default function HomePage() {
           map.setCenter(markerPositions[0]);
           map.setZoom(selectedBranch ? 16 : initialZoom);
         }
+        const branchItem = mapItems.find((item) => item.type === "branch");
+        if (branchItem) {
+          const branchCoords = branchItem.displayCoords || branchItem.coords;
+          const branchPosition = new window.naver.maps.LatLng(branchCoords[0], branchCoords[1]);
+          registerPrintMapAlignment({
+            getView: () => ({ center: map.getCenter(), zoom: map.getZoom() }),
+            centerBranch: () => {
+              window.naver.maps.Event.trigger(map, "resize");
+              map.setCenter(branchPosition);
+            },
+            restoreView: ({ center, zoom }) => {
+              window.naver.maps.Event.trigger(map, "resize");
+              map.setCenter(center);
+              map.setZoom(zoom);
+            }
+          });
+        }
         setMapStatus({ provider: "NAVER", message: "NAVER 지도 로드 완료" });
       } catch (error) {
         console.warn("NAVER Maps SDK loaded but map initialization failed.", error);
@@ -6039,6 +6104,21 @@ export default function HomePage() {
         map.fitBounds(markerCoords, { padding: [36, 36] });
       } else if (markerCoords.length === 1) {
         map.setView(markerCoords[0], selectedBranch ? 16 : initialZoom);
+      }
+      const branchItem = mapItems.find((item) => item.type === "branch");
+      if (branchItem) {
+        const branchCoords = branchItem.displayCoords || branchItem.coords;
+        registerPrintMapAlignment({
+          getView: () => ({ center: map.getCenter(), zoom: map.getZoom() }),
+          centerBranch: () => {
+            map.invalidateSize({ animate: false, pan: false });
+            map.setView(branchCoords, map.getZoom(), { animate: false });
+          },
+          restoreView: ({ center, zoom }) => {
+            map.invalidateSize({ animate: false, pan: false });
+            map.setView(center, zoom, { animate: false });
+          }
+        });
       }
       setMapStatus({ provider: "Leaflet", message: "NAVER 지도 호출 실패로 대체 지도 표시 중" });
     };
