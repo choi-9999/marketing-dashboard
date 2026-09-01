@@ -121,6 +121,14 @@ export async function GET(request) {
         comp3: Math.round(43 + Math.cos(i * 0.8 + 4) * 8 + i * 2) // 수만휘 하남미사점
       });
     }
+  } else if (cleanBranch.includes("다산") || cleanBranch.includes("남양주다산")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(46 + Math.cos(i + 2) * 10 + i * 2) // 수만휘 남양주다산점
+      });
+    }
   } else if (cleanBranch.includes("일산서구") || cleanBranch.includes("일산")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -439,6 +447,7 @@ export async function GET(request) {
       const isHanam = cleanBranch.includes("하남");
       const isUijeongbu = cleanBranch.includes("의정부");
       const isIlsan = cleanBranch.includes("일산서구") || cleanBranch.includes("일산");
+      const isDasan = cleanBranch.includes("다산") || cleanBranch.includes("남양주다산");
       const oursKeywords = isDokhakGisuk
         ? ["이투스247 독학기숙학원", "이투스247 독학기숙", "이투스 독학기숙"]
         : isDalseo
@@ -457,6 +466,8 @@ export async function GET(request) {
         ? ["의정부 이투스247", "의정부 이투스", "의정부이투스"]
         : isIlsan
         ? ["일산서구 이투스247", "일산 이투스247", "일산 이투스", "일산이투스"]
+        : isDasan
+        ? ["다산 이투스247", "남양주다산 이투스247", "다산 이투스", "다산이투스"]
         : [`${cleanBranch} 이투스247`, `${cleanBranch} 이투스`].filter(Boolean);
       const comp1Keywords = isDokhakGisuk
         ? ["이투스 기숙학원", "이투스기숙학원"]
@@ -476,6 +487,8 @@ export async function GET(request) {
         ? ["잇올 스파르타 의정부센터", "의정부 잇올", "의정부동 잇올"]
         : isIlsan
         ? ["디랩 일산", "일산 디랩", "대화동 디랩"]
+        : isDasan
+        ? ["수만휘 스파르타 남양주다산점", "남양주다산 수만휘", "다산 수만휘"]
         : [`${cleanBranch} 잇올`].filter(Boolean);
       const comp2Keywords = isDokhakGisuk
         ? ["비상에듀독학기숙학원", "비상에듀 독학기숙", "광주 비상에듀 기숙"]

@@ -651,6 +651,12 @@ const branchCompetitorAddressMap = {
     { name: "일산청솔학원", address: "경기도 고양시 일산서구 강성로 141 명운빌딩" },
     { name: "일산 메가스터디학원", address: "경기도 고양시 일산서구 중앙로 1542 유화프라자 6~8층" }
   ],
+  "다산": [
+    { name: "수만휘 스파르타 남양주다산점", address: "경기도 남양주시 다산중앙로123번길 22-24 맥스타워 7층" }
+  ],
+  "남양주다산": [
+    { name: "수만휘 스파르타 남양주다산점", address: "경기도 남양주시 다산중앙로123번길 22-24 맥스타워 7층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1749,6 +1755,21 @@ function getCompetitorsForBranch(branchName) {
           { title: "대입 재수종합/독학관리반 모집", content: "메가스터디 입시 콘텐츠 및 스타강사진 단과 연계 혜택 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [자기주도성 대응] 대형 단과 위주의 획일적 강의 수강보다 자기주도 학습 몰입을 극대화하는 이투스247의 개인 맞춤 학습 설계를 제안하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("다산") || cleanName.includes("남양주다산")) {
+    return [
+      {
+        name: "수만휘 스파르타 남양주다산점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 90 } },
+        trend: "1. 다산중앙로 맥스타워 7층 중심 수만휘 회원 수강료 10% 감면 프로모션 및 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 알림 강조",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시 컨설팅의 공신력을 부각하십시오."
       }
     ];
   }
