@@ -85,6 +85,15 @@ export async function GET(request) {
         comp6: Math.round(25 + Math.sin(i + 7) * 6 + i * 1) // 이천아이나인
       });
     }
+  } else if (cleanBranch.includes("부산교대") || cleanBranch.includes("교대")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(47 + Math.cos(i + 2) * 10 + i * 2), // 잇올 부산사직센터
+        comp2: Math.round(42 + Math.sin(i * 1.2 + 3) * 9 + i * 2) // 잇올 몰입관 부산동래사직캠프
+      });
+    }
   } else if (cleanBranch.includes("대구달서") || cleanBranch.includes("달서")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -305,20 +314,27 @@ export async function GET(request) {
     } else {
       const isDokhakGisuk = cleanBranch.includes("독학기숙") || (cleanBranch.includes("기숙") && !cleanBranch.includes("안성") && !cleanBranch.includes("이천"));
       const isDalseo = cleanBranch.includes("대구달서") || cleanBranch.includes("달서");
+      const isBusanGyodae = cleanBranch.includes("부산교대") || cleanBranch.includes("교대");
       const oursKeywords = isDokhakGisuk
         ? ["이투스247 독학기숙학원", "이투스247 독학기숙", "이투스 독학기숙"]
         : isDalseo
         ? ["대구달서 이투스247", "대구달서 이투스", "달서 이투스247", "달서구 이투스"]
+        : isBusanGyodae
+        ? ["부산교대 이투스247", "부산교대 이투스", "동래 이투스247", "부산교대이투스"]
         : [`${cleanBranch} 이투스247`, `${cleanBranch} 이투스`].filter(Boolean);
       const comp1Keywords = isDokhakGisuk
         ? ["이투스 기숙학원", "이투스기숙학원"]
         : isDalseo
         ? ["수만휘 스파르타 대구달서점", "달서 수만휘", "대구달서 수만휘"]
+        : isBusanGyodae
+        ? ["잇올 스파르타 부산사직센터", "부산사직 잇올", "사직동 잇올"]
         : [`${cleanBranch} 잇올`].filter(Boolean);
       const comp2Keywords = isDokhakGisuk
         ? ["비상에듀독학기숙학원", "비상에듀 독학기숙", "광주 비상에듀 기숙"]
         : isDalseo
         ? ["잇올 스파르타 대구월성센터", "대구월성 잇올", "월성동 잇올"]
+        : isBusanGyodae
+        ? ["잇올 몰입관 부산동래사직캠프", "동래사직 잇올 몰입관", "동래 잇올 몰입관"]
         : [`${cleanBranch} 수능선배`].filter(Boolean);
       const comp3Keywords = isDokhakGisuk
         ? ["진성스파르타기숙학원", "진성스파르타", "진성기숙학원"]

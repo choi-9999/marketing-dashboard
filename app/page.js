@@ -595,6 +595,10 @@ const branchCompetitorAddressMap = {
     { name: "잇올 스파르타 대구월성센터", address: "대구광역시 달서구 조암로 13 그루타워 6층" },
     { name: "잇올 스파르타 대구상인센터", address: "대구광역시 달서구 월곡로 260 상인프라자 6층" }
   ],
+  "부산교대": [
+    { name: "잇올 스파르타 부산사직센터", address: "부산광역시 동래구 종합운동장로 60 거성빌딩 2층" },
+    { name: "잇올 몰입관 부산동래사직캠프", address: "부산광역시 동래구 아시아드대로 245 위드피플타워 2층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1328,6 +1332,31 @@ function getCompetitorsForBranch(branchName) {
           { title: "대구상인센터 반수반 모집", content: "성적 우수자 장학 혜택 및 규칙적 생활 루틴 관리 운영", url: "https://www.etoos.com" }
         ],
         guide: "1. [피드백/케어 대응] 단순 시간 통제를 넘어선 이투스247만의 1:1 교과 피드백과 모의고사 오답 클리닉의 완성도를 부각하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("부산교대") || cleanName.includes("교대")) {
+    return [
+      {
+        name: "잇올 스파르타 부산사직센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 91, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 92 } },
+        trend: "1. 사직동 거성빌딩 2층 거점 엄격한 생활 관리 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 학교프로젝트 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "잇올 몰입관 부산동래사직캠프",
+        urgency: "high",
+        metrics: { ours: { mgmt: 91, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 93 } },
+        trend: "1. 온천동 위드피플타워 프리미엄 몰입형 자습 공간 및 소음 차단 1인석 집중 홍보\n2. 반수생 및 재수생 몰입 관리 프로그램 전개",
+        promotions: [
+          { title: "몰입관 좌석 1일 무료체험 이벤트", content: "프리미엄 몰입형 자습 좌석 체험 및 1:1 학습 상담 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [시설/학습 대응] 단순 공간 프리미엄을 넘어선 이투스247의 체계적인 교과 질의응답 및 입시 컨설팅의 결합 가치를 전면에 내세우십시오."
       }
     ];
   }
