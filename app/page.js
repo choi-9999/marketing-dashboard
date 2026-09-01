@@ -671,6 +671,18 @@ const branchCompetitorAddressMap = {
     { name: "잇올 스파르타 대전둔산센터 1관", address: "대전광역시 서구 둔산서로 15 8·9층" },
     { name: "메가스터디 러셀 대전", address: "대전광역시 서구 둔산로123번길 21 엠시티타워 5·6층" }
   ],
+  "마포": [
+    { name: "수능선배 신촌점", address: "서울특별시 마포구 신촌로 102" },
+    { name: "잇올 스파르타 마포신촌센터", address: "서울특별시 마포구 신촌로 94 그랜드프라자 8층" },
+    { name: "종로학원 강북", address: "서울특별시 마포구 신촌로 118" },
+    { name: "신촌 메가스터디학원", address: "서울특별시 서대문구 신촌로 73 거화빌딩" }
+  ],
+  "신촌": [
+    { name: "수능선배 신촌점", address: "서울특별시 마포구 신촌로 102" },
+    { name: "잇올 스파르타 마포신촌센터", address: "서울특별시 마포구 신촌로 94 그랜드프라자 8층" },
+    { name: "종로학원 강북", address: "서울특별시 마포구 신촌로 118" },
+    { name: "신촌 메가스터디학원", address: "서울특별시 서대문구 신촌로 73 거화빌딩" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -1839,6 +1851,51 @@ function getCompetitorsForBranch(branchName) {
           { title: "단과 연계 바자관 수강료 지원 패키지", content: "러셀 단과 2과목 이상 수강 등록 시 자습관 이용료 감면 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [환경/밀착 케어 대응] 대형 단과 자습관의 혼잡함 대비 이투스247의 엄격한 1인 독립 면학 환경과 1:1 담임 밀착 코칭의 차별성을 안내하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("마포") || cleanName.includes("신촌")) {
+    return [
+      {
+        name: "수능선배 신촌점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 78, facility: 92 } },
+        trend: "1. 신촌역 신촌로 거점 1인 태블릿 자습석 및 실시간 화면 원격 감시 시스템 도입\n2. 등록 원생 대상 수능 배치 점수별 맞춤 원서 컨설팅 무료 지원",
+        promotions: [
+          { title: "수시/정시 입시 컨설팅 무료 제공", content: "등록 원생 대상 수능 배치 점수별 맞춤 원서 대면 컨설팅 무료 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [관리 방식 대응] 기계적 화면 감시보다 개개인의 학습 약점을 진단하고 보완하는 이투스247 1:1 밀착 학습 코칭의 교육적 우월성을 강조하십시오."
+      },
+      {
+        name: "잇올 스파르타 마포신촌센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 신촌역 그랜드프라자 8층 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "종로학원 강북",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 90, content: 91, facility: 89 } },
+        trend: "1. 신촌로 거점 전통의 종로학원 대입 재수종합 및 독학관리 인프라 홍보\n2. 종로 모의고사 및 입시 설명회 전개",
+        promotions: [
+          { title: "종로학원 독학재수/재수종합 모집", content: "종로 모의고사 풀세트 및 수시/정시 정밀 배치표 무료 제공", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [1:1 맞춤 관리 대응] 전통 재종식 집단 관리 대비 이투스247의 개인별 학습 진단 알고리즘과 1:1 밀착 피드백의 정밀성을 부각하십시오."
+      },
+      {
+        name: "신촌 메가스터디학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 89, content: 93, facility: 90 } },
+        trend: "1. 신촌로 거화빌딩 대형 재수종합 및 스타강사 단과 연계 홍보\n2. 메가패스 결합 수강 할인 혜택 마케팅",
+        promotions: [
+          { title: "대입 재수종합/독학관리반 모집", content: "메가스터디 입시 콘텐츠 및 스타강사진 단과 연계 혜택 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [자기주도성 대응] 대형 단과 위주의 획일적 강의 수강보다 자기주도 학습 몰입을 극대화하는 이투스247의 개인 맞춤 학습 설계를 제안하십시오."
       }
     ];
   }
@@ -10476,6 +10533,7 @@ export default function HomePage() {
                               if (clean.includes("역사적사명")) return "#b45309"; // 역사적사명 브라운
                               if (clean.includes("72시간")) return "#0891b2"; // 72시간 시안
                               if (clean.includes("커넥츠") || clean.includes("공단기")) return "#4338ca"; // 커넥츠 인디고
+                              if (clean.includes("종로")) return "#0d9488"; // 종로 틸
                               return null;
                             };
 
