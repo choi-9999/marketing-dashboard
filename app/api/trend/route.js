@@ -148,6 +148,16 @@ export async function GET(request) {
         comp1: Math.round(48 + Math.cos(i + 2) * 10 + i * 3) // 잇올 부산서면센터
       });
     }
+  } else if (cleanBranch.includes("부산북구") || cleanBranch.includes("화명") || (cleanBranch.includes("부산") && cleanBranch.includes("북구"))) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(48 + Math.cos(i + 2) * 10 + i * 3), // 잇올 부산 화명센터
+        comp2: Math.round(46 + Math.sin(i * 1.2 + 3) * 11 + i * 2), // 잇올 몰입관 부산 동래사직캠프
+        comp3: Math.round(44 + Math.cos(i * 0.8 + 4) * 9 + i * 2) // 잇올 부산 사직센터
+      });
+    }
   } else if (cleanBranch.includes("부산대")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -594,9 +604,10 @@ export async function GET(request) {
     } else {
       const isDokhakGisuk = cleanBranch.includes("독학기숙") || (cleanBranch.includes("기숙") && !cleanBranch.includes("안성") && !cleanBranch.includes("이천"));
       const isDalseo = cleanBranch.includes("대구달서") || cleanBranch.includes("달서");
-      const isBusanGyodae = cleanBranch.includes("부산교대") || (cleanBranch.includes("교대") && !cleanBranch.includes("부산대") && !cleanBranch.includes("서면"));
-      const isBusandae = cleanBranch.includes("부산대") && !cleanBranch.includes("부산교대") && !cleanBranch.includes("서면");
+      const isBusanGyodae = cleanBranch.includes("부산교대") || (cleanBranch.includes("교대") && !cleanBranch.includes("부산대") && !cleanBranch.includes("서면") && !cleanBranch.includes("북구") && !cleanBranch.includes("화명"));
+      const isBusandae = cleanBranch.includes("부산대") && !cleanBranch.includes("부산교대") && !cleanBranch.includes("서면") && !cleanBranch.includes("북구") && !cleanBranch.includes("화명");
       const isBusanSeomyeon = cleanBranch.includes("부산서면") || cleanBranch.includes("서면");
+      const isBusanBukgu = cleanBranch.includes("부산북구") || cleanBranch.includes("화명") || (cleanBranch.includes("부산") && cleanBranch.includes("북구"));
       const isGwangjuDonggu = cleanBranch.includes("광주동구") || (cleanBranch.includes("광주") && cleanBranch.includes("동구"));
       const isChuncheon = cleanBranch.includes("춘천");
       const isPyeongtaek = cleanBranch.includes("평택");
@@ -618,6 +629,8 @@ export async function GET(request) {
         ? ["부산대 이투스247", "부산대 이투스", "부산대이투스", "금정 이투스247"]
         : isBusanSeomyeon
         ? ["부산서면 이투스247", "서면 이투스247", "부산서면 이투스", "서면 이투스"]
+        : isBusanBukgu
+        ? ["부산북구 이투스247", "화명 이투스247", "부산북구 이투스", "화명동 이투스247", "화명 이투스"]
         : isGwangjuDonggu
         ? ["광주동구 이투스247", "광주동구 이투스", "광주 이투스247", "광주이투스"]
         : isChuncheon
@@ -651,6 +664,8 @@ export async function GET(request) {
         ? ["잇올 스파르타 부산대센터", "부산대 잇올", "장전동 잇올"]
         : isBusanSeomyeon
         ? ["잇올 스파르타 부산서면센터", "부산서면 잇올", "서면 잇올", "전포동 잇올"]
+        : isBusanBukgu
+        ? ["잇올 스파르타 부산 화명센터", "부산화명 잇올", "화명동 잇올"]
         : isGwangjuDonggu
         ? ["메가스터디 러셀 광주", "러셀 광주", "광주 러셀"]
         : isChuncheon
@@ -680,6 +695,8 @@ export async function GET(request) {
         ? ["잇올 스파르타 대구월성센터", "대구월성 잇올", "월성동 잇올"]
         : isBusanGyodae
         ? ["잇올 몰입관 부산동래사직캠프", "동래사직 잇올 몰입관", "동래 잇올 몰입관"]
+        : isBusanBukgu
+        ? ["잇올 몰입관 부산 동래사직캠프", "동래사직 잇올 몰입관", "동래 잇올 몰입관"]
         : isGwangjuDonggu
         ? ["잇올 스파르타 광주충장로센터", "광주충장로 잇올", "충장로 잇올"]
         : isChuncheon
@@ -705,6 +722,8 @@ export async function GET(request) {
         ? ["진성스파르타기숙학원", "진성스파르타", "진성기숙학원"]
         : isDalseo
         ? ["잇올 스파르타 대구상인센터", "대구상인 잇올", "상인동 잇올"]
+        : isBusanBukgu
+        ? ["잇올 스파르타 부산 사직센터", "부산사직 잇올", "사직동 잇올"]
         : isGwangjuDonggu
         ? ["잇올 스파르타 광주봉선센터", "광주봉선 잇올", "봉선동 잇올"]
         : isChuncheon
@@ -732,7 +751,7 @@ export async function GET(request) {
         { groupName: "comp2", keywords: comp2Keywords }
       ];
 
-      if ((isDokhakGisuk || isDalseo || isGwangjuDonggu || isChuncheon || isHanam || isIlsandonggu || isIlsanseogu || isMapo) && comp3Keywords.length > 0) {
+      if ((isDokhakGisuk || isDalseo || isGwangjuDonggu || isChuncheon || isHanam || isIlsandonggu || isIlsanseogu || isMapo || isBusanBukgu) && comp3Keywords.length > 0) {
         keywordGroups.push({ groupName: "comp3", keywords: comp3Keywords });
       }
       if ((isGwangjuDonggu || isIlsanseogu || isMapo) && comp4Keywords.length > 0) {
@@ -785,7 +804,7 @@ export async function GET(request) {
           comp2: Math.round(comp2Val > 0 ? comp2Val : 8 + (hash % 8) + index * 1.5)
         };
 
-        if (isDokhakGisuk || isDalseo || isGwangjuDonggu || isChuncheon || isHanam || isIlsandonggu || isIlsanseogu || isMapo) {
+        if (isDokhakGisuk || isDalseo || isGwangjuDonggu || isChuncheon || isHanam || isIlsandonggu || isIlsanseogu || isMapo || isBusanBukgu) {
           row.comp3 = Math.round(comp3Val > 0 ? comp3Val : 6 + (hash % 6) + index);
         }
         if (isGwangjuDonggu || isIlsanseogu || isMapo) {
@@ -795,7 +814,7 @@ export async function GET(request) {
         return row;
       });
 
-      return NextResponse.json({ success: true, mode: isGwangjuDonggu || isIlsanseogu || isMapo ? "naver-api-4comps" : isDokhakGisuk || isDalseo || isChuncheon || isHanam || isIlsandonggu ? "naver-api-3comps" : "naver-api", trendData: realTrend });
+      return NextResponse.json({ success: true, mode: isGwangjuDonggu || isIlsanseogu || isMapo ? "naver-api-4comps" : isDokhakGisuk || isDalseo || isChuncheon || isHanam || isIlsandonggu || isBusanBukgu ? "naver-api-3comps" : "naver-api", trendData: realTrend });
     }
   } catch (error) {
     console.error("Failed to fetch NAVER Search Trend API:", error);

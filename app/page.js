@@ -739,6 +739,16 @@ const branchCompetitorAddressMap = {
   "서면": [
     { name: "잇올 스파르타 부산서면센터", address: "부산광역시 부산진구 전포대로199번길 27 KH마이우스 2층" }
   ],
+  "부산북구": [
+    { name: "잇올 스파르타 부산 화명센터", address: "부산광역시 북구 금곡대로303번길 62 장원아카데미 6층" },
+    { name: "잇올 몰입관 부산 동래사직캠프", address: "부산광역시 동래구 아시아드대로 245 위드피플타워 2층" },
+    { name: "잇올 스파르타 부산 사직센터", address: "부산광역시 동래구 종합운동장로 60 거성빌딩 2층" }
+  ],
+  "화명": [
+    { name: "잇올 스파르타 부산 화명센터", address: "부산광역시 북구 금곡대로303번길 62 장원아카데미 6층" },
+    { name: "잇올 몰입관 부산 동래사직캠프", address: "부산광역시 동래구 아시아드대로 245 위드피플타워 2층" },
+    { name: "잇올 스파르타 부산 사직센터", address: "부산광역시 동래구 종합운동장로 60 거성빌딩 2층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -2172,6 +2182,41 @@ function getCompetitorsForBranch(branchName) {
           { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("부산북구") || cleanName.includes("화명") || (cleanName.includes("부산") && cleanName.includes("북구"))) {
+    return [
+      {
+        name: "잇올 스파르타 부산 화명센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 화명동 장원아카데미 6층 화명역 학원가 거점 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "잇올 몰입관 부산 동래사직캠프",
+        urgency: "medium",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 90, content: 82, facility: 93 } },
+        trend: "1. 사직동 위드피플타워 초프리미엄 몰입형 자습 공간 브랜딩\n2. 장학생 선발 및 외부 모의고사 응시생 유치",
+        promotions: [
+          { title: "몰입형 장학생 선발 모집", content: "최상위권 대상 100% 장학 혜택 및 프리미엄 몰입 좌석 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [공간 차별화 대응] 단순 프리미엄 시설 지향에 대해 이투스247의 입시 결과 지향적 학습 진단과 밀착 관리의 본질적 가치를 전달하십시오."
+      },
+      {
+        name: "잇올 스파르타 부산 사직센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 91, content: 80, facility: 91 } },
+        trend: "1. 종합운동장역 거성빌딩 거점 스파르타식 생활 루틴 통제 홍보\n2. 등하원 알림 및 스마트폰 관리 마케팅",
+        promotions: [
+          { title: "사직센터 스파르타 관리반 모집", content: "철저한 출결 관리 및 휴대폰 의무 수거 스파르타 생활 관리", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [자기주도성 대응] 단순 통제 위주의 억압적 관리보다 주도적으로 목표를 달성할 수 있도록 돕는 이투스247의 자율·책임 학습 모델을 부각하십시오."
       }
     ];
   }
