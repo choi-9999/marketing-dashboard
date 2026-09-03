@@ -140,6 +140,27 @@ export async function GET(request) {
         comp6: Math.round(25 + Math.sin(i + 7) * 6 + i * 1) // 이천아이나인
       });
     }
+  } else if (cleanBranch.includes("부천")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(48 + Math.cos(i + 2) * 10 + i * 3), // 잇올 부천 1관
+        comp2: Math.round(43 + Math.sin(i * 1.2 + 3) * 10 + i * 2), // 디랩 부천
+        comp3: Math.round(47 + Math.cos(i * 0.8 + 4) * 9 + i * 2), // 잇올 부천 2관
+        comp4: Math.round(44 + Math.sin(i + 5) * 8 + i * 2), // 부천 청솔학원
+        comp5: Math.round(46 + Math.cos(i + 6) * 9 + i * 2), // 부천 메가스터디학원
+        comp6: Math.round(49 + Math.sin(i + 7) * 10 + i * 3) // 메가스터디 러셀 부천
+      });
+    }
+  } else if (cleanBranch.includes("부평") || cleanBranch.includes("인천부평")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(48 + Math.cos(i + 2) * 10 + i * 3) // 잇올 인천부평센터
+      });
+    }
   } else if (cleanBranch.includes("부산서면") || cleanBranch.includes("서면")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -355,7 +376,7 @@ export async function GET(request) {
     const periodMonths = ["2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01"];
     const monthLabels = ["1월", "2월", "3월", "4월", "5월", "6월"];
 
-    if (cleanBranch.includes("동탄") || cleanBranch.includes("목동") || cleanBranch.includes("오목교") || cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성")) || cleanBranch.includes("강북") || cleanBranch.includes("김포") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
+    if (cleanBranch.includes("동탄") || cleanBranch.includes("목동") || cleanBranch.includes("오목교") || cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성")) || cleanBranch.includes("강북") || cleanBranch.includes("김포") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성") || cleanBranch.includes("부천")) {
       const isDongtan = cleanBranch.includes("동탄");
       const isMokdong = cleanBranch.includes("목동") || cleanBranch.includes("오목교");
       const isDaejeonDunsan = cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성"));
@@ -365,6 +386,7 @@ export async function GET(request) {
       const isDaech = cleanBranch.includes("대치");
       const isIcheon = cleanBranch.includes("이천기숙") || cleanBranch.includes("이천");
       const isAnseong = cleanBranch.includes("안성기숙") || cleanBranch.includes("안성");
+      const isBucheon = cleanBranch.includes("부천");
       // 6+ groups exceeds Naver API limit (max 5 per call). We make parallel requests and normalize the scale using "ours"
       const body1 = {
         startDate: "2026-01-01",
@@ -434,6 +456,14 @@ export async function GET(request) {
               { groupName: "comp3", keywords: ["강남대성기숙 의대관", "강남대성 의대관", "대성기숙 의대관"] },
               { groupName: "comp4", keywords: ["이천청솔기숙학원", "이천청솔", "이천 청솔기숙"] }
             ]
+          : isBucheon
+          ? [
+              { groupName: "ours", keywords: ["부천 이투스247", "부천 이투스", "부천이투스", "신중동 이투스247", "상동 이투스247"] },
+              { groupName: "comp1", keywords: ["잇올 스파르타 부천센터 1관", "부천 잇올 1관", "신중동 잇올"] },
+              { groupName: "comp2", keywords: ["디랩 부천", "부천 디랩", "상동 디랩"] },
+              { groupName: "comp3", keywords: ["잇올 스파르타 부천센터 2관", "부천 잇올 2관", "상동 잇올"] },
+              { groupName: "comp4", keywords: ["부천 청솔학원", "부천 청솔", "송내 청솔학원"] }
+            ]
           : isDaech
           ? [
               { groupName: "ours", keywords: ["대치 이투스247", "대치 이투스", "대치이투스"] },
@@ -502,6 +532,12 @@ export async function GET(request) {
               { groupName: "ours", keywords: ["이투스247 이천기숙", "이투스 이천기숙", "이천 이투스247"] },
               { groupName: "comp5", keywords: ["이천탑클래스기숙학원", "이천탑클래스", "탑클래스 기숙학원"] },
               { groupName: "comp6", keywords: ["이천아이나인독학기숙재수학원", "이천아이나인", "아이나인 기숙학원"] }
+            ]
+          : isBucheon
+          ? [
+              { groupName: "ours", keywords: ["부천 이투스247", "부천 이투스", "부천이투스", "신중동 이투스247", "상동 이투스247"] },
+              { groupName: "comp5", keywords: ["부천 메가스터디학원", "부천 메가스터디", "상동 메가스터디"] },
+              { groupName: "comp6", keywords: ["메가스터디 러셀 부천", "러셀 부천", "부천 러셀"] }
             ]
           : isDaech
           ? [
@@ -612,7 +648,7 @@ export async function GET(request) {
           comp5: Math.round(comp5ValNormalized > 0 ? comp5ValNormalized : 20 + index)
         };
 
-        if (isIcheon || isDongtan || isGangbuk || isMokdong) {
+        if (isIcheon || isDongtan || isGangbuk || isMokdong || isBucheon) {
           row.comp6 = Math.round(comp6ValNormalized > 0 ? comp6ValNormalized : 15 + index);
         }
         if (isDongtan || isGangbuk || isMokdong) {
@@ -629,7 +665,7 @@ export async function GET(request) {
         return row;
       });
 
-      return NextResponse.json({ success: true, mode: isMokdong ? "naver-api-10comps" : isDongtan ? "naver-api-8comps" : isGangbuk ? "naver-api-7comps" : isIcheon ? "naver-api-6comps" : "naver-api-5comps", trendData: realTrend });
+      return NextResponse.json({ success: true, mode: isMokdong ? "naver-api-10comps" : isDongtan ? "naver-api-8comps" : isGangbuk ? "naver-api-7comps" : isIcheon || isBucheon ? "naver-api-6comps" : "naver-api-5comps", trendData: realTrend });
     } else {
       const isDokhakGisuk = cleanBranch.includes("독학기숙") || (cleanBranch.includes("기숙") && !cleanBranch.includes("안성") && !cleanBranch.includes("이천"));
       const isDalseo = cleanBranch.includes("대구달서") || cleanBranch.includes("달서");
@@ -651,6 +687,7 @@ export async function GET(request) {
       const isSeongbuk = cleanBranch.includes("성북");
       const isWonju = cleanBranch.includes("원주");
       const isSeongdong = cleanBranch.includes("성동");
+      const isBupyeong = cleanBranch.includes("부평") || cleanBranch.includes("인천부평");
       const oursKeywords = isDokhakGisuk
         ? ["이투스247 독학기숙학원", "이투스247 독학기숙", "이투스 독학기숙"]
         : isDalseo
@@ -691,6 +728,8 @@ export async function GET(request) {
         ? ["원주 이투스247", "원주 이투스", "원주이투스", "무실동 이투스247", "단구동 이투스247"]
         : isSeongdong
         ? ["성동 이투스247", "서울성동 이투스247", "성동 이투스", "왕십리 이투스247", "행당동 이투스247"]
+        : isBupyeong
+        ? ["인천부평 이투스247", "부평 이투스247", "부평 이투스", "부평이투스"]
         : [`${cleanBranch} 이투스247`, `${cleanBranch} 이투스`].filter(Boolean);
       const comp1Keywords = isDokhakGisuk
         ? ["이투스 기숙학원", "이투스기숙학원"]
@@ -732,6 +771,8 @@ export async function GET(request) {
         ? ["수만휘 스파르타 원주무실점", "원주무실 수만휘", "무실동 수만휘"]
         : isSeongdong
         ? ["잇올 스파르타 성동센터", "성동 잇올", "행당동 잇올"]
+        : isBupyeong
+        ? ["잇올 스파르타 인천부평센터", "인천부평 잇올", "부평 잇올"]
         : [`${cleanBranch} 잇올`].filter(Boolean);
       const comp2Keywords = isDokhakGisuk
         ? ["비상에듀독학기숙학원", "비상에듀 독학기숙", "광주 비상에듀 기숙"]

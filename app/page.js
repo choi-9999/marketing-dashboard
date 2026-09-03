@@ -772,6 +772,20 @@ const branchCompetitorAddressMap = {
     { name: "잇올 스파르타 성동센터", address: "서울특별시 성동구 고산자로6길 40 레몬프라자 4층" },
     { name: "PK독학재수학원 성동점", address: "서울특별시 성동구 행당로8길 9 3층 (행당동 322-21)" }
   ],
+  "인천부평": [
+    { name: "잇올 스파르타 인천부평센터", address: "인천광역시 부평구 부평대로 19-1 도시프라자 8층" }
+  ],
+  "부평": [
+    { name: "잇올 스파르타 인천부평센터", address: "인천광역시 부평구 부평대로 19-1 도시프라자 8층" }
+  ],
+  "부천": [
+    { name: "잇올 스파르타 부천센터 1관", address: "경기도 부천시 원미구 길주로 181 골든벨타워 6층" },
+    { name: "디랩 부천", address: "경기도 부천시 원미구 상동로 87 8층" },
+    { name: "잇올 스파르타 부천센터 2관", address: "경기도 부천시 원미구 소향로 131 로하스빌딩 6층" },
+    { name: "부천 청솔학원", address: "경기도 부천시 원미구 부일로221번길 52" },
+    { name: "부천 메가스터디학원", address: "경기도 부천시 원미구 소향로 31 라파에스타빌딩 4~6층" },
+    { name: "메가스터디 러셀 부천", address: "경기도 부천시 원미구 길주로 231 한양프라자 4~5층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -2335,6 +2349,86 @@ function getCompetitorsForBranch(branchName) {
           { title: "1:1 과목별 맞춤 스케줄링 프로그램", content: "취약 과목 집중 보완 및 개인별 밀착 스케줄링 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [인프라 대응] 소수 코칭 대비 이투스의 방대한 교육 콘텐츠 인프라와 체계적인 학습 진단 시스템의 비교 우위를 안내하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("부평") || cleanName.includes("인천부평")) {
+    return [
+      {
+        name: "잇올 스파르타 인천부평센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 부평대로 도시프라자 8층 거점 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("부천")) {
+    return [
+      {
+        name: "잇올 스파르타 부천센터 1관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 길주로 골든벨타워 6층 신중동역 중심 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "디랩 부천",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 86, content: 90, facility: 89 } },
+        trend: "1. 상동로 87 8층 상동역 거점 대성 모의고사(더프/이감) 외부생 모집 및 성적 관리 시스템 홍보\n2. 수시/정시 지원 전략 설명회 개최",
+        promotions: [
+          { title: "더프 및 이감 외부생 모집", content: "실전 감각 극대화를 위한 전국 모의고사 외부생 응시 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [모의고사 대응] 자사 풀시즌 모의고사 라인업과 1:1 오답 피드백 클리닉의 결합 가치를 전면에 내세우십시오."
+      },
+      {
+        name: "잇올 스파르타 부천센터 2관",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 80, facility: 91 } },
+        trend: "1. 소향로 로하스빌딩 6층 상동 학원가 프리미엄 시설 및 스파르타식 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 실시간 알림 마케팅",
+        promotions: [
+          { title: "부천 2관 스파르타 관리반 모집", content: "철저한 출결 관리 및 휴대폰 의무 수거 스파르타 생활 관리", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [자기주도성 대응] 단순 통제 위주의 억압적 관리보다 주도적으로 목표를 달성할 수 있도록 돕는 이투스247의 자율·책임 학습 모델을 부각하십시오."
+      },
+      {
+        name: "부천 청솔학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 91, content: 92, facility: 90 } },
+        trend: "1. 송내역 부일로 거점 전통의 입시 전문 재수종합 및 선택형 단과 홍보\n2. 6평/9평 심층 분석 입시 리포트 및 입시 설명회 전개",
+        promotions: [
+          { title: "청솔 선택형 단과 및 독학관리반 모집", content: "필요 수업만 선택 수강하는 자율 선택형 종합 관리 프로그램", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [완전 독학 맞춤 대응] 불필요한 의무 수업을 배제하고 오직 개인에게 필요한 학습과 피드백에 100% 집중하는 이투스247의 완벽한 독학 관리 체계를 부각하십시오."
+      },
+      {
+        name: "부천 메가스터디학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 89, content: 93, facility: 90 } },
+        trend: "1. 소향로 라파에스타빌딩 4~6층 대형 재수종합 및 메가패스 결합 단과 자습관 홍보\n2. 상위권 대학 진학 설명회 전개",
+        promotions: [
+          { title: "대입 재수종합/독학관리반 모집", content: "메가스터디 입시 콘텐츠 및 스타강사진 단과 연계 혜택 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [1:1 밀착 케어 대응] 대형 재종의 획일적 진도보다 개인별 취약점을 1:1로 밀착 피드백하는 이투스247 담임 코칭의 우수성을 강조하십시오."
+      },
+      {
+        name: "메가스터디 러셀 부천",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 94, facility: 92 } },
+        trend: "1. 길주로 한양프라자 4~5층 신중동역 거점 바른공부 자습전용관(바자관) 및 스타강사 단과 연계 홍보\n2. 메가패스 결합 할인 및 의약학계열 전문반 운영",
+        promotions: [
+          { title: "러셀 바자관/단과 연계 모집", content: "바른공부 자습전용관 및 대형 스타강사진 단과 연계 수강 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [밀착 코칭 대응] 대형 단과 위주의 획일적 강의 수강보다 자기주도 학습 몰입을 극대화하는 이투스247의 개인 맞춤 학습 설계를 제안하십시오."
       }
     ];
   }
