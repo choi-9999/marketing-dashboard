@@ -749,6 +749,16 @@ const branchCompetitorAddressMap = {
     { name: "잇올 몰입관 부산 동래사직캠프", address: "부산광역시 동래구 아시아드대로 245 위드피플타워 2층" },
     { name: "잇올 스파르타 부산 사직센터", address: "부산광역시 동래구 종합운동장로 60 거성빌딩 2층" }
   ],
+  "성북": [
+    { name: "잇올 스파르타 성북센터", address: "서울특별시 성북구 동소문로 63 드림트리빌딩 1층, 2층" },
+    { name: "강북종로학원", address: "서울특별시 성북구 동소문로 299" },
+    { name: "PK대치스파르타 성북점", address: "서울특별시 성북구 종암로 113 2층" }
+  ],
+  "서울성북": [
+    { name: "잇올 스파르타 성북센터", address: "서울특별시 성북구 동소문로 63 드림트리빌딩 1층, 2층" },
+    { name: "강북종로학원", address: "서울특별시 성북구 동소문로 299" },
+    { name: "PK대치스파르타 성북점", address: "서울특별시 성북구 종암로 113 2층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -2217,6 +2227,41 @@ function getCompetitorsForBranch(branchName) {
           { title: "사직센터 스파르타 관리반 모집", content: "철저한 출결 관리 및 휴대폰 의무 수거 스파르타 생활 관리", url: "https://www.etoos.com" }
         ],
         guide: "1. [자기주도성 대응] 단순 통제 위주의 억압적 관리보다 주도적으로 목표를 달성할 수 있도록 돕는 이투스247의 자율·책임 학습 모델을 부각하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("성북")) {
+    return [
+      {
+        name: "잇올 스파르타 성북센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 동소문로 드림트리빌딩 1~2층 거점 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "강북종로학원",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 90, content: 91, facility: 89 } },
+        trend: "1. 길음역 동소문로 299 거점 전통의 종로 입시 인프라 및 재수종합/독학 연계 홍보\n2. 종로 모의고사 분석 리포트 및 입시 설명회 전개",
+        promotions: [
+          { title: "대입 재수종합/독학관리반 모집", content: "종로학원 빅데이터 기반 입시 컨설팅 및 성적 향상 리포트 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [1:1 맞춤 관리 대응] 전통 재종식 집단 관리 대비 이투스247의 개인별 맞춤 학습 진단과 1:1 밀착 코칭의 정밀성을 부각하십시오."
+      },
+      {
+        name: "PK대치스파르타 성북점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 89, content: 80, facility: 88 } },
+        trend: "1. 종암로 113 2층 거점 1:1 과목별 코칭 및 스케줄링 관리 특화 홍보\n2. 소수 정예 밀착 질의응답 시스템 강조",
+        promotions: [
+          { title: "1:1 과목별 맞춤 스케줄링 프로그램", content: "취약 과목 집중 보완 및 개인별 밀착 스케줄링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [인프라 대응] 소수 코칭 대비 이투스의 방대한 교육 콘텐츠 인프라와 체계적인 학습 진단 시스템의 비교 우위를 안내하십시오."
       }
     ];
   }
