@@ -4464,6 +4464,7 @@ function BranchMarketingReport({ report, generatedAt, mapStatus, onPrint, onFocu
           grade: report.grade,
           rank: report.rank,
           totalRankedBranches: report.totalRankedBranches,
+          operationScore: report.operationScore,
           nationalAverage: report.nationalAverage,
           regionAverage: report.regionAverage,
           nationalOperationAverage: report.nationalOperationAverage,
@@ -4472,16 +4473,27 @@ function BranchMarketingReport({ report, generatedAt, mapStatus, onPrint, onFocu
           programs: report.programs,
           snsScore: report.snsScore,
           snsGrade: report.snsGrade,
+          nationalSnsAverage: report.nationalSnsAverage,
+          regionSnsAverage: report.regionSnsAverage,
           blogScore: report.blogScore,
           instagramScore: report.instagramScore,
+          blogRecentPosts: report.blogRecentPosts,
+          instagramRecentPosts: report.instagramRecentPosts,
+          blogLastPosted: report.blogLastPosted,
+          instagramLastPosted: report.instagramLastPosted,
           recentContentCount: report.recentContentCount,
           latestBlogPosts: report.latestBlogPosts,
           latestInstagramPosts: report.latestInstagramPosts,
           hasFacilityVideo: report.hasFacilityVideo,
           collabUrlCount: report.collabUrlCount,
+          collabEventCount: report.collabEventCount,
+          collabEvents: report.collabEvents,
           mentorCount: report.mentorCount,
           scholarshipAmount: report.scholarshipAmount,
-          contentAssetCount: report.contentAssetCount
+          contentAssetCount: report.contentAssetCount,
+          nationalContentAssetAverage: report.nationalContentAssetAverage,
+          regionContentAssetAverage: report.regionContentAssetAverage,
+          completenessRate: report.completenessRate
         })
       });
 
