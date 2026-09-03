@@ -8214,10 +8214,11 @@ export default function HomePage() {
     try {
       let data = [];
       if (tab.kind === SPECIAL_SOCIAL_TAB_KIND) {
-        data = (tab.socialRows || []).map(r => {
-          const { id, ...rest } = r;
-          return rest;
-        });
+        data = (tab.socialRows || []).map((row) =>
+          Object.fromEntries(
+            specialSocialColumns.map((column) => [column.label, row[column.key] ?? ""])
+          )
+        );
       } else if (tab.kind === SPECIAL_FACILITY_TAB_KIND) {
         data = (tab.facilityRows || []).map(r => {
           const { id, ...rest } = r;
@@ -11749,8 +11750,7 @@ export default function HomePage() {
                 >
                   엑셀 불러오기
                 </button>
-                {activeTab.kind !== SPECIAL_SOCIAL_TAB_KIND &&
-                activeTab.kind !== SPECIAL_COLLAB_TAB_KIND &&
+                {activeTab.kind !== SPECIAL_COLLAB_TAB_KIND &&
                 activeTab.kind !== SPECIAL_FACILITY_TAB_KIND &&
                 activeTab.kind !== SPECIAL_MENTOR_TAB_KIND ? (
                   <button
