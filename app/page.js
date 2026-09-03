@@ -759,6 +759,11 @@ const branchCompetitorAddressMap = {
     { name: "강북종로학원", address: "서울특별시 성북구 동소문로 299" },
     { name: "PK대치스파르타 성북점", address: "서울특별시 성북구 종암로 113 2층" }
   ],
+  "원주": [
+    { name: "수만휘 스파르타 원주무실점", address: "강원특별자치도 원주시 능라동길 61 9층 (901호, 904호, 905호)" },
+    { name: "잇올 스파르타 원주센터", address: "강원특별자치도 원주시 서원대로 408 광장빌딩 4층" },
+    { name: "메가스터디 러셀 원주", address: "강원특별자치도 원주시 능라동길 25 3, 4, 5층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -2262,6 +2267,41 @@ function getCompetitorsForBranch(branchName) {
           { title: "1:1 과목별 맞춤 스케줄링 프로그램", content: "취약 과목 집중 보완 및 개인별 밀착 스케줄링 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [인프라 대응] 소수 코칭 대비 이투스의 방대한 교육 콘텐츠 인프라와 체계적인 학습 진단 시스템의 비교 우위를 안내하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("원주")) {
+    return [
+      {
+        name: "수만휘 스파르타 원주무실점",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 88, content: 80, facility: 90 } },
+        trend: "1. 무실동 능라동길 61 9층 거점 수만휘 회원 수강료 지원 및 생활 루틴 통제 홍보\n2. 주간 플래너 점검 및 등하원 실시간 알림 마케팅",
+        promotions: [
+          { title: "수만휘 회원 10% 수강료 지원", content: "수만휘 회원 인증 시 첫 달 등록 수강료 즉시 감면 프로모션", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [입시 전문성 대응] 수강료 할인 공세에 맞서 이투스 교육평가연구소의 정밀 성적 분석 리포트 및 1:1 수시/정시 컨설팅의 공신력을 부각하십시오."
+      },
+      {
+        name: "잇올 스파르타 원주센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 단구동 서원대로 광장빌딩 4층 거점 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      },
+      {
+        name: "메가스터디 러셀 원주",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 92, content: 94, facility: 92 } },
+        trend: "1. 능라동길 25 3~5층 대형 바자관 인프라 및 스타강사 라이브 단과 연계 홍보\n2. 메가패스 결합 혜택 및 최상위권 장학 프로그램 강조",
+        promotions: [
+          { title: "러셀 바자관/라이브 단과 모집", content: "최상위권 전문 바른공부 자습전용관 및 스타강사진 단과 연계", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [1:1 밀착 코칭 대응] 대형 단과 위주의 획일적 관리보다 개인별 맞춤 학습 진단과 1:1 밀착 피드백을 제공하는 이투스247 담임 코칭의 우수성을 강조하십시오."
       }
     ];
   }
