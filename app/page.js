@@ -703,6 +703,9 @@ const branchCompetitorAddressMap = {
     { name: "수원 스카이에듀학원", address: "경기도 수원시 팔달구 권선로 733" },
     { name: "수원 메가스터디학원", address: "경기도 수원시 권선구 권광로 90" }
   ],
+  "부산대": [
+    { name: "잇올 스파르타 부산대센터", address: "부산광역시 금정구 금강로 252-1 근영테크빌 7~9층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -2046,6 +2049,21 @@ function getCompetitorsForBranch(branchName) {
           { title: "대입 재수종합/독학관리반 모집", content: "메가스터디 입시 콘텐츠 및 스타강사진 단과 연계 혜택 지원", url: "https://www.etoos.com" }
         ],
         guide: "1. [1:1 밀착 케어 대응] 대형 재종의 획일적 진도보다 개인별 취약점을 1:1로 밀착 피드백하는 이투스247 담임 코칭의 우수성을 강조하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("부산대")) {
+    return [
+      {
+        name: "잇올 스파르타 부산대센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 장전동 근영테크빌 7~9층 3개 층 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
       }
     ];
   }
