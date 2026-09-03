@@ -1887,7 +1887,7 @@ function getCompetitorsForBranch(branchName) {
     ];
   }
 
-  if (cleanName.includes("대전둔산") || cleanName.includes("둔산") || (cleanName.includes("대전") && !cleanBranch?.includes("유성"))) {
+  if (cleanName.includes("대전둔산") || cleanName.includes("둔산") || (cleanName.includes("대전") && !cleanName.includes("유성"))) {
     return [
       {
         name: "디랩 대전",
@@ -2092,7 +2092,7 @@ function getCompetitorsForBranch(branchName) {
     ];
   }
 
-  if (cleanName.includes("수원시청") || (cleanName.includes("수원") && !cleanBranch?.includes("영통") && !cleanBranch?.includes("장안") && !cleanBranch?.includes("정자"))) {
+  if (cleanName.includes("수원시청") || (cleanName.includes("수원") && !cleanName.includes("영통") && !cleanName.includes("장안") && !cleanName.includes("정자"))) {
     return [
       {
         name: "수원 스카이에듀학원",
