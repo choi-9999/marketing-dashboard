@@ -36,7 +36,7 @@ export async function GET(request) {
         comp8: Math.round(32 + Math.sin(i + 9) * 6 + i * 1) // PK 동탄센터
       });
     }
-  } else if (cleanBranch.includes("목동")) {
+  } else if (cleanBranch.includes("목동") || cleanBranch.includes("오목교")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
         month: months[i],
@@ -289,9 +289,9 @@ export async function GET(request) {
     const periodMonths = ["2026-01-01", "2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01", "2026-06-01"];
     const monthLabels = ["1월", "2월", "3월", "4월", "5월", "6월"];
 
-    if (cleanBranch.includes("동탄") || cleanBranch.includes("목동") || cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성")) || cleanBranch.includes("강북") || cleanBranch.includes("김포") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
+    if (cleanBranch.includes("동탄") || cleanBranch.includes("목동") || cleanBranch.includes("오목교") || cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성")) || cleanBranch.includes("강북") || cleanBranch.includes("김포") || cleanBranch.includes("송도") || cleanBranch.includes("인천송도") || cleanBranch.includes("분당정자") || cleanBranch.includes("분당") || cleanBranch.includes("대치") || cleanBranch.includes("이천기숙") || cleanBranch.includes("이천") || cleanBranch.includes("안성기숙") || cleanBranch.includes("안성")) {
       const isDongtan = cleanBranch.includes("동탄");
-      const isMokdong = cleanBranch.includes("목동");
+      const isMokdong = cleanBranch.includes("목동") || cleanBranch.includes("오목교");
       const isDaejeonDunsan = cleanBranch.includes("대전둔산") || cleanBranch.includes("둔산") || (cleanBranch.includes("대전") && !cleanBranch.includes("유성"));
       const isGangbuk = cleanBranch.includes("강북");
       const isGimpo = cleanBranch.includes("김포");
@@ -306,7 +306,7 @@ export async function GET(request) {
         timeUnit: "month",
         keywordGroups: isMokdong
           ? [
-              { groupName: "ours", keywords: ["목동 이투스247", "목동 이투스", "목동이투스", "양천 이투스247"] },
+              { groupName: "ours", keywords: ["목동 이투스247", "목동오목교 이투스247", "오목교 이투스247", "목동 이투스", "목동이투스", "양천 이투스247"] },
               { groupName: "comp1", keywords: ["강남하이퍼학원 목동관", "강남하이퍼 목동관", "하이퍼 목동관"] },
               { groupName: "comp2", keywords: ["디랩 목동", "목동 디랩"] },
               { groupName: "comp3", keywords: ["수만휘 스파르타 목동2관", "목동2관 수만휘", "목동 수만휘 2관"] },
@@ -390,7 +390,7 @@ export async function GET(request) {
         timeUnit: "month",
         keywordGroups: isMokdong
           ? [
-              { groupName: "ours", keywords: ["목동 이투스247", "목동 이투스", "목동이투스", "양천 이투스247"] },
+              { groupName: "ours", keywords: ["목동 이투스247", "목동오목교 이투스247", "오목교 이투스247", "목동 이투스", "목동이투스", "양천 이투스247"] },
               { groupName: "comp5", keywords: ["종로학원 목동", "목동 종로학원", "목동 종로"] },
               { groupName: "comp6", keywords: ["수만휘 스파르타 목동1관", "목동1관 수만휘", "목동 수만휘 1관"] },
               { groupName: "comp7", keywords: ["잇올 스파르타 목동센터 1관", "목동 잇올 1관", "목동잇올 1관"] },
@@ -453,7 +453,7 @@ export async function GET(request) {
             endDate: "2026-06-30",
             timeUnit: "month",
             keywordGroups: [
-              { groupName: "ours", keywords: ["목동 이투스247", "목동 이투스", "목동이투스", "양천 이투스247"] },
+              { groupName: "ours", keywords: ["목동 이투스247", "목동오목교 이투스247", "오목교 이투스247", "목동 이투스", "목동이투스", "양천 이투스247"] },
               { groupName: "comp9", keywords: ["메가스터디 러셀 목동", "러셀 목동", "목동 러셀"] },
               { groupName: "comp10", keywords: ["PK대치스파르타 목동센터 1관", "목동 PK대치스파르타", "목동 PK 1관"] }
             ]
