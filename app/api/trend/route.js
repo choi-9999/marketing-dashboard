@@ -140,6 +140,14 @@ export async function GET(request) {
         comp6: Math.round(25 + Math.sin(i + 7) * 6 + i * 1) // 이천아이나인
       });
     }
+  } else if (cleanBranch.includes("부산서면") || cleanBranch.includes("서면")) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(48 + Math.cos(i + 2) * 10 + i * 3) // 잇올 부산서면센터
+      });
+    }
   } else if (cleanBranch.includes("부산대")) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -567,8 +575,9 @@ export async function GET(request) {
     } else {
       const isDokhakGisuk = cleanBranch.includes("독학기숙") || (cleanBranch.includes("기숙") && !cleanBranch.includes("안성") && !cleanBranch.includes("이천"));
       const isDalseo = cleanBranch.includes("대구달서") || cleanBranch.includes("달서");
-      const isBusanGyodae = cleanBranch.includes("부산교대") || (cleanBranch.includes("교대") && !cleanBranch.includes("부산대"));
-      const isBusandae = cleanBranch.includes("부산대") && !cleanBranch.includes("부산교대");
+      const isBusanGyodae = cleanBranch.includes("부산교대") || (cleanBranch.includes("교대") && !cleanBranch.includes("부산대") && !cleanBranch.includes("서면"));
+      const isBusandae = cleanBranch.includes("부산대") && !cleanBranch.includes("부산교대") && !cleanBranch.includes("서면");
+      const isBusanSeomyeon = cleanBranch.includes("부산서면") || cleanBranch.includes("서면");
       const isGwangjuDonggu = cleanBranch.includes("광주동구") || (cleanBranch.includes("광주") && cleanBranch.includes("동구"));
       const isChuncheon = cleanBranch.includes("춘천");
       const isPyeongtaek = cleanBranch.includes("평택");
@@ -586,6 +595,8 @@ export async function GET(request) {
         ? ["부산교대 이투스247", "부산교대 이투스", "동래 이투스247", "부산교대이투스"]
         : isBusandae
         ? ["부산대 이투스247", "부산대 이투스", "부산대이투스", "금정 이투스247"]
+        : isBusanSeomyeon
+        ? ["부산서면 이투스247", "서면 이투스247", "부산서면 이투스", "서면 이투스"]
         : isGwangjuDonggu
         ? ["광주동구 이투스247", "광주동구 이투스", "광주 이투스247", "광주이투스"]
         : isChuncheon
@@ -613,6 +624,8 @@ export async function GET(request) {
         ? ["잇올 스파르타 부산사직센터", "부산사직 잇올", "사직동 잇올"]
         : isBusandae
         ? ["잇올 스파르타 부산대센터", "부산대 잇올", "장전동 잇올"]
+        : isBusanSeomyeon
+        ? ["잇올 스파르타 부산서면센터", "부산서면 잇올", "서면 잇올", "전포동 잇올"]
         : isGwangjuDonggu
         ? ["메가스터디 러셀 광주", "러셀 광주", "광주 러셀"]
         : isChuncheon

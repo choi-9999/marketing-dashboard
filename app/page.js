@@ -730,6 +730,12 @@ const branchCompetitorAddressMap = {
   "부산대": [
     { name: "잇올 스파르타 부산대센터", address: "부산광역시 금정구 금강로 252-1 근영테크빌 7~9층" }
   ],
+  "부산서면": [
+    { name: "잇올 스파르타 부산서면센터", address: "부산광역시 부산진구 전포대로199번길 27 KH마이우스 2층" }
+  ],
+  "서면": [
+    { name: "잇올 스파르타 부산서면센터", address: "부산광역시 부산진구 전포대로199번길 27 KH마이우스 2층" }
+  ],
   "분당정자": [
     { name: "메가스터디 러셀 분당학원", address: "경기도 성남시 분당구 성남대로 381 폴라리스Ⅰ빌딩 4층" },
     { name: "수만휘 스파르타 분당정자점", address: "경기도 성남시 분당구 정자일로 232 젤존타워1 10층" },
@@ -2084,6 +2090,21 @@ function getCompetitorsForBranch(branchName) {
         urgency: "high",
         metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
         trend: "1. 장전동 근영테크빌 7~9층 3개 층 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
+        promotions: [
+          { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
+        ],
+        guide: "1. [코칭 시스템 대응] '잇올 티처스' 공세에 맞서 자사 담임 코치의 전담 밀착 관리 체계와 성적 향상 사례를 실증 자료로 제시하십시오."
+      }
+    ];
+  }
+
+  if (cleanName.includes("부산서면") || cleanName.includes("서면")) {
+    return [
+      {
+        name: "잇올 스파르타 부산서면센터",
+        urgency: "high",
+        metrics: { ours: { mgmt: 92, content: 94, facility: 90 }, theirs: { mgmt: 93, content: 80, facility: 92 } },
+        trend: "1. 전포동 KH마이우스 2층 서면 상권 거점 대형 프리미엄 시설 및 '잇올 티처스' 초개인화 멘토링 홍보\n2. 실전 수능 시뮬레이션 모의고사 및 외부생 응시 운영",
         promotions: [
           { title: "잇올 티처스 초개인화 멘토링 시스템", content: "전과목 학습 질문 및 개인별 학습 전략 설계 멘토링 지원", url: "https://www.etoos.com" }
         ],
