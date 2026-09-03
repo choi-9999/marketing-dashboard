@@ -156,6 +156,15 @@ export async function GET(request) {
         comp1: Math.round(48 + Math.cos(i + 2) * 10 + i * 3) // 잇올 부산대센터
       });
     }
+  } else if (cleanBranch.includes("수원정자") || (cleanBranch.includes("수원") && cleanBranch.includes("정자"))) {
+    for (let i = 0; i < 6; i++) {
+      fallbackTrend.push({
+        month: months[i],
+        ours: Math.round(45 + Math.sin(i + 1) * 8 + i * 3),
+        comp1: Math.round(48 + Math.cos(i + 2) * 10 + i * 3), // 잇올 수원 정자센터
+        comp2: Math.round(46 + Math.sin(i * 1.2 + 3) * 11 + i * 2) // 수만휘 수원정자점
+      });
+    }
   } else if (cleanBranch.includes("수원시청") || (cleanBranch.includes("수원") && !cleanBranch.includes("영통") && !cleanBranch.includes("장안") && !cleanBranch.includes("정자"))) {
     for (let i = 0; i < 6; i++) {
       fallbackTrend.push({
@@ -597,6 +606,7 @@ export async function GET(request) {
       const isIlsanseogu = cleanBranch.includes("일산서구") || (cleanBranch.includes("일산") && !cleanBranch.includes("동구"));
       const isDasan = cleanBranch.includes("다산") || cleanBranch.includes("남양주다산");
       const isMapo = cleanBranch.includes("마포") || cleanBranch.includes("신촌");
+      const isSuwonJeongja = cleanBranch.includes("수원정자") || (cleanBranch.includes("수원") && cleanBranch.includes("정자"));
       const isSuwonSicheong = cleanBranch.includes("수원시청") || (cleanBranch.includes("수원") && !cleanBranch.includes("영통") && !cleanBranch.includes("장안") && !cleanBranch.includes("정자"));
       const oursKeywords = isDokhakGisuk
         ? ["이투스247 독학기숙학원", "이투스247 독학기숙", "이투스 독학기숙"]
@@ -626,6 +636,8 @@ export async function GET(request) {
         ? ["다산 이투스247", "남양주다산 이투스247", "다산 이투스", "다산이투스"]
         : isMapo
         ? ["마포 이투스247", "마포 이투스", "신촌 이투스247", "마포이투스"]
+        : isSuwonJeongja
+        ? ["수원정자 이투스247", "수원정자 이투스", "수원 이투스247", "정자동 이투스247", "장안구 이투스247"]
         : isSuwonSicheong
         ? ["수원시청 이투스247", "수원시청 이투스", "수원 이투스247", "인계동 이투스247"]
         : [`${cleanBranch} 이투스247`, `${cleanBranch} 이투스`].filter(Boolean);
@@ -657,6 +669,8 @@ export async function GET(request) {
         ? ["수만휘 스파르타 남양주다산점", "남양주다산 수만휘", "다산 수만휘"]
         : isMapo
         ? ["수능선배 신촌점", "신촌 수능선배", "마포 수능선배"]
+        : isSuwonJeongja
+        ? ["잇올 스파르타 수원 정자센터", "수원정자 잇올", "정자동 잇올"]
         : isSuwonSicheong
         ? ["수원 스카이에듀학원", "수원 스카이에듀", "인계동 스카이에듀"]
         : [`${cleanBranch} 잇올`].filter(Boolean);
@@ -682,6 +696,8 @@ export async function GET(request) {
         ? ["일산 청솔학원", "일산청솔학원", "주엽 청솔학원"]
         : isMapo
         ? ["잇올 스파르타 마포신촌센터", "마포신촌 잇올", "마포 잇올", "신촌 잇올"]
+        : isSuwonJeongja
+        ? ["수만휘 스파르타 수원정자점", "수원정자 수만휘", "정자동 수만휘"]
         : isSuwonSicheong
         ? ["수원 메가스터디학원", "수원 메가스터디", "권선동 메가스터디"]
         : [`${cleanBranch} 수능선배`].filter(Boolean);
