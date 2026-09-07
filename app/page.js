@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState, Fragment, useCallback } from "react";
 import * as XLSX from "xlsx";
+import scholarshipEssays from "./data/scholarshipEssays.json";
 
 const OVERVIEW_TAB_ID = "__overall__";
 const SPECIAL_SOCIAL_TAB_KIND = "special-social";
@@ -279,10 +280,21 @@ function createSpecialMentorRow(seed = {}) {
 }
 
 function createSpecialMentorTab(id, name, seededRows = []) {
-  const rows = seededRows.length > 0
-    ? seededRows.map((row) => createSpecialMentorRow(row))
+  const defaultSeeds = (Array.isArray(scholarshipEssays) && scholarshipEssays.length > 0)
+    ? scholarshipEssays.map((item, idx) => ({
+        year: "2026",
+        name: item.name,
+        phone: "",
+        university: item.university,
+        department: item.department,
+        branch: item.branch,
+        group: "1억장학금",
+        amount: 2000000,
+        isMentor: idx < 10,
+        memo: `${item.type || 'N수생'} | ${item.admissionType || '정시'}`
+      }))
     : [
-        createSpecialMentorRow({
+        {
           year: "2026",
           name: "김철수",
           phone: "010-1234-5678",
@@ -293,8 +305,8 @@ function createSpecialMentorTab(id, name, seededRows = []) {
           amount: 3000000,
           isMentor: true,
           memo: "우수 멘토"
-        }),
-        createSpecialMentorRow({
+        },
+        {
           year: "2026",
           name: "이영희",
           phone: "010-5678-1234",
@@ -305,8 +317,10 @@ function createSpecialMentorTab(id, name, seededRows = []) {
           amount: 2000000,
           isMentor: false,
           memo: ""
-        })
+        }
       ];
+
+  const rows = (seededRows.length > 0 ? seededRows : defaultSeeds).map((row) => createSpecialMentorRow(row));
 
   const sortedRows = [...rows].sort((a, b) => {
     const yA = parseInt(a.year, 10) || 0;
@@ -2777,7 +2791,23 @@ function migrateLegacyTab(tab) {
   }
 
   if (tab.kind === SPECIAL_MENTOR_TAB_KIND) {
-    const sortedMentorRows = (Array.isArray(tab.mentorRows) ? tab.mentorRows : [])
+    let rowsToMigrate = Array.isArray(tab.mentorRows) ? tab.mentorRows : [];
+    const isLegacySample = rowsToMigrate.length <= 2 && rowsToMigrate.every(r => r.name === "김철수" || r.name === "이영희");
+    if ((rowsToMigrate.length === 0 || isLegacySample) && Array.isArray(scholarshipEssays) && scholarshipEssays.length > 0) {
+      rowsToMigrate = scholarshipEssays.map((item, idx) => ({
+        year: "2026",
+        name: item.name,
+        phone: "",
+        university: item.university,
+        department: item.department,
+        branch: item.branch,
+        group: "1억장학금",
+        amount: 2000000,
+        isMentor: idx < 10,
+        memo: `${item.type || 'N수생'} | ${item.admissionType || '정시'}`
+      }));
+    }
+    const sortedMentorRows = rowsToMigrate
       .map((row, index) => createSpecialMentorRow({ ...row, id: row?.id || createId(`mentor-row-${index}`) }))
       .sort((a, b) => {
         const yA = parseInt(a.year, 10) || 0;
@@ -4600,6 +4630,371 @@ function CustomDialogModal({ modal, onClose }) {
   );
 }
 
+function ScholarshipEssayModal({ isOpen, onClose, essay }) {
+  if (!isOpen || !essay) return null;
+
+  const {
+    name = "",
+    branch = "",
+    targetUnivDept = "",
+    university = "",
+    department = "",
+    days = "",
+    type = "",
+    winter = "",
+    admissionType = "",
+    weakSubject = "",
+    answers = {}
+  } = essay;
+
+  const sections = [
+    {
+      id: "intro",
+      title: "수험 생활 & 학원 선택",
+      icon: "🌟",
+      items: [
+        { q: "자기소개", a: answers["자기소개"] },
+        { q: "이투스247학원을 선택한 이유", a: answers["이투스247학원을  선택한 이유"] || answers["이투스247학원을 선택한 이유"] },
+        { q: "가장 마음에 들었던 공간 및 이유", a: [answers["이투스247학원에서 가장 마음에 들었던 공간"], answers["위에서 선택한 공간이  왜 마음에 들었는지."] || answers["위에서 선택한 공간이 왜 마음에 들었는지."]].filter(Boolean).join("\n\n") },
+        { q: "이투스247학원에서의 하루 루틴", a: answers["이투스247학원에서의  하루 루틴"] || answers["이투스247학원에서의 하루 루틴"] }
+      ].filter((item) => item.a && item.a.trim())
+    },
+    {
+      id: "study",
+      title: "학습 관리 & 시스템 활용",
+      icon: "📚",
+      items: [
+        { q: "학습 관리 시스템 만족 항목 및 유용한 이유", a: [answers["학습 관리 시스템  중 가장 만족했던 것  3가지 "] || answers["학습 관리 시스템 중 가장 만족했던 것 3가지"], answers["학습 관리 시스템이 유용했던 이유"]].filter(Boolean).join("\n\n") },
+        { q: "MY247 프로그램 활용 및 유용한 점", a: [answers["MY247 프로그램  중 가장 유용하게 활용한 2가지"] || answers["MY247 프로그램 중 가장 유용하게 활용한 2가지"], answers["선택한  MY247 프로그램 이 어떤 점에서 유용했는지"] || answers["선택한 MY247 프로그램이 어떤 점에서 유용했는지"]].filter(Boolean).join("\n\n") },
+        { q: "재원생 전용 학습 콘텐츠 활용법", a: [answers["재원생 전용 학습 콘텐츠 중 가장 유용하게 활용한 것"], answers["선택한 재원생 전용 학습 콘텐츠를 활용한 방법"]].filter(Boolean).join("\n\n") },
+        { q: "나만의 학습 스케줄 작성 TIP", a: answers["나만의  학습 스케줄 작성 TIP"] || answers["나만의 학습 스케줄 작성 TIP"] }
+      ].filter((item) => item.a && item.a.trim())
+    },
+    {
+      id: "life",
+      title: "생활 관리 & 슬럼프 극복기",
+      icon: "🛡️",
+      items: [
+        { q: "생활 관리 시스템 만족 항목 및 유용한 이유", a: [answers["생활 관리 시스템  중 가장 만족했던 3가지"] || answers["생활 관리 시스템 중 가장 만족했던 3가지"], answers["위에서 선택한 생활 관리 시스템 이 어떤 점에서 유용했는지 "] || answers["위에서 선택한 생활 관리 시스템이 어떤 점에서 유용했는지"]].filter(Boolean).join("\n\n") },
+        { q: "취약 과목 극복 학습법", a: [answers["자신이 가장 취약했던 과목"] ? `[취약 과목]: ${answers["자신이 가장 취약했던 과목"]}` : "", answers["위에서 선택한  취약과목을 극복한 자신만의 특별한 학습법"] || answers["위에서 선택한 취약과목을 극복한 자신만의 특별한 학습법"]].filter(Boolean).join("\n\n") },
+        { q: "피로 및 집중력 저하 극복법", a: answers["집중력이 떨어졌을 때나 피곤할 때 힘을 나게 하는 자신만의 방법 "] || answers["집중력이 떨어졌을 때나 피곤할 때 힘을 나게 하는 자신만의 방법"] },
+        { q: "자신만의 슬럼프 극복법", a: answers["자신만의 슬럼프 극복법"] },
+        { q: "학원을 안 갔거나 조퇴했을 때의 시간 활용", a: answers[" 학원을 안 갔을 때, 조퇴했을 때   시간을 어떻게 보냈는지"] || answers["학원을 안 갔을 때, 조퇴했을 때 시간을 어떻게 보냈는지"] }
+      ].filter((item) => item.a && item.a.trim())
+    },
+    {
+      id: "advice",
+      title: "대입 지원 전략 & 후배를 위한 응원",
+      icon: "🎯",
+      items: [
+        { q: "합격 전형 지원 전략 & 입시 상담 진행 과정", a: [answers["합격 전형에 대한  지원 전략"] || answers["합격 전형에 대한 지원 전략"], answers["입시 상담 및 관리 는 어떻게 진행되었는지"] || answers["입시 상담 및 관리는 어떻게 진행되었는지"]].filter(Boolean).join("\n\n") },
+        { q: "27학년도 수험생들에게 도움이 될 메시지", a: answers[" 27학년도 수험생들에게   도움이 될 메시지"] || answers["27학년도 수험생들에게 도움이 될 메시지"] },
+        { q: "시기별(6평/9평/파이널) 응원의 메시지", a: answers["시기별(6평/9평/파이널) 응원의 메시지"] },
+        { q: "27학년도 N수생들에게 이투스247학원을 추천하는 이유", a: answers[" 27학년도 n수생들에게 이투스247학원을 추천하는 이유"] || answers["27학년도 n수생들에게 이투스247학원을 추천하는 이유"] },
+        { q: "부모님 또는 이투스247학원 선생님들께 감사 인사", a: answers[" 부모님 또는 이투스247학원 선생님들께 감사 인사"] || answers["부모님 또는 이투스247학원 선생님들께 감사 인사"] }
+      ].filter((item) => item.a && item.a.trim())
+    }
+  ];
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        backgroundColor: "rgba(15, 23, 42, 0.65)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 100000,
+        padding: "20px"
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "920px",
+          maxHeight: "90vh",
+          display: "flex",
+          flexDirection: "column",
+          borderRadius: "24px",
+          background: "var(--panel-bg, #ffffff)",
+          border: "1px solid rgba(59, 130, 246, 0.25)",
+          boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.45)",
+          overflow: "hidden"
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* 모달 헤더 */}
+        <div
+          style={{
+            padding: "24px 28px 20px",
+            background: "linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(59, 130, 246, 0.02) 100%)",
+            borderBottom: "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
+            position: "relative"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+            <span
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: "700",
+                background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+                color: "#ffffff",
+                padding: "3px 10px",
+                borderRadius: "20px",
+                letterSpacing: "0.3px",
+                boxShadow: "0 2px 6px rgba(37, 99, 235, 0.3)"
+              }}
+            >
+              🎓 2026 장학생 명예의 전당
+            </span>
+            <span
+              style={{
+                fontSize: "0.82rem",
+                fontWeight: "600",
+                color: "#3b82f6",
+                background: "rgba(59, 130, 246, 0.1)",
+                padding: "3px 10px",
+                borderRadius: "20px"
+              }}
+            >
+              {branch}점
+            </span>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "baseline", gap: "12px", flexWrap: "wrap" }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "1.6rem",
+                fontWeight: "800",
+                color: "var(--text-color, #0f172a)",
+                fontFamily: "'Pretendard', sans-serif",
+                letterSpacing: "-0.5px"
+              }}
+            >
+              {name} 학생 합격 수기
+            </h2>
+            <span
+              style={{
+                fontSize: "1.05rem",
+                fontWeight: "700",
+                color: "#2563eb"
+              }}
+            >
+              {targetUnivDept || `${university} ${department}`}
+            </span>
+          </div>
+
+          {/* 닫기 버튼 */}
+          <button
+            onClick={onClose}
+            style={{
+              position: "absolute",
+              top: "20px",
+              right: "20px",
+              width: "36px",
+              height: "36px",
+              borderRadius: "50%",
+              border: "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
+              background: "var(--panel-bg, #ffffff)",
+              color: "var(--text-muted, #64748b)",
+              fontSize: "1.2rem",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.15s"
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "#0f172a"; e.currentTarget.style.background = "rgba(0,0,0,0.06)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted, #64748b)"; e.currentTarget.style.background = "var(--panel-bg, #ffffff)"; }}
+          >
+            ✕
+          </button>
+
+          {/* 프로필 요약 카드 바 */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
+              gap: "10px",
+              marginTop: "16px"
+            }}
+          >
+            <div style={{ padding: "8px 12px", borderRadius: "10px", background: "var(--card-bg, rgba(248, 250, 252, 0.8))", border: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))" }}>
+              <div style={{ fontSize: "0.74rem", color: "var(--text-muted, #64748b)", fontWeight: "600" }}>합격 대학교/학과</div>
+              <div style={{ fontSize: "0.88rem", fontWeight: "700", color: "var(--text-color, #0f172a)", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={targetUnivDept}>
+                {targetUnivDept || `${university} ${department}`}
+              </div>
+            </div>
+
+            <div style={{ padding: "8px 12px", borderRadius: "10px", background: "var(--card-bg, rgba(248, 250, 252, 0.8))", border: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))" }}>
+              <div style={{ fontSize: "0.74rem", color: "var(--text-muted, #64748b)", fontWeight: "600" }}>재원 지점/일수</div>
+              <div style={{ fontSize: "0.88rem", fontWeight: "700", color: "var(--text-color, #0f172a)", marginTop: "2px" }}>
+                {branch}점 ({days || "-"})
+              </div>
+            </div>
+
+            <div style={{ padding: "8px 12px", borderRadius: "10px", background: "var(--card-bg, rgba(248, 250, 252, 0.8))", border: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))" }}>
+              <div style={{ fontSize: "0.74rem", color: "var(--text-muted, #64748b)", fontWeight: "600" }}>수험 유형 / 윈터</div>
+              <div style={{ fontSize: "0.88rem", fontWeight: "700", color: "var(--text-color, #0f172a)", marginTop: "2px" }}>
+                {type || "N수생"} {winter ? `(${winter})` : ""}
+              </div>
+            </div>
+
+            <div style={{ padding: "8px 12px", borderRadius: "10px", background: "var(--card-bg, rgba(248, 250, 252, 0.8))", border: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))" }}>
+              <div style={{ fontSize: "0.74rem", color: "var(--text-muted, #64748b)", fontWeight: "600" }}>합격 전형 / 취약과목</div>
+              <div style={{ fontSize: "0.88rem", fontWeight: "700", color: "var(--text-color, #0f172a)", marginTop: "2px" }}>
+                {admissionType || "정시"} / {weakSubject || "-"}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 모달 본문 (스크롤) */}
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: "24px 28px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "24px"
+          }}
+        >
+          {sections.map((sec) => {
+            if (!sec.items || sec.items.length === 0) return null;
+            return (
+              <div
+                key={sec.id}
+                style={{
+                  borderRadius: "16px",
+                  border: "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
+                  background: "var(--card-bg, rgba(248, 250, 252, 0.5))",
+                  overflow: "hidden"
+                }}
+              >
+                {/* 섹션 타이틀 */}
+                <div
+                  style={{
+                    padding: "12px 20px",
+                    background: "rgba(59, 130, 246, 0.05)",
+                    borderBottom: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontWeight: "700",
+                    fontSize: "0.98rem",
+                    color: "var(--text-color, #0f172a)"
+                  }}
+                >
+                  <span>{sec.icon}</span>
+                  <span>{sec.title}</span>
+                </div>
+
+                {/* 섹션 질문/답변 리스트 */}
+                <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                  {sec.items.map((item, qIdx) => (
+                    <div
+                      key={qIdx}
+                      style={{
+                        borderRadius: "12px",
+                        background: "var(--panel-bg, #ffffff)",
+                        border: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))",
+                        padding: "16px",
+                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.02)"
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          gap: "8px",
+                          marginBottom: "10px"
+                        }}
+                      >
+                        <span
+                          style={{
+                            background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+                            color: "#ffffff",
+                            fontSize: "0.72rem",
+                            fontWeight: "800",
+                            padding: "2px 7px",
+                            borderRadius: "6px",
+                            marginTop: "2px",
+                            flexShrink: 0
+                          }}
+                        >
+                          Q
+                        </span>
+                        <h4
+                          style={{
+                            margin: 0,
+                            fontSize: "0.95rem",
+                            fontWeight: "700",
+                            color: "var(--text-color, #0f172a)",
+                            lineHeight: "1.4"
+                          }}
+                        >
+                          {item.q}
+                        </h4>
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: "0.91rem",
+                          lineHeight: "1.75",
+                          color: "var(--text-color, #334155)",
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                          paddingLeft: "26px"
+                        }}
+                      >
+                        {item.a}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 모달 푸터 */}
+        <div
+          style={{
+            padding: "16px 28px",
+            borderTop: "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
+            display: "flex",
+            justifyContent: "flex-end",
+            background: "var(--panel-bg, #ffffff)"
+          }}
+        >
+          <button
+            onClick={onClose}
+            style={{
+              padding: "10px 24px",
+              borderRadius: "12px",
+              background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+              border: "none",
+              color: "#ffffff",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)"
+            }}
+          >
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 
 function ReportParticipationChart({ participationRate, operationScore, nationalAverage, regionAverage, region }) {
@@ -5360,8 +5755,39 @@ export default function HomePage() {
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [customModal, setCustomModal] = useState(null);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+  const [selectedEssayStudent, setSelectedEssayStudent] = useState(null);
+  const [isEssayModalOpen, setIsEssayModalOpen] = useState(false);
   const [selectedKeywordFilter, setSelectedKeywordFilter] = useState("");
   const [isSnsScoreTooltipOpen, setIsSnsScoreTooltipOpen] = useState(false);
+
+  const handleOpenEssay = useCallback((studentName, studentBranch) => {
+    if (!studentName) return;
+    const cleanStudentName = String(studentName).trim();
+    const cleanBranch = String(studentBranch || "").trim();
+
+    let essay = (scholarshipEssays || []).find(
+      (e) =>
+        e.name === cleanStudentName &&
+        cleanBranch &&
+        (e.branch.includes(cleanBranch) || cleanBranch.includes(e.branch))
+    );
+    if (!essay) {
+      essay = (scholarshipEssays || []).find((e) => e.name === cleanStudentName);
+    }
+
+    if (essay) {
+      setSelectedEssayStudent(essay);
+      setIsEssayModalOpen(true);
+    } else {
+      setCustomModal({
+        type: "info",
+        title: "합격 수기 안내",
+        message: `'${cleanStudentName}' 학생의 등록된 합격 수기가 없습니다.`,
+        confirmText: "확인",
+        onConfirm: () => setCustomModal(null)
+      });
+    }
+  }, []);
 
   const showAlert = (message, title = "알림", type = "info") => {
     return new Promise((resolve) => {
@@ -9835,7 +10261,38 @@ export default function HomePage() {
                             {mentorsList.map((row) => (
                               <tr key={row.id}>
                                 <td>{row.year}</td>
-                                <td style={{ fontWeight: "600" }}>{row.name}</td>
+                                <td>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenEssay(row.name, row.branch)}
+                                    title={`${row.name} 학생 합격 수기 보기`}
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: "6px",
+                                      fontWeight: "600",
+                                      color: "var(--metric-accent-color)",
+                                      background: "rgba(37, 99, 235, 0.08)",
+                                      border: "1px solid rgba(37, 99, 235, 0.25)",
+                                      borderRadius: "6px",
+                                      padding: "4px 8px",
+                                      cursor: "pointer",
+                                      fontSize: "0.88rem",
+                                      transition: "all 0.2s ease"
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.background = "rgba(37, 99, 235, 0.18)";
+                                      e.currentTarget.style.transform = "translateY(-1px)";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.background = "rgba(37, 99, 235, 0.08)";
+                                      e.currentTarget.style.transform = "none";
+                                    }}
+                                  >
+                                    <span>{row.name}</span>
+                                    <span style={{ fontSize: "0.75rem", opacity: 0.85 }}>📝 수기</span>
+                                  </button>
+                                </td>
                                 <td>{row.university}</td>
                                 <td>{row.department}</td>
                                 <td><span className="status-pill good">{row.branch}</span></td>
@@ -9877,7 +10334,38 @@ export default function HomePage() {
                             {scholarsList.map((row) => (
                               <tr key={row.id}>
                                 <td>{row.year}</td>
-                                <td>{row.name}</td>
+                                <td>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenEssay(row.name, row.branch)}
+                                    title={`${row.name} 학생 합격 수기 보기`}
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: "6px",
+                                      fontWeight: "600",
+                                      color: "#10b981",
+                                      background: "rgba(16, 185, 129, 0.08)",
+                                      border: "1px solid rgba(16, 185, 129, 0.25)",
+                                      borderRadius: "6px",
+                                      padding: "4px 8px",
+                                      cursor: "pointer",
+                                      fontSize: "0.88rem",
+                                      transition: "all 0.2s ease"
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.background = "rgba(16, 185, 129, 0.18)";
+                                      e.currentTarget.style.transform = "translateY(-1px)";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.background = "rgba(16, 185, 129, 0.08)";
+                                      e.currentTarget.style.transform = "none";
+                                    }}
+                                  >
+                                    <span>{row.name}</span>
+                                    <span style={{ fontSize: "0.75rem", opacity: 0.85 }}>📝 수기</span>
+                                  </button>
+                                </td>
                                 <td>{row.university}</td>
                                 <td>{row.department}</td>
                                 <td><span className="status-pill good">{row.branch}</span></td>
@@ -12675,6 +13163,11 @@ export default function HomePage() {
         branchA={selectedBranch}
         rawTabs={rawTabs}
         allBranches={allBranches}
+      />
+      <ScholarshipEssayModal
+        isOpen={isEssayModalOpen}
+        onClose={() => setIsEssayModalOpen(false)}
+        essay={selectedEssayStudent}
       />
       <CustomDialogModal
         modal={customModal}
