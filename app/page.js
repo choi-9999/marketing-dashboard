@@ -4647,6 +4647,56 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
     answers = {}
   } = essay;
 
+  const handleDownloadExcel = () => {
+    try {
+      const rows = [
+        { "구분": "장학생 이름", "내용": name },
+        { "구분": "재원 지점", "내용": `${branch}점` },
+        { "구분": "최종 등록 대학 및 학과", "내용": targetUnivDept || `${university} ${department}` },
+        { "구분": "재원 일수", "내용": days || "-" },
+        { "구분": "수험 유형", "내용": type || "N수생" },
+        { "구분": "윈터스쿨 재원 여부", "내용": winter || "-" },
+        { "구분": "합격 전형", "내용": admissionType || "정시" },
+        { "구분": "취약 과목", "내용": weakSubject || "-" },
+        { "구분": "----------------", "내용": "--------------------------------------------------------" }
+      ];
+
+      // 각 질문과 답변 추가
+      Object.entries(answers).forEach(([key, val]) => {
+        if (
+          [
+            "이름",
+            "재원지점",
+            "최종 등록 대학 및 학과",
+            "재원일수",
+            "재원유형",
+            "윈터스쿨 재원 유무",
+            "합격전형",
+            "자신이 가장 취약했던 과목"
+          ].includes(key)
+        ) {
+          return;
+        }
+        if (val && String(val).trim()) {
+          rows.push({
+            "구분": key,
+            "내용": String(val).trim()
+          });
+        }
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      worksheet["!cols"] = [{ wch: 32 }, { wch: 90 }];
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "합격수기");
+      const safeFileName = `합격수기_2026_${name}_${branch}점_${targetUnivDept || university}.xlsx`.replace(/[\\/:*?"<>|]/g, "_");
+      XLSX.writeFile(workbook, safeFileName);
+    } catch (err) {
+      console.error("수기 엑셀 다운로드 오류:", err);
+      alert("엑셀 다운로드 중 오류가 발생했습니다.");
+    }
+  };
+
   const sections = [
     {
       id: "intro",
@@ -4715,7 +4765,8 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
       <div
         style={{
           width: "100%",
-          maxWidth: "920px",
+          maxWidth: "940px",
+          height: "90vh",
           maxHeight: "90vh",
           display: "flex",
           flexDirection: "column",
@@ -4730,46 +4781,100 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
         {/* 모달 헤더 */}
         <div
           style={{
-            padding: "24px 28px 20px",
+            flexShrink: 0,
+            padding: "22px 28px 18px",
             background: "linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(59, 130, 246, 0.02) 100%)",
             borderBottom: "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
             position: "relative"
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-            <span
-              style={{
-                fontSize: "0.78rem",
-                fontWeight: "700",
-                background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-                color: "#ffffff",
-                padding: "3px 10px",
-                borderRadius: "20px",
-                letterSpacing: "0.3px",
-                boxShadow: "0 2px 6px rgba(37, 99, 235, 0.3)"
-              }}
-            >
-              🎓 2026 장학생 명예의 전당
-            </span>
-            <span
-              style={{
-                fontSize: "0.82rem",
-                fontWeight: "600",
-                color: "#3b82f6",
-                background: "rgba(59, 130, 246, 0.1)",
-                padding: "3px 10px",
-                borderRadius: "20px"
-              }}
-            >
-              {branch}점
-            </span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span
+                style={{
+                  fontSize: "0.78rem",
+                  fontWeight: "700",
+                  background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+                  color: "#ffffff",
+                  padding: "3px 10px",
+                  borderRadius: "20px",
+                  letterSpacing: "0.3px",
+                  boxShadow: "0 2px 6px rgba(37, 99, 235, 0.3)"
+                }}
+              >
+                🎓 2026 장학생 명예의 전당
+              </span>
+              <span
+                style={{
+                  fontSize: "0.82rem",
+                  fontWeight: "600",
+                  color: "#3b82f6",
+                  background: "rgba(59, 130, 246, 0.1)",
+                  padding: "3px 10px",
+                  borderRadius: "20px"
+                }}
+              >
+                {branch}점
+              </span>
+            </div>
+
+            {/* 우측 헤더 액션 (다운로드 & 닫기) */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <button
+                type="button"
+                onClick={handleDownloadExcel}
+                title="수기 엑셀(.xlsx) 파일 다운로드"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "6px 14px",
+                  borderRadius: "10px",
+                  background: "#10b981",
+                  border: "none",
+                  color: "#ffffff",
+                  fontSize: "0.82rem",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 8px rgba(16, 185, 129, 0.3)",
+                  transition: "all 0.15s"
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "#059669"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "#10b981"; e.currentTarget.style.transform = "none"; }}
+              >
+                <span>📥</span>
+                <span>수기 다운로드</span>
+              </button>
+
+              <button
+                onClick={onClose}
+                style={{
+                  width: "34px",
+                  height: "34px",
+                  borderRadius: "50%",
+                  border: "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
+                  background: "var(--panel-bg, #ffffff)",
+                  color: "var(--text-muted, #64748b)",
+                  fontSize: "1.1rem",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.15s"
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "#0f172a"; e.currentTarget.style.background = "rgba(0,0,0,0.06)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted, #64748b)"; e.currentTarget.style.background = "var(--panel-bg, #ffffff)"; }}
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           <div style={{ display: "flex", alignItems: "baseline", gap: "12px", flexWrap: "wrap" }}>
             <h2
               style={{
                 margin: 0,
-                fontSize: "1.6rem",
+                fontSize: "1.55rem",
                 fontWeight: "800",
                 color: "var(--text-color, #0f172a)",
                 fontFamily: "'Pretendard', sans-serif",
@@ -4789,39 +4894,13 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
             </span>
           </div>
 
-          {/* 닫기 버튼 */}
-          <button
-            onClick={onClose}
-            style={{
-              position: "absolute",
-              top: "20px",
-              right: "20px",
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              border: "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
-              background: "var(--panel-bg, #ffffff)",
-              color: "var(--text-muted, #64748b)",
-              fontSize: "1.2rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.15s"
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "#0f172a"; e.currentTarget.style.background = "rgba(0,0,0,0.06)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted, #64748b)"; e.currentTarget.style.background = "var(--panel-bg, #ffffff)"; }}
-          >
-            ✕
-          </button>
-
           {/* 프로필 요약 카드 바 */}
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
               gap: "10px",
-              marginTop: "16px"
+              marginTop: "14px"
             }}
           >
             <div style={{ padding: "8px 12px", borderRadius: "10px", background: "var(--card-bg, rgba(248, 250, 252, 0.8))", border: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))" }}>
@@ -4858,7 +4937,9 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
         <div
           style={{
             flex: 1,
+            minHeight: 0,
             overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
             padding: "24px 28px",
             display: "flex",
             flexDirection: "column",
@@ -4966,13 +5047,40 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
         {/* 모달 푸터 */}
         <div
           style={{
+            flexShrink: 0,
             padding: "16px 28px",
             borderTop: "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
+            alignItems: "center",
             background: "var(--panel-bg, #ffffff)"
           }}
         >
+          <button
+            type="button"
+            onClick={handleDownloadExcel}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px 18px",
+              borderRadius: "12px",
+              background: "#10b981",
+              border: "none",
+              color: "#ffffff",
+              fontWeight: "700",
+              fontSize: "0.88rem",
+              cursor: "pointer",
+              boxShadow: "0 3px 10px rgba(16, 185, 129, 0.25)",
+              transition: "all 0.15s"
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "#059669"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "#10b981"; e.currentTarget.style.transform = "none"; }}
+          >
+            <span>📥</span>
+            <span>수기 다운로드 (.xlsx)</span>
+          </button>
+
           <button
             onClick={onClose}
             style={{
