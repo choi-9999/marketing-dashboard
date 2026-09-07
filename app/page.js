@@ -3612,9 +3612,9 @@ function extractMentorRowsFromWorkbook(arrayBuffer) {
         department = strVal;
       } else if (keyVal === "지점" || keyVal.includes("branch")) {
         branch = strVal;
-      } else if (keyVal === "1억장학금" || keyVal === "장학그룹" || keyVal.includes("group")) {
+      } else if (keyVal === "1억장학금" || keyVal === "장학그룹" || keyVal === "장학 그룹" || keyVal.includes("group")) {
         group = strVal;
-      } else if (keyVal === "1억 장학금" || keyVal === "장학금액" || keyVal === "장학금" || keyVal.includes("amount")) {
+      } else if (keyVal === "1억 장학금" || keyVal === "장학금액" || keyVal === "장학 금액" || keyVal === "장학금" || keyVal.includes("amount")) {
         const cleanedVal = strVal.replace(/[^0-9.-]+/g, "");
         amount = Number(cleanedVal) || 0;
       } else if (keyVal === "비고" || keyVal === "메모" || keyVal.includes("memo")) {
@@ -8620,10 +8620,18 @@ export default function HomePage() {
           return rest;
         });
       } else if (tab.kind === SPECIAL_MENTOR_TAB_KIND) {
-        data = (tab.mentorRows || []).map(r => {
-          const { id, ...rest } = r;
-          return rest;
-        });
+        data = (tab.mentorRows || []).map(r => ({
+          "멘토여부": r.isMentor ? "O" : "X",
+          "연도": r.year ?? "",
+          "이름": r.name ?? "",
+          "연락처": r.phone ?? "",
+          "합격 대학": r.university ?? "",
+          "학과": r.department ?? "",
+          "지점": r.branch ?? "",
+          "장학 그룹": r.group ?? "",
+          "장학 금액": r.amount ?? 0,
+          "비고": r.memo ?? ""
+        }));
       } else if (tab.kind === SPECIAL_COLLAB_TAB_KIND) {
         data = (tab.collabRows || []).map(r => r.values);
       } else {
@@ -12146,8 +12154,7 @@ export default function HomePage() {
                   엑셀 불러오기
                 </button>
                 {activeTab.kind !== SPECIAL_COLLAB_TAB_KIND &&
-                activeTab.kind !== SPECIAL_FACILITY_TAB_KIND &&
-                activeTab.kind !== SPECIAL_MENTOR_TAB_KIND ? (
+                activeTab.kind !== SPECIAL_FACILITY_TAB_KIND ? (
                   <button
                     className="mini-button"
                     onClick={() => exportToExcel(activeTab)}
