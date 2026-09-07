@@ -9,6 +9,13 @@ const SPECIAL_SOCIAL_TAB_KIND = "special-social";
 const SPECIAL_COLLAB_TAB_KIND = "special-collab";
 const SPECIAL_FACILITY_TAB_KIND = "special-facility";
 const SPECIAL_MENTOR_TAB_KIND = "special-mentor";
+const SCHOLARSHIP_ESSAY_YEAR = "2026";
+const SCHOLARSHIP_ESSAY_DOWNLOADS = {
+  [SCHOLARSHIP_ESSAY_YEAR]: {
+    href: "/downloads/scholarship-essays-2026.xlsx",
+    fileName: "합격수기_2026_전체.xlsx"
+  }
+};
 const BROWSER_SAVE_KEY = "branch-activation-dashboard-state";
 
 const getInstagramDisplayCaption = (rawCaption) => {
@@ -5976,19 +5983,23 @@ export default function HomePage() {
   const [selectedKeywordFilter, setSelectedKeywordFilter] = useState("");
   const [isSnsScoreTooltipOpen, setIsSnsScoreTooltipOpen] = useState(false);
 
-  const handleOpenEssay = useCallback((studentName, studentBranch) => {
+  const handleOpenEssay = useCallback((studentName, studentBranch, studentYear = SCHOLARSHIP_ESSAY_YEAR) => {
     if (!studentName) return;
     const cleanStudentName = String(studentName).trim();
     const cleanBranch = String(studentBranch || "").trim();
+    const cleanYear = String(studentYear || "").trim();
 
-    let essay = (scholarshipEssays || []).find(
-      (e) =>
-        e.name === cleanStudentName &&
-        cleanBranch &&
-        (e.branch.includes(cleanBranch) || cleanBranch.includes(e.branch))
-    );
-    if (!essay) {
-      essay = (scholarshipEssays || []).find((e) => e.name === cleanStudentName);
+    let essay = null;
+    if (cleanYear === SCHOLARSHIP_ESSAY_YEAR) {
+      essay = (scholarshipEssays || []).find(
+        (e) =>
+          e.name === cleanStudentName &&
+          cleanBranch &&
+          (e.branch.includes(cleanBranch) || cleanBranch.includes(e.branch))
+      );
+      if (!essay) {
+        essay = (scholarshipEssays || []).find((e) => e.name === cleanStudentName);
+      }
     }
 
     if (essay) {
@@ -5998,7 +6009,7 @@ export default function HomePage() {
       setCustomModal({
         type: "info",
         title: "합격 수기 안내",
-        message: `'${cleanStudentName}' 학생의 등록된 합격 수기가 없습니다.`,
+        message: `'${cleanYear || "연도 미지정"}년 ${cleanStudentName}' 학생의 등록된 합격 수기가 없습니다.`,
         confirmText: "확인",
         onConfirm: () => setCustomModal(null)
       });
@@ -6438,6 +6449,7 @@ export default function HomePage() {
   const [overviewSearch, setOverviewSearch] = useState("");
   const [snsSearch, setSnsSearch] = useState("");
   const [mentorSearch, setMentorSearch] = useState("");
+  const [mentorYearFilter, setMentorYearFilter] = useState("");
   const [mentorBranchFilter, setMentorBranchFilter] = useState("all");
   const [mentorUnivFilter, setMentorUnivFilter] = useState("all");
   const [areEventChipsExpanded, setAreEventChipsExpanded] = useState(true);
@@ -8025,25 +8037,37 @@ export default function HomePage() {
     return [];
   }, [selectedDashboardTab]);
 
-  const mentorStats = useMemo(() => {
-    const total = mentorRows.length;
-    const mentors = mentorRows.filter((r) => r.isMentor).length;
-    const scholars = total - mentors;
-    const amountSum = mentorRows.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
-    return { total, mentors, scholars, amountSum };
+  const mentorYearOptions = useMemo(() => {
+    return [...new Set(mentorRows.map((r) => String(r.year || "").trim()).filter(Boolean))]
+      .sort((a, b) => (parseInt(b, 10) || 0) - (parseInt(a, 10) || 0));
   }, [mentorRows]);
+
+  const effectiveMentorYearFilter = mentorYearFilter || mentorYearOptions[0] || "all";
+  const yearScopedMentorRows = useMemo(() => {
+    if (effectiveMentorYearFilter === "all") return mentorRows;
+    return mentorRows.filter((r) => String(r.year || "").trim() === effectiveMentorYearFilter);
+  }, [mentorRows, effectiveMentorYearFilter]);
+  const activeMentorEssayDownload = SCHOLARSHIP_ESSAY_DOWNLOADS[effectiveMentorYearFilter] || null;
+
+  const mentorStats = useMemo(() => {
+    const total = yearScopedMentorRows.length;
+    const mentors = yearScopedMentorRows.filter((r) => r.isMentor).length;
+    const scholars = total - mentors;
+    const amountSum = yearScopedMentorRows.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+    return { total, mentors, scholars, amountSum };
+  }, [yearScopedMentorRows]);
 
   const mentorBranchOptions = useMemo(() => {
-    return ["all", ...new Set(mentorRows.map((r) => r.branch.trim()).filter(Boolean))].sort();
-  }, [mentorRows]);
+    return ["all", ...new Set(yearScopedMentorRows.map((r) => r.branch.trim()).filter(Boolean))].sort();
+  }, [yearScopedMentorRows]);
 
   const mentorUnivOptions = useMemo(() => {
-    return ["all", ...new Set(mentorRows.map((r) => r.university.trim()).filter(Boolean))].sort();
-  }, [mentorRows]);
+    return ["all", ...new Set(yearScopedMentorRows.map((r) => r.university.trim()).filter(Boolean))].sort();
+  }, [yearScopedMentorRows]);
 
   const filteredMentorRows = useMemo(() => {
     const search = mentorSearch.trim().toLowerCase();
-    const filtered = mentorRows.filter((r) => {
+    const filtered = yearScopedMentorRows.filter((r) => {
       const matchesSearch = !search ||
         r.name.toLowerCase().includes(search) ||
         (r.year && r.year.toLowerCase().includes(search)) ||
@@ -8065,7 +8089,7 @@ export default function HomePage() {
       if (yB !== yA) return yB - yA;
       return (a.name || "").localeCompare(b.name || "", "ko");
     });
-  }, [mentorRows, mentorSearch, mentorBranchFilter, mentorUnivFilter]);
+  }, [yearScopedMentorRows, mentorSearch, mentorBranchFilter, mentorUnivFilter]);
 
   const mentorsList = useMemo(() => filteredMentorRows.filter((r) => r.isMentor), [filteredMentorRows]);
   const scholarsList = useMemo(() => filteredMentorRows.filter((r) => !r.isMentor), [filteredMentorRows]);
@@ -10410,7 +10434,25 @@ export default function HomePage() {
                 <section className="sheet-panel">
                   <div className="panel-title-row">
                     <h2>멘토단 및 장학생 상세 조회</h2>
-                    <span className="note-text">이름, 대학, 학과, 메모 등으로 검색하거나 필터를 적용하세요.</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                      <span className="note-text">연도별로 조회하고 해당 연도의 전체 합격 수기를 다운로드하세요.</span>
+                      {activeMentorEssayDownload ? (
+                        <a
+                          className="mini-button"
+                          href={activeMentorEssayDownload.href}
+                          download={activeMentorEssayDownload.fileName}
+                          title={`${effectiveMentorYearFilter}년 전체 합격 수기 엑셀 다운로드`}
+                          style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: "800" }}
+                        >
+                          <span aria-hidden="true">📥</span>
+                          {effectiveMentorYearFilter}년 전체 수기 다운로드
+                        </a>
+                      ) : (
+                        <button className="mini-button" type="button" disabled title="다운로드할 연도를 선택하세요.">
+                          연도별 전체 수기 다운로드
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="dashboard-search-row dashboard-search-row-tight" style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap", marginBottom: "20px" }}>
@@ -10423,6 +10465,19 @@ export default function HomePage() {
                     />
                     
                     <div style={{ display: "flex", gap: "10px" }}>
+                      <select
+                        className="branch-selector-dropdown"
+                        value={effectiveMentorYearFilter}
+                        onChange={(e) => setMentorYearFilter(e.target.value)}
+                        aria-label="멘토단 및 장학생 연도 선택"
+                        style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--panel-bg)", color: "var(--text-color)" }}
+                      >
+                        <option value="all">전체 연도</option>
+                        {mentorYearOptions.map((year) => (
+                          <option key={year} value={year}>{year}년</option>
+                        ))}
+                      </select>
+
                       <select
                         className="branch-selector-dropdown"
                         value={mentorBranchFilter}
@@ -10480,7 +10535,7 @@ export default function HomePage() {
                                 <td>
                                   <button
                                     type="button"
-                                    onClick={() => handleOpenEssay(row.name, row.branch)}
+                                    onClick={() => handleOpenEssay(row.name, row.branch, row.year)}
                                     title={`${row.name} 학생 합격 수기 보기`}
                                     style={{
                                       display: "inline-flex",
@@ -10553,7 +10608,7 @@ export default function HomePage() {
                                 <td>
                                   <button
                                     type="button"
-                                    onClick={() => handleOpenEssay(row.name, row.branch)}
+                                    onClick={() => handleOpenEssay(row.name, row.branch, row.year)}
                                     title={`${row.name} 학생 합격 수기 보기`}
                                     style={{
                                       display: "inline-flex",
