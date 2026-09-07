@@ -5729,3 +5729,44 @@ select:focus {
     height: 32px !important;
   }
 }
+
+/* ==========================================================================
+   장학생 합격 수기 모달 전용 스크롤 & 탭 스타일
+   ========================================================================== */
+.essay-modal-body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(37, 99, 235, 0.35) rgba(0, 0, 0, 0.04);
+}
+.essay-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+.essay-modal-body::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+}
+.essay-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(37, 99, 235, 0.3);
+  border-radius: 8px;
+}
+.essay-modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(37, 99, 235, 0.55);
+}
+
+.essay-answer-box {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.45) rgba(0, 0, 0, 0.03);
+}
+.essay-answer-box::-webkit-scrollbar {
+  width: 6px;
+}
+.essay-answer-box::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+}
+.essay-answer-box::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.45);
+  border-radius: 6px;
+}
+.essay-answer-box::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.7);
+}

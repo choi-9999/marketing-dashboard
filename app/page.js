@@ -4633,6 +4633,9 @@ function CustomDialogModal({ modal, onClose }) {
 function ScholarshipEssayModal({ isOpen, onClose, essay }) {
   if (!isOpen || !essay) return null;
 
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const {
     name = "",
     branch = "",
@@ -4701,6 +4704,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
     {
       id: "intro",
       title: "수험 생활 & 학원 선택",
+      shortTitle: "수험 생활",
       icon: "🌟",
       items: [
         { q: "자기소개", a: answers["자기소개"] },
@@ -4712,6 +4716,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
     {
       id: "study",
       title: "학습 관리 & 시스템 활용",
+      shortTitle: "학습 관리",
       icon: "📚",
       items: [
         { q: "학습 관리 시스템 만족 항목 및 유용한 이유", a: [answers["학습 관리 시스템  중 가장 만족했던 것  3가지 "] || answers["학습 관리 시스템 중 가장 만족했던 것 3가지"], answers["학습 관리 시스템이 유용했던 이유"]].filter(Boolean).join("\n\n") },
@@ -4723,6 +4728,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
     {
       id: "life",
       title: "생활 관리 & 슬럼프 극복기",
+      shortTitle: "생활 관리",
       icon: "🛡️",
       items: [
         { q: "생활 관리 시스템 만족 항목 및 유용한 이유", a: [answers["생활 관리 시스템  중 가장 만족했던 3가지"] || answers["생활 관리 시스템 중 가장 만족했던 3가지"], answers["위에서 선택한 생활 관리 시스템 이 어떤 점에서 유용했는지 "] || answers["위에서 선택한 생활 관리 시스템이 어떤 점에서 유용했는지"]].filter(Boolean).join("\n\n") },
@@ -4735,6 +4741,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
     {
       id: "advice",
       title: "대입 지원 전략 & 후배를 위한 응원",
+      shortTitle: "대입 전략",
       icon: "🎯",
       items: [
         { q: "합격 전형 지원 전략 & 입시 상담 진행 과정", a: [answers["합격 전형에 대한  지원 전략"] || answers["합격 전형에 대한 지원 전략"], answers["입시 상담 및 관리 는 어떻게 진행되었는지"] || answers["입시 상담 및 관리는 어떻게 진행되었는지"]].filter(Boolean).join("\n\n") },
@@ -4745,6 +4752,8 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
       ].filter((item) => item.a && item.a.trim())
     }
   ];
+
+  const filteredSections = sections.filter((sec) => activeCategory === "all" || sec.id === activeCategory);
 
   return (
     <div
@@ -4765,7 +4774,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
       <div
         style={{
           width: "100%",
-          maxWidth: "940px",
+          maxWidth: "960px",
           height: "90vh",
           maxHeight: "90vh",
           display: "flex",
@@ -4782,7 +4791,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
         <div
           style={{
             flexShrink: 0,
-            padding: "22px 28px 18px",
+            padding: "20px 28px 16px",
             background: "linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(59, 130, 246, 0.02) 100%)",
             borderBottom: "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
             position: "relative"
@@ -4900,7 +4909,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
               gap: "10px",
-              marginTop: "14px"
+              marginTop: "12px"
             }}
           >
             <div style={{ padding: "8px 12px", borderRadius: "10px", background: "var(--card-bg, rgba(248, 250, 252, 0.8))", border: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))" }}>
@@ -4931,22 +4940,105 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
               </div>
             </div>
           </div>
+
+          {/* 항목별 탭 네비게이션 & 스크롤 모드 제어 바 */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "10px",
+              marginTop: "14px",
+              paddingTop: "12px",
+              borderTop: "1px solid var(--border-color, rgba(226, 232, 240, 0.7))",
+              flexWrap: "wrap"
+            }}
+          >
+            {/* 카테고리 탭 버튼들 */}
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => setActiveCategory("all")}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: "16px",
+                  fontSize: "0.8rem",
+                  fontWeight: activeCategory === "all" ? "700" : "500",
+                  border: activeCategory === "all" ? "1px solid #2563eb" : "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
+                  background: activeCategory === "all" ? "#2563eb" : "var(--panel-bg, #ffffff)",
+                  color: activeCategory === "all" ? "#ffffff" : "var(--text-color, #475569)",
+                  cursor: "pointer",
+                  boxShadow: activeCategory === "all" ? "0 2px 6px rgba(37, 99, 235, 0.25)" : "none",
+                  transition: "all 0.15s"
+                }}
+              >
+                📋 전체 보기 ({sections.reduce((acc, s) => acc + s.items.length, 0)})
+              </button>
+              {sections.map((sec) => (
+                <button
+                  key={sec.id}
+                  type="button"
+                  onClick={() => setActiveCategory(sec.id)}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: "16px",
+                    fontSize: "0.8rem",
+                    fontWeight: activeCategory === sec.id ? "700" : "500",
+                    border: activeCategory === sec.id ? "1px solid #2563eb" : "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
+                    background: activeCategory === sec.id ? "#2563eb" : "var(--panel-bg, #ffffff)",
+                    color: activeCategory === sec.id ? "#ffffff" : "var(--text-color, #475569)",
+                    cursor: "pointer",
+                    boxShadow: activeCategory === sec.id ? "0 2px 6px rgba(37, 99, 235, 0.25)" : "none",
+                    transition: "all 0.15s"
+                  }}
+                >
+                  <span>{sec.icon}</span> <span>{sec.shortTitle || sec.title}</span> ({sec.items.length})
+                </button>
+              ))}
+            </div>
+
+            {/* 개별 수기 항목 스크롤 / 전체 펼치기 전환 토글 */}
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              title={isExpanded ? "각 수기 항목 답변 박스 내 개별 스크롤 모드로 전환" : "모든 수기 답변 내용을 전체 펼쳐서 표시"}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+                padding: "5px 12px",
+                borderRadius: "8px",
+                fontSize: "0.78rem",
+                fontWeight: "600",
+                border: isExpanded ? "1px solid #3b82f6" : "1px solid var(--border-color, rgba(203, 213, 225, 0.8))",
+                background: isExpanded ? "rgba(59, 130, 246, 0.1)" : "var(--card-bg, #f8fafc)",
+                color: isExpanded ? "#2563eb" : "var(--text-muted, #64748b)",
+                cursor: "pointer",
+                transition: "all 0.15s"
+              }}
+            >
+              <span>{isExpanded ? "🔽 항목별 스크롤 모드" : "📖 답변 전체 펼치기"}</span>
+            </button>
+          </div>
         </div>
 
         {/* 모달 본문 (스크롤) */}
         <div
+          className="essay-modal-body"
+          tabIndex={0}
           style={{
-            flex: 1,
+            flex: "1 1 auto",
             minHeight: 0,
             overflowY: "auto",
+            overscrollBehavior: "contain",
             WebkitOverflowScrolling: "touch",
-            padding: "24px 28px",
+            padding: "22px 28px 30px",
             display: "flex",
             flexDirection: "column",
-            gap: "24px"
+            gap: "22px"
           }}
         >
-          {sections.map((sec) => {
+          {filteredSections.map((sec) => {
             if (!sec.items || sec.items.length === 0) return null;
             return (
               <div
@@ -4974,6 +5066,9 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
                 >
                   <span>{sec.icon}</span>
                   <span>{sec.title}</span>
+                  <span style={{ fontSize: "0.78rem", color: "var(--text-muted, #64748b)", fontWeight: "500", marginLeft: "4px" }}>
+                    (총 {sec.items.length}개 항목)
+                  </span>
                 </div>
 
                 {/* 섹션 질문/답변 리스트 */}
@@ -4986,15 +5081,17 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
                         background: "var(--panel-bg, #ffffff)",
                         border: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))",
                         padding: "16px",
-                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.02)"
+                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.02)",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px"
                       }}
                     >
                       <div
                         style={{
                           display: "flex",
                           alignItems: "flex-start",
-                          gap: "8px",
-                          marginBottom: "10px"
+                          gap: "8px"
                         }}
                       >
                         <span
@@ -5009,7 +5106,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
                             flexShrink: 0
                           }}
                         >
-                          Q
+                          Q{qIdx + 1}
                         </span>
                         <h4
                           style={{
@@ -5024,14 +5121,24 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
                         </h4>
                       </div>
 
+                      {/* 개별 수기 항목 답변 박스 (각 수기 항목별 스크롤 영역) */}
                       <div
+                        className="essay-answer-box"
+                        tabIndex={0}
                         style={{
                           fontSize: "0.91rem",
                           lineHeight: "1.75",
                           color: "var(--text-color, #334155)",
                           whiteSpace: "pre-wrap",
                           wordBreak: "break-word",
-                          paddingLeft: "26px"
+                          padding: "12px 16px",
+                          background: "var(--card-bg, rgba(248, 250, 252, 0.75))",
+                          borderRadius: "10px",
+                          border: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))",
+                          maxHeight: isExpanded ? "none" : "240px",
+                          overflowY: isExpanded ? "visible" : "auto",
+                          overscrollBehavior: "contain",
+                          WebkitOverflowScrolling: "touch"
                         }}
                       >
                         {item.a}
