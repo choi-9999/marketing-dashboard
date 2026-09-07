@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo, useRef, useState, Fragment, useCallback } from "react";
 import * as XLSX from "xlsx";
-import scholarshipEssays from "./data/scholarshipEssays.json";
+import scholarshipEssays2025 from "./data/scholarshipEssays2025.json";
+import scholarshipEssays2026 from "./data/scholarshipEssays.json";
 
 const OVERVIEW_TAB_ID = "__overall__";
 const SPECIAL_SOCIAL_TAB_KIND = "special-social";
@@ -10,7 +11,15 @@ const SPECIAL_COLLAB_TAB_KIND = "special-collab";
 const SPECIAL_FACILITY_TAB_KIND = "special-facility";
 const SPECIAL_MENTOR_TAB_KIND = "special-mentor";
 const SCHOLARSHIP_ESSAY_YEAR = "2026";
+const SCHOLARSHIP_ESSAYS_BY_YEAR = {
+  "2025": scholarshipEssays2025,
+  "2026": scholarshipEssays2026
+};
 const SCHOLARSHIP_ESSAY_DOWNLOADS = {
+  "2025": {
+    href: "/downloads/scholarship-essays-2025.xlsx",
+    fileName: "합격수기_2025_전체.xlsx"
+  },
   [SCHOLARSHIP_ESSAY_YEAR]: {
     href: "/downloads/scholarship-essays-2026.xlsx",
     fileName: "합격수기_2026_전체.xlsx"
@@ -287,8 +296,8 @@ function createSpecialMentorRow(seed = {}) {
 }
 
 function createSpecialMentorTab(id, name, seededRows = []) {
-  const defaultSeeds = (Array.isArray(scholarshipEssays) && scholarshipEssays.length > 0)
-    ? scholarshipEssays.map((item, idx) => ({
+  const defaultSeeds = (Array.isArray(scholarshipEssays2026) && scholarshipEssays2026.length > 0)
+    ? scholarshipEssays2026.map((item, idx) => ({
         year: "2026",
         name: item.name,
         phone: "",
@@ -2800,8 +2809,8 @@ function migrateLegacyTab(tab) {
   if (tab.kind === SPECIAL_MENTOR_TAB_KIND) {
     let rowsToMigrate = Array.isArray(tab.mentorRows) ? tab.mentorRows : [];
     const isLegacySample = rowsToMigrate.length <= 2 && rowsToMigrate.every(r => r.name === "김철수" || r.name === "이영희");
-    if ((rowsToMigrate.length === 0 || isLegacySample) && Array.isArray(scholarshipEssays) && scholarshipEssays.length > 0) {
-      rowsToMigrate = scholarshipEssays.map((item, idx) => ({
+    if ((rowsToMigrate.length === 0 || isLegacySample) && Array.isArray(scholarshipEssays2026) && scholarshipEssays2026.length > 0) {
+      rowsToMigrate = scholarshipEssays2026.map((item, idx) => ({
         year: "2026",
         name: item.name,
         phone: "",
@@ -4644,6 +4653,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const {
+    year = SCHOLARSHIP_ESSAY_YEAR,
     name = "",
     branch = "",
     targetUnivDept = "",
@@ -4656,6 +4666,14 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
     weakSubject = "",
     answers = {}
   } = essay;
+
+  const getAnswer = (...keys) => {
+    for (const key of keys) {
+      const value = answers[key];
+      if (value != null && String(value).trim()) return String(value);
+    }
+    return "";
+  };
 
   const handleDownloadExcel = () => {
     try {
@@ -4677,12 +4695,18 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
           [
             "이름",
             "재원지점",
+            "재원 지점",
             "최종 등록 대학 및 학과",
+            "합격 대학 및 학과",
             "재원일수",
+            "재원 기간(개월)",
             "재원유형",
+            "재원 유형",
             "윈터스쿨 재원 유무",
             "합격전형",
-            "자신이 가장 취약했던 과목"
+            "합격 전형",
+            "자신이 가장 취약했던 과목",
+            "자신이 취약했던 과목"
           ].includes(key)
         ) {
           return;
@@ -4699,7 +4723,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
       worksheet["!cols"] = [{ wch: 32 }, { wch: 90 }];
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "합격수기");
-      const safeFileName = `합격수기_2026_${name}_${branch}점_${targetUnivDept || university}.xlsx`.replace(/[\\/:*?"<>|]/g, "_");
+      const safeFileName = `합격수기_${year}_${name}_${branch}점_${targetUnivDept || university}.xlsx`.replace(/[\\/:*?"<>|]/g, "_");
       XLSX.writeFile(workbook, safeFileName);
     } catch (err) {
       console.error("수기 엑셀 다운로드 오류:", err);
@@ -4714,10 +4738,10 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
       shortTitle: "수험 생활",
       icon: "🌟",
       items: [
-        { q: "자기소개", a: answers["자기소개"] },
-        { q: "이투스247학원을 선택한 이유", a: answers["이투스247학원을  선택한 이유"] || answers["이투스247학원을 선택한 이유"] },
-        { q: "가장 마음에 들었던 공간 및 이유", a: [answers["이투스247학원에서 가장 마음에 들었던 공간"], answers["위에서 선택한 공간이  왜 마음에 들었는지."] || answers["위에서 선택한 공간이 왜 마음에 들었는지."]].filter(Boolean).join("\n\n") },
-        { q: "이투스247학원에서의 하루 루틴", a: answers["이투스247학원에서의  하루 루틴"] || answers["이투스247학원에서의 하루 루틴"] }
+        { q: "자기소개", a: getAnswer("자기소개", "자기 소개") },
+        { q: "이투스247학원을 선택한 이유", a: getAnswer("이투스247학원을  선택한 이유", "이투스247학원을 선택한 이유") },
+        { q: "가장 마음에 들었던 공간 및 이유", a: [getAnswer("이투스247학원에서 가장 마음에 들었던 공간", "이투스247학원에서 마음에 들었던 공간"), getAnswer("위에서 선택한 공간이  왜 마음에 들었는지.", "위에서 선택한 공간이 왜 마음에 들었는지.", "공간이 왜 마음에 들었는지")].filter(Boolean).join("\n\n") },
+        { q: "이투스247학원에서의 하루 루틴", a: getAnswer("이투스247학원에서의  하루 루틴", "이투스247학원에서의 하루 루틴") }
       ].filter((item) => item.a && item.a.trim())
     },
     {
@@ -4726,10 +4750,10 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
       shortTitle: "학습 관리",
       icon: "📚",
       items: [
-        { q: "학습 관리 시스템 만족 항목 및 유용한 이유", a: [answers["학습 관리 시스템  중 가장 만족했던 것  3가지 "] || answers["학습 관리 시스템 중 가장 만족했던 것 3가지"], answers["학습 관리 시스템이 유용했던 이유"]].filter(Boolean).join("\n\n") },
-        { q: "MY247 프로그램 활용 및 유용한 점", a: [answers["MY247 프로그램  중 가장 유용하게 활용한 2가지"] || answers["MY247 프로그램 중 가장 유용하게 활용한 2가지"], answers["선택한  MY247 프로그램 이 어떤 점에서 유용했는지"] || answers["선택한 MY247 프로그램이 어떤 점에서 유용했는지"]].filter(Boolean).join("\n\n") },
-        { q: "재원생 전용 학습 콘텐츠 활용법", a: [answers["재원생 전용 학습 콘텐츠 중 가장 유용하게 활용한 것"], answers["선택한 재원생 전용 학습 콘텐츠를 활용한 방법"]].filter(Boolean).join("\n\n") },
-        { q: "나만의 학습 스케줄 작성 TIP", a: answers["나만의  학습 스케줄 작성 TIP"] || answers["나만의 학습 스케줄 작성 TIP"] }
+        { q: "학습 관리 시스템 만족 항목 및 유용한 이유", a: [getAnswer("학습 관리 시스템  중 가장 만족했던 것  3가지 ", "학습 관리 시스템 중 가장 만족했던 것 3가지", "학습 관리 시스템 중 가장 만족했던 것"), getAnswer("학습 관리 시스템이 유용했던 이유", "학습 관리 시스템 만족한 이유")].filter(Boolean).join("\n\n") },
+        { q: "MY247 프로그램 활용 및 유용한 점", a: [getAnswer("MY247 프로그램  중 가장 유용하게 활용한 2가지", "MY247 프로그램 중 가장 유용하게 활용한 2가지", "MY247 프로그램 유용하게 활용한 2가지"), getAnswer("선택한  MY247 프로그램 이 어떤 점에서 유용했는지", "선택한 MY247 프로그램이 어떤 점에서 유용했는지", "MY247 프로그램 유용한 이유")].filter(Boolean).join("\n\n") },
+        { q: "재원생 전용 학습 콘텐츠 활용법", a: [getAnswer("재원생 전용 학습 콘텐츠 중 가장 유용하게 활용한 것", "재원생 전용 학습 콘텐츠 유용하게 활용한 것"), getAnswer("선택한 재원생 전용 학습 콘텐츠를 활용한 방법", "재원생 전용 학습 콘텐츠를 활용한 방법")].filter(Boolean).join("\n\n") },
+        { q: "나만의 학습 스케줄 작성 TIP", a: getAnswer("나만의  학습 스케줄 작성 TIP", "나만의 학습 스케줄 작성 TIP") }
       ].filter((item) => item.a && item.a.trim())
     },
     {
@@ -4738,11 +4762,11 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
       shortTitle: "생활 관리",
       icon: "🛡️",
       items: [
-        { q: "생활 관리 시스템 만족 항목 및 유용한 이유", a: [answers["생활 관리 시스템  중 가장 만족했던 3가지"] || answers["생활 관리 시스템 중 가장 만족했던 3가지"], answers["위에서 선택한 생활 관리 시스템 이 어떤 점에서 유용했는지 "] || answers["위에서 선택한 생활 관리 시스템이 어떤 점에서 유용했는지"]].filter(Boolean).join("\n\n") },
-        { q: "취약 과목 극복 학습법", a: [answers["자신이 가장 취약했던 과목"] ? `[취약 과목]: ${answers["자신이 가장 취약했던 과목"]}` : "", answers["위에서 선택한  취약과목을 극복한 자신만의 특별한 학습법"] || answers["위에서 선택한 취약과목을 극복한 자신만의 특별한 학습법"]].filter(Boolean).join("\n\n") },
-        { q: "피로 및 집중력 저하 극복법", a: answers["집중력이 떨어졌을 때나 피곤할 때 힘을 나게 하는 자신만의 방법 "] || answers["집중력이 떨어졌을 때나 피곤할 때 힘을 나게 하는 자신만의 방법"] },
-        { q: "자신만의 슬럼프 극복법", a: answers["자신만의 슬럼프 극복법"] },
-        { q: "학원을 안 갔거나 조퇴했을 때의 시간 활용", a: answers[" 학원을 안 갔을 때, 조퇴했을 때   시간을 어떻게 보냈는지"] || answers["학원을 안 갔을 때, 조퇴했을 때 시간을 어떻게 보냈는지"] }
+        { q: "생활 관리 시스템 만족 항목 및 유용한 이유", a: [getAnswer("생활 관리 시스템  중 가장 만족했던 3가지", "생활 관리 시스템 중 가장 만족했던 3가지", "생활 관리 시스템 만족했던 것"), getAnswer("위에서 선택한 생활 관리 시스템 이 어떤 점에서 유용했는지 ", "위에서 선택한 생활 관리 시스템이 어떤 점에서 유용했는지", "생활 관리 시스템이 어떤 점에서 유용했는지")].filter(Boolean).join("\n\n") },
+        { q: "취약 과목 극복 학습법", a: [getAnswer("자신이 가장 취약했던 과목", "자신이 취약했던 과목") ? `[취약 과목]: ${getAnswer("자신이 가장 취약했던 과목", "자신이 취약했던 과목")}` : "", getAnswer("위에서 선택한  취약과목을 극복한 자신만의 특별한 학습법", "위에서 선택한 취약과목을 극복한 자신만의 특별한 학습법", "취약과목을 극복한 특별한 학습법은?")].filter(Boolean).join("\n\n") },
+        { q: "피로 및 집중력 저하 극복법", a: getAnswer("집중력이 떨어졌을 때나 피곤할 때 힘을 나게 하는 자신만의 방법 ", "집중력이 떨어졌을 때나 피곤할 때 힘을 나게 하는 자신만의 방법") },
+        { q: "자신만의 슬럼프 극복법", a: getAnswer("자신만의 슬럼프 극복법") },
+        { q: "학원을 안 갔거나 조퇴했을 때의 시간 활용", a: getAnswer(" 학원을 안 갔을 때, 조퇴했을 때   시간을 어떻게 보냈는지", "학원을 안 갔을 때, 조퇴했을 때 시간을 어떻게 보냈는지", "학원을 안 갔을 때, 조퇴했을 때 시간 보내는 법") }
       ].filter((item) => item.a && item.a.trim())
     },
     {
@@ -4751,11 +4775,12 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
       shortTitle: "대입 전략",
       icon: "🎯",
       items: [
-        { q: "합격 전형 지원 전략 & 입시 상담 진행 과정", a: [answers["합격 전형에 대한  지원 전략"] || answers["합격 전형에 대한 지원 전략"], answers["입시 상담 및 관리 는 어떻게 진행되었는지"] || answers["입시 상담 및 관리는 어떻게 진행되었는지"]].filter(Boolean).join("\n\n") },
-        { q: "27학년도 수험생들에게 도움이 될 메시지", a: answers[" 27학년도 수험생들에게   도움이 될 메시지"] || answers["27학년도 수험생들에게 도움이 될 메시지"] },
-        { q: "시기별(6평/9평/파이널) 응원의 메시지", a: answers["시기별(6평/9평/파이널) 응원의 메시지"] },
-        { q: "27학년도 N수생들에게 이투스247학원을 추천하는 이유", a: answers[" 27학년도 n수생들에게 이투스247학원을 추천하는 이유"] || answers["27학년도 n수생들에게 이투스247학원을 추천하는 이유"] },
-        { q: "부모님 또는 이투스247학원 선생님들께 감사 인사", a: answers[" 부모님 또는 이투스247학원 선생님들께 감사 인사"] || answers["부모님 또는 이투스247학원 선생님들께 감사 인사"] }
+        { q: "합격 전형 지원 전략 & 입시 상담 진행 과정", a: [getAnswer("합격 전형에 대한  지원 전략", "합격 전형에 대한 지원 전략", "자신의 합격 지원 전략"), getAnswer("입시 상담 및 관리 는 어떻게 진행되었는지", "입시 상담 및 관리는 어떻게 진행되었는지", "이투스247학원에서 입시 상담 및 관리")].filter(Boolean).join("\n\n") },
+        { q: "시기별 추천 학습법과 전략", a: getAnswer("시기별 추천 학습법과 전략 을 알려주세요") },
+        { q: `${Number(year) + 1}학년도 수험생들에게 도움이 될 메시지`, a: getAnswer(" 27학년도 수험생들에게   도움이 될 메시지", "27학년도 수험생들에게 도움이 될 메시지", "26학년도 수험생들에게 도움이 될 메시지") },
+        { q: "시기별(6평/9평/파이널) 응원의 메시지", a: getAnswer("시기별(6평/9평/파이널) 응원의 메시지") },
+        { q: "27학년도 N수생들에게 이투스247학원을 추천하는 이유", a: getAnswer(" 27학년도 n수생들에게 이투스247학원을 추천하는 이유", "27학년도 n수생들에게 이투스247학원을 추천하는 이유") },
+        { q: "부모님 또는 이투스247학원 선생님들께 감사 인사", a: getAnswer(" 부모님 또는 이투스247학원 선생님들께 감사 인사", "부모님 또는 이투스247학원 선생님들께 감사 인사", "이투스247학원 선생님 들께 감사 인사") }
       ].filter((item) => item.a && item.a.trim())
     }
   ];
@@ -4818,7 +4843,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
                   boxShadow: "0 2px 6px rgba(37, 99, 235, 0.3)"
                 }}
               >
-                🎓 2026 장학생 명예의 전당
+                🎓 {year} 장학생 명예의 전당
               </span>
               <span
                 style={{
@@ -5989,21 +6014,19 @@ export default function HomePage() {
     const cleanBranch = String(studentBranch || "").trim();
     const cleanYear = String(studentYear || "").trim();
 
-    let essay = null;
-    if (cleanYear === SCHOLARSHIP_ESSAY_YEAR) {
-      essay = (scholarshipEssays || []).find(
+    const yearEssays = SCHOLARSHIP_ESSAYS_BY_YEAR[cleanYear] || [];
+    let essay = yearEssays.find(
         (e) =>
           e.name === cleanStudentName &&
           cleanBranch &&
           (e.branch.includes(cleanBranch) || cleanBranch.includes(e.branch))
       );
-      if (!essay) {
-        essay = (scholarshipEssays || []).find((e) => e.name === cleanStudentName);
-      }
+    if (!essay) {
+      essay = yearEssays.find((e) => e.name === cleanStudentName);
     }
 
     if (essay) {
-      setSelectedEssayStudent(essay);
+      setSelectedEssayStudent({ ...essay, year: cleanYear });
       setIsEssayModalOpen(true);
     } else {
       setCustomModal({
