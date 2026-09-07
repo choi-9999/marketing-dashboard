@@ -5044,6 +5044,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
               <div
                 key={sec.id}
                 style={{
+                  flexShrink: 0,
                   borderRadius: "16px",
                   border: "1px solid var(--border-color, rgba(226, 232, 240, 0.8))",
                   background: "var(--card-bg, rgba(248, 250, 252, 0.5))",
@@ -5137,7 +5138,7 @@ function ScholarshipEssayModal({ isOpen, onClose, essay }) {
                           border: "1px solid var(--border-color, rgba(226, 232, 240, 0.6))",
                           maxHeight: isExpanded ? "none" : "240px",
                           overflowY: isExpanded ? "visible" : "auto",
-                          overscrollBehavior: "contain",
+                          overscrollBehavior: "auto",
                           WebkitOverflowScrolling: "touch"
                         }}
                       >
