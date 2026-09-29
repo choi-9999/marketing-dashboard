@@ -6472,7 +6472,7 @@ export default function HomePage() {
   const [overviewSearch, setOverviewSearch] = useState("");
   const [snsSearch, setSnsSearch] = useState("");
   const [mentorSearch, setMentorSearch] = useState("");
-  const [mentorYearFilter, setMentorYearFilter] = useState("");
+  const [mentorYearFilter, setMentorYearFilter] = useState("all");
   const [mentorBranchFilter, setMentorBranchFilter] = useState("all");
   const [mentorUnivFilter, setMentorUnivFilter] = useState("all");
   const [areEventChipsExpanded, setAreEventChipsExpanded] = useState(true);
