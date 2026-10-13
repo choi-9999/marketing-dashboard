@@ -2911,6 +2911,22 @@ function migrateLegacyTab(tab) {
     }));
   }
 
+  // Some source workbooks use the event name itself as the column header
+  // (for example, "23수시" or "마케팅교육(SNS)") and store participant
+  // counts directly below it. When no explicit 참여여부/인원 columns exist,
+  // treat every non-identity column as an event instead of discarding it.
+  if (eventDefinitions.length === 0) {
+    eventDefinitions = columns
+      .map((column, index) => ({ column: String(column || "").trim(), index }))
+      .filter((item) => item.column && item.index !== regionIndex && item.index !== branchIndex)
+      .map((item, index) => ({
+        id: createId(`event-${index}`),
+        name: item.column,
+        statusIndex: -1,
+        participantIndex: item.index
+      }));
+  }
+
   if (eventDefinitions.length === 0) {
     eventDefinitions = [
       {

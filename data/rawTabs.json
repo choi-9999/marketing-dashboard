@@ -1,5 +1,5 @@
 {
-  "page": "report",
+  "page": "rawdata",
   "rawTabs": [
     {
       "id": "tab-social-1",
@@ -15654,9 +15654,3846 @@
           "memo": ""
         }
       ]
+    },
+    {
+      "id": "tab-1791877937129",
+      "name": "교육",
+      "kind": "default",
+      "events": [
+        {
+          "id": "event-0-1791877967692-un3vh0",
+          "name": "23수시"
+        },
+        {
+          "id": "event-1-1791877967692-8c2lu4",
+          "name": "마케팅교육(영상 1차)"
+        },
+        {
+          "id": "event-2-1791877967693-rlg8z6",
+          "name": "23정시"
+        },
+        {
+          "id": "event-3-1791877967693-h12m0j",
+          "name": "마케팅교육(영상 2차)"
+        },
+        {
+          "id": "event-4-1791877967693-lu0rdd",
+          "name": "24수시"
+        },
+        {
+          "id": "event-5-1791877967693-h3ue8k",
+          "name": "마케팅교육(SNS)"
+        },
+        {
+          "id": "event-6-1791877967693-p701ev",
+          "name": "24정시"
+        },
+        {
+          "id": "event-7-1791877967693-fdb982",
+          "name": "25수시"
+        },
+        {
+          "id": "event-8-1791877967693-mfsu03",
+          "name": "25정시"
+        },
+        {
+          "id": "event-9-1791877967693-sjg4sc",
+          "name": "26수시"
+        },
+        {
+          "id": "event-10-1791877967693-hzjrx3",
+          "name": "26정시"
+        },
+        {
+          "id": "event-11-1791877967693-0pugjq",
+          "name": "27수시"
+        }
+      ],
+      "rows": [
+        {
+          "id": "row-0-1791877967693-oxrsj4",
+          "region": "서울",
+          "branch": "대치",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "3"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "5"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "6"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "4"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-1-1791877967693-gbkjul",
+          "region": "서울",
+          "branch": "강북",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-2-1791877967693-cizz8j",
+          "region": "서울",
+          "branch": "노량진",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-3-1791877967693-smgfal",
+          "region": "서울",
+          "branch": "마포",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "3"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "3"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "3"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-4-1791877967693-gekl19",
+          "region": "서울",
+          "branch": "목동",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "5"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "2"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-5-1791877967693-e9sr9a",
+          "region": "서울",
+          "branch": "목동오목교",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-6-1791877967693-u6x4wi",
+          "region": "서울",
+          "branch": "서울강동",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-7-1791877967693-tb4lgu",
+          "region": "서울",
+          "branch": "서울강서",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-8-1791877967693-v7r13i",
+          "region": "서울",
+          "branch": "서울광진",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "3"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-9-1791877967693-10ypr4",
+          "region": "서울",
+          "branch": "서울대점",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-10-1791877967693-pdcf1n",
+          "region": "서울",
+          "branch": "서울도봉",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-11-1791877967693-a86iow",
+          "region": "서울",
+          "branch": "서울성동",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "4"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "2"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-12-1791877967693-a1gefw",
+          "region": "서울",
+          "branch": "서울성북",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-13-1791877967693-kch78s",
+          "region": "서울",
+          "branch": "서울송파",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-14-1791877967693-xzhfta",
+          "region": "서울",
+          "branch": "은평서대문",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "3"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "3"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-15-1791877967693-6q93ks",
+          "region": "경기",
+          "branch": "광명",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-16-1791877967693-b5foml",
+          "region": "경기",
+          "branch": "구리남양주",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-17-1791877967693-enr1gt",
+          "region": "경기",
+          "branch": "김포",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-18-1791877967693-aaxcyu",
+          "region": "경기",
+          "branch": "동탄",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "3"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "3"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-19-1791877967693-tk2xoj",
+          "region": "경기",
+          "branch": "부천",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-20-1791877967693-b2afrj",
+          "region": "경기",
+          "branch": "분당정자",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "3"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "4"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "4"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-21-1791877967693-2yq43c",
+          "region": "경기",
+          "branch": "수원시청",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-22-1791877967693-n3ikj4",
+          "region": "경기",
+          "branch": "수원영통",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-23-1791877967693-97x7ud",
+          "region": "경기",
+          "branch": "수원정자",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-24-1791877967693-85cg1q",
+          "region": "경기",
+          "branch": "안산",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-25-1791877967693-a39ryv",
+          "region": "경기",
+          "branch": "용인수지",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-26-1791877967693-c45ctg",
+          "region": "경기",
+          "branch": "의정부",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-27-1791877967693-dhrm58",
+          "region": "경기",
+          "branch": "일산동구",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-28-1791877967693-cr88es",
+          "region": "경기",
+          "branch": "일산서구",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-29-1791877967693-agn38z",
+          "region": "경기",
+          "branch": "일산화정",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-30-1791877967693-5gounf",
+          "region": "경기",
+          "branch": "파주",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-31-1791877967693-ch4b57",
+          "region": "경기",
+          "branch": "평택",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "4"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "3"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "3"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "2"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-32-1791877967693-pyymtg",
+          "region": "경기",
+          "branch": "하남",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-33-1791877967693-kxaiff",
+          "region": "경기",
+          "branch": "다산",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "4"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-34-1791877967693-mf7hks",
+          "region": "인천",
+          "branch": "인천부평",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-35-1791877967693-ftegga",
+          "region": "인천",
+          "branch": "인천송도",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-36-1791877967693-itudxe",
+          "region": "인천",
+          "branch": "인천청라",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-37-1791877967693-9k9ubz",
+          "region": "강원",
+          "branch": "원주",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "3"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-38-1791877967693-95r6j2",
+          "region": "강원",
+          "branch": "춘천",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-39-1791877967693-hw61b4",
+          "region": "충청",
+          "branch": "대전둔산",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-40-1791877967693-of7cp6",
+          "region": "충청",
+          "branch": "천안",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-41-1791877967693-s7dq0x",
+          "region": "충청",
+          "branch": "청주",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-42-1791877967693-wfi352",
+          "region": "전라",
+          "branch": "광주남구",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-43-1791877967693-28loox",
+          "region": "전라",
+          "branch": "광주동구",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "3"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "5"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-44-1791877967693-kddjdb",
+          "region": "전라",
+          "branch": "광주북구",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-45-1791877967693-dj8b3c",
+          "region": "전라",
+          "branch": "광주수완",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-46-1791877967693-ov50fo",
+          "region": "전라",
+          "branch": "목포",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-47-1791877967693-uf6o1a",
+          "region": "전라",
+          "branch": "익산",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-48-1791877967693-czepwc",
+          "region": "경상",
+          "branch": "대구달서",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-49-1791877967693-nb68uc",
+          "region": "경상",
+          "branch": "대구수성 1관",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-50-1791877967693-njn60l",
+          "region": "경상",
+          "branch": "대구수성 2관",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-51-1791877967693-0h239o",
+          "region": "경상",
+          "branch": "부산교대",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-52-1791877967693-bvli5b",
+          "region": "경상",
+          "branch": "부산대",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-53-1791877967693-d7qs38",
+          "region": "경상",
+          "branch": "부산북구",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-54-1791877967693-f8w01q",
+          "region": "경상",
+          "branch": "부산서면",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-55-1791877967693-nerjft",
+          "region": "경상",
+          "branch": "부산해운대",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-56-1791877967693-k7tq33",
+          "region": "경상",
+          "branch": "울산남구",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-57-1791877967693-jp28b4",
+          "region": "경상",
+          "branch": "진주",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-58-1791877967693-07jxh6",
+          "region": "경상",
+          "branch": "창원",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "X",
+              "participants": "0"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-59-1791877967693-71zkr1",
+          "region": "제주",
+          "branch": "제주",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "1"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-60-1791877967693-ryzbz2",
+          "region": "기숙",
+          "branch": "안성기숙",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "2"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "2"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-61-1791877967693-9xgzcw",
+          "region": "기숙",
+          "branch": "이천기숙",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "4"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "3"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": "row-62-1791877967693-pahgs5",
+          "region": "기숙",
+          "branch": "독학기숙",
+          "eventValues": {
+            "event-0-1791877967692-un3vh0": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-1-1791877967692-8c2lu4": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-2-1791877967693-rlg8z6": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-3-1791877967693-h12m0j": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-4-1791877967693-lu0rdd": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-5-1791877967693-h3ue8k": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-6-1791877967693-p701ev": {
+              "status": "X",
+              "participants": "0"
+            },
+            "event-7-1791877967693-fdb982": {
+              "status": "O",
+              "participants": "5"
+            },
+            "event-8-1791877967693-mfsu03": {
+              "status": "O",
+              "participants": "5"
+            },
+            "event-9-1791877967693-sjg4sc": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-10-1791877967693-hzjrx3": {
+              "status": "O",
+              "participants": "1"
+            },
+            "event-11-1791877967693-0pugjq": {
+              "status": "O",
+              "participants": "2"
+            }
+          },
+          "representativeLinks": [
+            "",
+            "",
+            ""
+          ]
+        }
+      ]
     }
   ],
-  "activeTabId": "tab-social-1",
-  "dashboardTabId": "__overall__",
-  "updatedAt": "2026-08-31T05:02:43.288Z"
+  "activeTabId": "tab-1791877937129",
+  "dashboardTabId": "tab-1791877937129",
+  "updatedAt": "2026-10-13T07:52:50.295Z"
 }
