@@ -2,6 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { kv } from "@vercel/kv";
 import { isAdminAuthenticated } from "../../lib/adminAuth";
+import { sanitizeRawTabsForPublic } from "../../lib/mentorPrivacy";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -128,7 +129,9 @@ export async function GET() {
     const data = await readRawTabs();
 
     if (data) {
-      return Response.json({ ...data, storageMode }, { headers: noStoreHeaders });
+      const isAdmin = await isAdminAuthenticated();
+      const responseData = isAdmin ? data : sanitizeRawTabsForPublic(data);
+      return Response.json({ ...responseData, storageMode }, { headers: noStoreHeaders });
     }
 
     if (storageMode === "browser-fallback") {

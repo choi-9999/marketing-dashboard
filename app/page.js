@@ -2,8 +2,6 @@
 
 import React, { useEffect, useMemo, useRef, useState, Fragment, useCallback } from "react";
 import * as XLSX from "xlsx";
-import scholarshipEssays2025 from "./data/scholarshipEssays2025.json";
-import scholarshipEssays2026 from "./data/scholarshipEssays.json";
 
 const OVERVIEW_TAB_ID = "__overall__";
 const SPECIAL_SOCIAL_TAB_KIND = "special-social";
@@ -11,10 +9,6 @@ const SPECIAL_COLLAB_TAB_KIND = "special-collab";
 const SPECIAL_FACILITY_TAB_KIND = "special-facility";
 const SPECIAL_MENTOR_TAB_KIND = "special-mentor";
 const SCHOLARSHIP_ESSAY_YEAR = "2026";
-const SCHOLARSHIP_ESSAYS_BY_YEAR = {
-  "2025": scholarshipEssays2025,
-  "2026": scholarshipEssays2026
-};
 const SCHOLARSHIP_ESSAY_DOWNLOADS = {
   "2025": {
     href: "/downloads/scholarship-essays-2025.xlsx",
@@ -296,47 +290,7 @@ function createSpecialMentorRow(seed = {}) {
 }
 
 function createSpecialMentorTab(id, name, seededRows = []) {
-  const defaultSeeds = (Array.isArray(scholarshipEssays2026) && scholarshipEssays2026.length > 0)
-    ? scholarshipEssays2026.map((item, idx) => ({
-        year: "2026",
-        name: item.name,
-        phone: "",
-        university: item.university,
-        department: item.department,
-        branch: item.branch,
-        group: "1억장학금",
-        amount: 2000000,
-        isMentor: idx < 10,
-        memo: `${item.type || 'N수생'} | ${item.admissionType || '정시'}`
-      }))
-    : [
-        {
-          year: "2026",
-          name: "김철수",
-          phone: "010-1234-5678",
-          university: "서울대학교",
-          department: "의예과",
-          branch: "강남",
-          group: "1그룹",
-          amount: 3000000,
-          isMentor: true,
-          memo: "우수 멘토"
-        },
-        {
-          year: "2026",
-          name: "이영희",
-          phone: "010-5678-1234",
-          university: "연세대학교",
-          department: "치의예과",
-          branch: "대치",
-          group: "2그룹",
-          amount: 2000000,
-          isMentor: false,
-          memo: ""
-        }
-      ];
-
-  const rows = (seededRows.length > 0 ? seededRows : defaultSeeds).map((row) => createSpecialMentorRow(row));
+  const rows = seededRows.map((row) => createSpecialMentorRow(row));
 
   const sortedRows = [...rows].sort((a, b) => {
     const yA = parseInt(a.year, 10) || 0;
@@ -2807,22 +2761,7 @@ function migrateLegacyTab(tab) {
   }
 
   if (tab.kind === SPECIAL_MENTOR_TAB_KIND) {
-    let rowsToMigrate = Array.isArray(tab.mentorRows) ? tab.mentorRows : [];
-    const isLegacySample = rowsToMigrate.length <= 2 && rowsToMigrate.every(r => r.name === "김철수" || r.name === "이영희");
-    if ((rowsToMigrate.length === 0 || isLegacySample) && Array.isArray(scholarshipEssays2026) && scholarshipEssays2026.length > 0) {
-      rowsToMigrate = scholarshipEssays2026.map((item, idx) => ({
-        year: "2026",
-        name: item.name,
-        phone: "",
-        university: item.university,
-        department: item.department,
-        branch: item.branch,
-        group: "1억장학금",
-        amount: 2000000,
-        isMentor: idx < 10,
-        memo: `${item.type || 'N수생'} | ${item.admissionType || '정시'}`
-      }));
-    }
+    const rowsToMigrate = Array.isArray(tab.mentorRows) ? tab.mentorRows : [];
     const sortedMentorRows = rowsToMigrate
       .map((row, index) => createSpecialMentorRow({ ...row, id: row?.id || createId(`mentor-row-${index}`) }))
       .sort((a, b) => {
@@ -6024,36 +5963,50 @@ export default function HomePage() {
   const [selectedKeywordFilter, setSelectedKeywordFilter] = useState("");
   const [isSnsScoreTooltipOpen, setIsSnsScoreTooltipOpen] = useState(false);
 
-  const handleOpenEssay = useCallback((studentName, studentBranch, studentYear = SCHOLARSHIP_ESSAY_YEAR) => {
+  const handleOpenEssay = useCallback(async (studentName, studentBranch, studentYear = SCHOLARSHIP_ESSAY_YEAR) => {
     if (!studentName) return;
+    if (!isAdmin) {
+      setIsAdminLoginOpen(true);
+      return;
+    }
+
     const cleanStudentName = String(studentName).trim();
     const cleanBranch = String(studentBranch || "").trim();
     const cleanYear = String(studentYear || "").trim();
 
-    const yearEssays = SCHOLARSHIP_ESSAYS_BY_YEAR[cleanYear] || [];
-    let essay = yearEssays.find(
-        (e) =>
-          e.name === cleanStudentName &&
-          cleanBranch &&
-          (e.branch.includes(cleanBranch) || cleanBranch.includes(e.branch))
-      );
-    if (!essay) {
-      essay = yearEssays.find((e) => e.name === cleanStudentName);
-    }
+    try {
+      const response = await fetch("/api/scholarship-essays", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          year: cleanYear,
+          name: cleanStudentName,
+          branch: cleanBranch
+        }),
+        cache: "no-store"
+      });
+      const result = await response.json().catch(() => null);
 
-    if (essay) {
-      setSelectedEssayStudent({ ...essay, year: cleanYear });
+      if (response.status === 401) {
+        setIsAdmin(false);
+        setIsAdminLoginOpen(true);
+        return;
+      }
+
+      if (!response.ok || !result?.essay) throw new Error(result?.error || "등록된 합격 수기가 없습니다.");
+
+      setSelectedEssayStudent(result.essay);
       setIsEssayModalOpen(true);
-    } else {
+    } catch (error) {
       setCustomModal({
         type: "info",
         title: "합격 수기 안내",
-        message: `'${cleanYear || "연도 미지정"}년 ${cleanStudentName}' 학생의 등록된 합격 수기가 없습니다.`,
+        message: error.message || `'${cleanYear || "연도 미지정"}년 ${cleanStudentName}' 학생의 등록된 합격 수기가 없습니다.`,
         confirmText: "확인",
         onConfirm: () => setCustomModal(null)
       });
     }
-  }, []);
+  }, [isAdmin]);
 
   const showAlert = (message, title = "알림", type = "info") => {
     return new Promise((resolve) => {
@@ -6458,6 +6411,9 @@ export default function HomePage() {
       await fetch("/api/admin/session", { method: "DELETE", cache: "no-store" });
     } finally {
       setIsAdmin(false);
+      setRawTabs(initialTabs);
+      setSelectedEssayStudent(null);
+      setIsEssayModalOpen(false);
       setAdminPassword("");
       setAdminLoginError("");
       if (page === "rawdata") {
@@ -7466,7 +7422,10 @@ export default function HomePage() {
   }
 
   useEffect(() => {
+    if (!isAdminAuthChecked) return;
+
     let ignore = false;
+    setIsHydrated(false);
 
     async function loadRawTabs() {
       try {
@@ -7507,6 +7466,16 @@ export default function HomePage() {
       serverUpdatedAtRef.current = null;
       lastServerRawTabsSignatureRef.current = "";
 
+      if (!isAdmin) {
+        window.localStorage.removeItem(BROWSER_SAVE_KEY);
+        if (!ignore) {
+          setRawTabs(initialTabs);
+          setSaveState("서버 데이터를 불러오지 못했습니다.");
+          setIsHydrated(true);
+        }
+        return;
+      }
+
       try {
         const cached = window.localStorage.getItem(BROWSER_SAVE_KEY);
         if (!cached) throw new Error("no cached state");
@@ -7533,7 +7502,7 @@ export default function HomePage() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [isAdmin, isAdminAuthChecked]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -8086,7 +8055,9 @@ export default function HomePage() {
     if (effectiveMentorYearFilter === "all") return mentorRows;
     return mentorRows.filter((r) => String(r.year || "").trim() === effectiveMentorYearFilter);
   }, [mentorRows, effectiveMentorYearFilter]);
-  const activeMentorEssayDownload = SCHOLARSHIP_ESSAY_DOWNLOADS[effectiveMentorYearFilter] || null;
+  const activeMentorEssayDownload = isAdmin
+    ? SCHOLARSHIP_ESSAY_DOWNLOADS[effectiveMentorYearFilter] || null
+    : null;
 
   const mentorStats = useMemo(() => {
     const total = yearScopedMentorRows.length;
@@ -10487,7 +10458,12 @@ export default function HomePage() {
                           {effectiveMentorYearFilter}년 전체 수기 다운로드
                         </a>
                       ) : (
-                        <button className="mini-button" type="button" disabled title="다운로드할 연도를 선택하세요.">
+                        <button
+                          className="mini-button"
+                          type="button"
+                          disabled
+                          title={isAdmin ? "다운로드할 연도를 선택하세요." : "관리자 로그인 후 다운로드할 수 있습니다."}
+                        >
                           연도별 전체 수기 다운로드
                         </button>
                       )}
