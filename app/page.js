@@ -6065,6 +6065,12 @@ export default function HomePage() {
       imgSrc: "/showcase-news.png"
     },
     {
+      name: "AI STUDIO",
+      className: "card-theme-ai-studio",
+      desc: "AI 영상 제작 사례와 프롬프트, 제작 가이드를 한곳에서 탐색하고 활용하는 이투스247 AI 콘텐츠 허브",
+      url: "https://etoos247-ai-studio.vercel.app/"
+    },
+    {
       name: "YOUTUBE",
       className: "card-theme-youtube",
       desc: "합격 성공 스토리, 입시 정보 및 이투스247학원의 생생한 현장 소식을 전하는 본사 공식 유튜브 채널",

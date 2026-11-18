@@ -2667,6 +2667,12 @@ select:focus {
   align-items: center;
   justify-content: center;
 }
+.vertical-showcase-image-fallback.card-theme-ai-studio {
+  background:
+    radial-gradient(circle at 72% 32%, rgba(0, 149, 255, 0.95) 0 5%, transparent 22%),
+    radial-gradient(circle at 28% 72%, rgba(36, 71, 255, 0.72) 0 4%, transparent 25%),
+    linear-gradient(125deg, #050608 0%, #111827 46%, #0057ff 100%);
+}
 .vertical-showcase-slide.active .vertical-showcase-image-fallback {
   transform: scale(1.1);
 }
