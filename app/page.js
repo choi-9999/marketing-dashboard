@@ -6068,7 +6068,8 @@ export default function HomePage() {
       name: "AI STUDIO",
       className: "card-theme-ai-studio",
       desc: "AI 영상 제작 사례와 프롬프트, 제작 가이드를 한곳에서 탐색하고 활용하는 이투스247 AI 콘텐츠 허브",
-      url: "https://etoos247-ai-studio.vercel.app/"
+      url: "https://etoos247-ai-studio.vercel.app/",
+      imgSrc: "/showcase-ai-studio.png"
     },
     {
       name: "YOUTUBE",
